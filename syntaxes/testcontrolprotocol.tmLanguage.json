@@ -3,6 +3,12 @@
 	"name": "Test Control Protocol",
 	"patterns": [
 		{
+			"include": "#invalid"
+		},
+		{
+			"include": "#comments"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -10,6 +16,24 @@
 		}
 	],
 	"repository": {
+		"invalid": {
+			"patterns": [
+				{
+					"name": "invalid.too-long.testcontrolprotocol",
+					"match": "^.{80}.*\n"
+				},
+				{
+					"name": "invalid.illegal-character.testcontrolprotocol",
+					"match": "^.{6}[^\\s].*\n"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [{
+				"name": "comment.testcontrolprotocol",
+				"match": "^.{7}\\*.*\n"
+			}]
+		},
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.testcontrolprotocol",
@@ -17,16 +41,16 @@
 			}]
 		},
 		"strings": {
-			"name": "string.quoted.double.testcontrolprotocol",
-			"begin": "\"",
-			"end": "\"",
+			"name": "string.testcontrolprotocol",
+			"begin": "^.{7}A.{10}\\K",
+			"end": "\n",
 			"patterns": [
 				{
-					"name": "constant.character.escape.testcontrolprotocol",
+					"name": "constant.testcontrolprotocol",
 					"match": "\\\\."
 				}
 			]
 		}
 	},
-	"scopeName": "source.tcp"
+	"scopeName": "source.testcontrolprotocol"
 }

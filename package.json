@@ -18,7 +18,7 @@
         }],
         "grammars": [{
             "language": "testcontrolprotocol",
-            "scopeName": "source.tcp",
+            "scopeName": "source.testcontrolprotocol",
             "path": "./syntaxes/testcontrolprotocol.tmLanguage.json"
         }]
     }

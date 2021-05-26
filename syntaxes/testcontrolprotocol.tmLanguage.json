@@ -9,10 +9,13 @@
 			"include": "#comments"
 		},
 		{
+			"include": "#title"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
-			"include": "#strings"
+			"include": "#alpha-line"
 		}
 	],
 	"repository": {
@@ -34,22 +37,32 @@
 				"match": "^.{7}\\*.*\n"
 			}]
 		},
+		"title": {
+			"patterns": [{
+				"name": "support.type.testcontrolprotocol",
+				"match": "^.{7}T.*\n"
+			}]
+		},
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.testcontrolprotocol",
-				"match": "\\b(if|while|for|return)\\b"
+				"match": "\\b(GOTO|PRINT|MOVE)\\b"
 			}]
 		},
-		"strings": {
-			"name": "string.testcontrolprotocol",
-			"begin": "^.{7}A.{10}\\K",
-			"end": "\n",
-			"patterns": [
-				{
-					"name": "constant.testcontrolprotocol",
-					"match": "\\\\."
+		"alpha-line": {
+			"captures": {
+				"1": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"2": {
+					"name": "storage.control.testcontrolprotocol"
+				},
+				"3": {
+					"name": "string.control.testcontrolprotocol"
 				}
-			]
+			},
+			"match": "(A)(\\s.{8})(\\s.*)",
+			"name": "alpha-line.testcontrolprotocol"
 		}
 	},
 	"scopeName": "source.testcontrolprotocol"

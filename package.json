@@ -1,0 +1,25 @@
+{
+    "name": "test-control-protocol",
+    "displayName": "Test Control Protocol",
+    "description": "Delphic LIS Test Control Protocol",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.56.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "testcontrolprotocol",
+            "aliases": ["Test Control Protocol", "testcontrolprotocol"],
+            "extensions": [""],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "testcontrolprotocol",
+            "scopeName": "source.tcp",
+            "path": "./syntaxes/testcontrolprotocol.tmLanguage.json"
+        }]
+    }
+}

@@ -26,7 +26,7 @@
 			"patterns": [
 				{
 					"name": "invalid.too-long.testcontrolprotocol",
-					"match": "^.{80}.*\n"
+					"match": "^.{81}.*\n"
 				},
 				{
 					"name": "invalid.illegal-character.testcontrolprotocol",
@@ -37,13 +37,13 @@
 		"comments": {
 			"patterns": [{
 				"name": "comment.line.testcontrolprotocol",
-				"match": "^.{7}\\*.*\n"
+				"match": "^.{7}\\K\\*.*\n"
 			}]
 		},
 		"title-lines": {
 			"patterns": [{
 				"name": "support.type.testcontrolprotocol",
-				"match": "^.{7}T.*\n"
+				"match": "^.{7}\\K[TDQ].*\n"
 			}]
 		},
 		"number-lines": {
@@ -64,7 +64,7 @@
 					"name": "string.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bN\\b\\s)(.{8}\\s)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)",
+			"match": "(^.{7})(\\bN\\b\\s)(.{8}\\s)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)?([+-.]?\\d*[+-.]?\\d*\\s+)?",
 			"name": "number-line.testcontrolprotocol"
 		},
 		"alpha-lines": {
@@ -109,7 +109,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8})",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
 			"name": "instruction-line.testcontrolprotocol"
 		}
 	},

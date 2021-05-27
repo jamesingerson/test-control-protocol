@@ -9,13 +9,16 @@
 			"include": "#comments"
 		},
 		{
-			"include": "#title"
+			"include": "#title-lines"
 		},
 		{
-			"include": "#keywords"
+			"include": "#number-lines"
 		},
 		{
-			"include": "#alpha-line"
+			"include": "#alpha-lines"
+		},
+		{
+			"include": "#instruction-lines"
 		}
 	],
 	"repository": {
@@ -33,36 +36,81 @@
 		},
 		"comments": {
 			"patterns": [{
-				"name": "comment.testcontrolprotocol",
+				"name": "comment.line.testcontrolprotocol",
 				"match": "^.{7}\\*.*\n"
 			}]
 		},
-		"title": {
+		"title-lines": {
 			"patterns": [{
 				"name": "support.type.testcontrolprotocol",
 				"match": "^.{7}T.*\n"
 			}]
 		},
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.testcontrolprotocol",
-				"match": "\\b(GOTO|PRINT|MOVE)\\b"
-			}]
-		},
-		"alpha-line": {
+		"number-lines": {
 			"captures": {
-				"1": {
-					"name": "keyword.control.testcontrolprotocol"
-				},
 				"2": {
-					"name": "storage.control.testcontrolprotocol"
+					"name": "variable.parameter.testcontrolprotocol"
 				},
 				"3": {
-					"name": "string.control.testcontrolprotocol"
+					"name": "storage.testcontrolprotocol"
+				},
+				"4": {
+					"name": "string.testcontrolprotocol"
+				},
+				"5": {
+					"name": "string.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
 				}
 			},
-			"match": "(A)(\\s.{8})(\\s.*)",
+			"match": "(^.{7})(\\bN\\b\\s)(.{8}\\s)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)",
+			"name": "number-line.testcontrolprotocol"
+		},
+		"alpha-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "storage.testcontrolprotocol"
+				},
+				"4": {
+					"name": "string.testcontrolprotocol"
+				},
+				"5": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bA\\b\\s)(.{1,8}\\s)(.{1,60})(.*)",
 			"name": "alpha-line.testcontrolprotocol"
+		},
+		"instruction-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "string.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
+					"name": "string.testcontrolprotocol"
+				},
+				"8": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8}\\s)(.{1,8})",
+			"name": "instruction-line.testcontrolprotocol"
 		}
 	},
 	"scopeName": "source.testcontrolprotocol"

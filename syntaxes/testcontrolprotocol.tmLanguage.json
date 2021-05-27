@@ -12,6 +12,9 @@
 			"include": "#title-lines"
 		},
 		{
+			"include": "#hex-lines"
+		},
+		{
 			"include": "#number-lines"
 		},
 		{
@@ -45,6 +48,24 @@
 				"name": "support.type.testcontrolprotocol",
 				"match": "^.{7}\\K[TDQ].*\n"
 			}]
+		},
+		"hex-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "string.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bH\\b\\s)(.{1,8}\\s)?(.{1,61})(.*)",
+			"name": "hex-line.testcontrolprotocol"
 		},
 		"number-lines": {
 			"captures": {
@@ -82,7 +103,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\b[AM]\\b\\s)(.{1,8}\\s)(.{1,60})(.*)",
+			"match": "(^.{7})(\\b[AM]\\b\\s)(.{1,8}\\s)(.{1,61})(.*)",
 			"name": "alpha-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

@@ -3,6 +3,7 @@
     "displayName": "Test Control Protocol",
     "description": "Delphic LIS Test Control Protocol VS Code Syntax Highlighting",
     "version": "0.0.1",
+    "author": "James Ingerson",
     "engines": {
         "vscode": "^1.56.0"
     },

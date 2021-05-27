@@ -64,7 +64,7 @@
 					"name": "string.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bN\\b\\s)(.{8}\\s)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)?([+-.]?\\d*[+-.]?\\d*\\s+)?",
+			"match": "(^.{7})(\\b[NRS]\\b\\s)(.{8}\\s)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)?([+-.]?\\d*[+-.]?\\d*\\s+)?",
 			"name": "number-line.testcontrolprotocol"
 		},
 		"alpha-lines": {
@@ -82,7 +82,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bA\\b\\s)(.{1,8}\\s)(.{1,60})(.*)",
+			"match": "(^.{7})(\\b[AM]\\b\\s)(.{1,8}\\s)(.{1,60})(.*)",
 			"name": "alpha-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

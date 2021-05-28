@@ -1,102 +1,49 @@
 # test-control-protocol README
 
-This is the README for your extension "test-control-protocol". After writing up a brief description, we recommend including the following sections.
+Naive syntax highlighting for Test Control Protocol (TCP) files for the Delphic LIS.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Primitive support based on existing Pathlab TCP's:
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+\!\[Example of Highlighting\]\(images/tcp-highlighting-example.png\)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Pathlab TCP files do not have an extension, so you need to declare the file type association in VS Code yourself:
 
-## Extension Settings
+In the directory where you're working, if it does not already exist create a .vscode folder, within that, settings.json.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+```
+{
+  "editor.rulers": [7, 18, 27, 36, 45, 54, 80],
+  "workbench.colorCustomizations": {
+    "editorRuler.foreground": "#424242"
+  },
+  "files.associations": {
+    "**/testlisv10-tcp/**/*.gitignore": "txt",
+    "**/testlisv10-tcp/**/TCP_LIST*": "shellscript",
+    "**/testlisv10-tcp/**/*.json": "json",
+    "**/testlisv10-tcp/**/*": "testcontrolprotocol"
+  }
+}
+```
 
-For example:
+(Rulers are optional.)
 
-This extension contributes the following settings:
+## Installation
 
-- `myExtension.enable`: enable/disable this extension
-- `myExtension.thing`: set to `blah` to do something
+- In `<user home>/.vscode/extensions` folder `https://github.com/pl-jamesi/test-control-protocol` and restart Code.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Highlights if line structure is more or less correct, but does not verify validity of instructions/keywords/macros.
 
-## Release Notes
+## Contributing
 
-Users appreciate release notes as you update your extension.
+All the magic happens in `syntaxes/testcontrolprotocol.tmLanguage.json` - this is the Text mate grammar file that is used for tokenization.
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
-
----
-
-# Welcome to your VS Code Extension
-
-## What's in the folder
-
-- This folder contains all of the files necessary for your extension.
-- `package.json` - this is the manifest file in which you declare your language support and define the location of the grammar file that has been copied into your extension.
-- `syntaxes/testcontrolprotocol.tmLanguage.json` - this is the Text mate grammar file that is used for tokenization.
-- `language-configuration.json` - this is the language configuration, defining the tokens that are used for comments and brackets.
-
-## Get up and running straight away
-
-- Make sure the language configuration settings in `language-configuration.json` are accurate.
-- Press `F5` to open a new window with your extension loaded.
-- Create a new file with a file name suffix matching your language.
-- Verify that syntax highlighting works and that the language configuration settings are working.
-
-## Make changes
-
-- You can relaunch the extension from the debug toolbar after making changes to the files listed above.
-- You can also reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load your changes.
-
-## Add more language features
-
-- To add features such as intellisense, hovers and validators check out the VS Code extenders documentation at https://code.visualstudio.com/docs
-
-## Install your extension
-
-- To start using your extension with Visual Studio Code copy it into the `<user home>/.vscode/extensions` folder and restart Code.
-- To share your extension with the world, read on https://code.visualstudio.com/docs about publishing an extension.
-
----
+You may find the following resources useful:
 
 https://www.youtube.com/watch?v=5msZv-nKebI
 
@@ -105,3 +52,16 @@ https://code.visualstudio.com/api/language-extensions/syntax-highlight-guidev
 https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json
 
 https://regexr.com/
+
+## Development
+
+- Make changes to `syntaxes/testcontrolprotocol.tmLanguage.json`
+- Press `F5` to open a new window with the extension loaded.
+- Create a new file with a file name suffix matching your language or otherwise manage file type association in .vscode/settings.json.
+- Verify that syntax highlighting works.
+- You can also reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load saved changes.
+
+## Add more language features
+
+- I've ignored the below for now but it may be worthwhile.
+- To add features such as intellisense, hovers and validators check out the VS Code extenders documentation at https://code.visualstudio.com/docs

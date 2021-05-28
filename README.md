@@ -8,6 +8,10 @@ Primitive support based on existing Pathlab TCP's:
 
 <img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/images/tcp-highlighting-example.png?raw=true" alt="Example TCP Highlighting" width="600px" />
 
+Also has folding:
+
+<img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/images/collapse-tcp.gif?raw=true" alt="Example TCP Folding" width="800px" />
+
 ## Requirements
 
 Pathlab TCP files do not have an extension, so you need to declare the file type association in VS Code yourself:

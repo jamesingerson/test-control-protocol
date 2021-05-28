@@ -6,7 +6,7 @@ Naive syntax highlighting for Test Control Protocol (TCP) files for the Delphic 
 
 Primitive support based on existing Pathlab TCP's:
 
-\!\[Example of Highlighting\]\(images/tcp-highlighting-example.png\)
+![Example of Highlighting](images\tcp-highlighting-example.png)
 
 ## Requirements
 
@@ -33,7 +33,7 @@ In the directory where you're working, if it does not already exist create a .vs
 
 ## Installation
 
-- In `<user home>/.vscode/extensions` folder `https://github.com/pl-jamesi/test-control-protocol` and restart Code.
+- In `<user home>/.vscode/extensions` folder `https://github.com/pl-jamesi/test-control-protocol.git` and restart Code.
 
 ## Known Issues
 

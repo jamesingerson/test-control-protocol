@@ -4,6 +4,10 @@
     "description": "Delphic LIS Test Control Protocol VS Code Syntax Highlighting",
     "version": "0.0.1",
     "author": "James Ingerson",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pl-jamesi/test-control-protocol.git"
+    },
     "engines": {
         "vscode": "^1.56.0"
     },

@@ -33,25 +33,25 @@ In the directory where you're working, if it does not already exist create a .vs
 
 ## Installation
 
-- In `<user home>/.vscode/extensions` folder `https://github.com/pl-jamesi/test-control-protocol.git` and restart Code.
+- In `<user home>/.vscode/extensions` folder `git clone https://github.com/pl-jamesi/test-control-protocol.git` and restart VS Code.
 
 ## Known Issues
 
-Highlights if line structure is more or less correct, but does not verify validity of instructions/keywords/macros.
+Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros.
 
 ## Contributing
 
-All the magic happens in `syntaxes/testcontrolprotocol.tmLanguage.json` - this is the Text mate grammar file that is used for tokenization.
+All the magic happens in `syntaxes/testcontrolprotocol.tmLanguage.json` the Text mate grammar file that is used for tokenization.
 
 You may find the following resources useful:
 
-https://www.youtube.com/watch?v=5msZv-nKebI
+https://www.youtube.com/watch?v=5msZv-nKebI - walkthrough of someone else going through the experience of setting up syntax highlighting for their own language.
 
-https://code.visualstudio.com/api/language-extensions/syntax-highlight-guidev
+https://regexr.com/ - for testing regular expressions. Note, in .tmLanguage.json you have to double escape using \\, but regexr should only have one \ to escape something.
 
-https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json
+https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide - written instructions on set up and behaviour of VS Code syntax highlighting.
 
-https://regexr.com/
+https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json - for examples of "names" to use for colouring.
 
 ## Development
 
@@ -63,5 +63,5 @@ https://regexr.com/
 
 ## Add more language features
 
-- I've ignored the below for now but it may be worthwhile.
-- To add features such as intellisense, hovers and validators check out the VS Code extenders documentation at https://code.visualstudio.com/docs
+- There's documentation on intellisense, hovers, and validators, etc at VS Code extenders documentation at https://code.visualstudio.com/docs
+- I've not implemented any of it at this time but it may be worthwhile.

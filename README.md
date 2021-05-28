@@ -39,6 +39,8 @@ In the directory where you're working, if it does not already exist create a .vs
 
 - Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros.
 - After a GOTO of any kind, the first operand should probably be label coloured, not data coloured.
+- Assumed line numbers will be systemically removed in the future, so they are not validated or coloured.
+- Missing support for EOL comments as their validity is unclear, should probably be moved to their own lines.
 
 ## Contributing
 

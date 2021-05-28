@@ -37,9 +37,10 @@ In the directory where you're working, if it does not already exist create a .vs
 
 ## Known Issues
 
-- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros.
+- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros/globals.
 - Assumed line numbers will be systemically removed in the future, so they are not validated or coloured.
 - Missing support for EOL comments as their validity is unclear, should probably be moved to their own lines.
+- Some instructions should have more intelligent highlighting, e.g. NORMAL's first operand is a reference range so the colours should match.
 
 ## Contributing
 

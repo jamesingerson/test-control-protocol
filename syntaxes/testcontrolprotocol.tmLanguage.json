@@ -133,7 +133,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(\\bGOTO.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

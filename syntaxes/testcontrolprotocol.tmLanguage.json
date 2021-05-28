@@ -21,6 +21,9 @@
 			"include": "#alpha-lines"
 		},
 		{
+			"include": "#goto-lines"
+		},
+		{
 			"include": "#instruction-lines"
 		}
 	],
@@ -105,6 +108,33 @@
 			},
 			"match": "(^.{7})(\\b[AM]\\b\\s)(.{1,8}\\s)(.{1,61})(.*)",
 			"name": "alpha-line.testcontrolprotocol"
+		},
+		"goto-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
+					"name": "string.testcontrolprotocol"
+				},
+				"8": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(\\bGOTO.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {
 			"captures": {

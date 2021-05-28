@@ -6,7 +6,7 @@ Naive syntax highlighting for Test Control Protocol (TCP) files for the Delphic 
 
 Primitive support based on existing Pathlab TCP's:
 
-<img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/tcp-highlighting-example.png?raw=true" alt="Example TCP Highlighting" width="600px" />
+<img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/images/tcp-highlighting-example.png?raw=true" alt="Example TCP Highlighting" width="600px" />
 
 ## Requirements
 

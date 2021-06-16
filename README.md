@@ -21,6 +21,7 @@ In the directory where you're working, if it does not already exist create a .vs
 ```
 {
   "editor.rulers": [7, 18, 27, 36, 45, 54, 80],
+  "editor.wordBasedSuggestions": false,
   "workbench.colorCustomizations": {
     "editorRuler.foreground": "#424242"
   },

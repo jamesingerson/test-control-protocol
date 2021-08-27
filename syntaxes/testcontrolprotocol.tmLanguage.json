@@ -24,6 +24,9 @@
 			"include": "#goto-lines"
 		},
 		{
+			"include": "#get-lines"
+		},
+		{
 			"include": "#instruction-lines"
 		}
 	],
@@ -134,6 +137,33 @@
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"name": "instruction-line.testcontrolprotocol"
+		},
+		"get-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
+					"name": "string.testcontrolprotocol"
+				},
+				"8": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGET.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

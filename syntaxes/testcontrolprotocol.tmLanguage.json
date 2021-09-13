@@ -53,10 +53,22 @@
 			}]
 		},
 		"title-lines": {
-			"patterns": [{
-				"name": "support.type.testcontrolprotocol",
-				"match": "^.{7}\\K[TDQ].*\n"
-			}]
+			"captures": {
+				"2": {
+					"name": "support.type.testcontrolprotocol"
+				},
+				"3": {
+					"name": "support.type.testcontrolprotocol"
+				},
+				"4": {
+					"name": "string.testcontrolprotocol"
+				},
+				"5": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})([TDQ].{4})(.{1,18})(.{0,19})(.*)",
+			"name": "hex-line.testcontrolprotocol"
 		},
 		"hex-lines": {
 			"captures": {

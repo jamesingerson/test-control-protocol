@@ -24,6 +24,9 @@
 			"include": "#goto-lines"
 		},
 		{
+			"include": "#gotcp-lines"
+		},
+		{
 			"include": "#get-lines"
 		},
 		{
@@ -142,9 +145,36 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}|GOSUB.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
 			"name": "instruction-line.testcontrolprotocol"
-		},
+		}, 
+		"gotcp-lines": {
+			"captures": {
+				"2": {
+					"name": "variable.parameter.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "support.type.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
+					"name": "string.testcontrolprotocol"
+				},
+				"8": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"name": "instruction-line.testcontrolprotocol"
+		}, 
 		"get-lines": {
 			"captures": {
 				"2": {

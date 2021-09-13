@@ -145,7 +145,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}|GOSUB.{1,3}\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}|GOSUB.{1,3}\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		}, 
 		"gotcp-lines": {
@@ -172,7 +172,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		}, 
 		"get-lines": {
@@ -199,7 +199,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGET.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGET.{1,4}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {
@@ -226,7 +226,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		}
 	},

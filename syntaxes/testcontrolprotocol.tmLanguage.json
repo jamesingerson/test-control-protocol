@@ -67,7 +67,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})([TDQ].{4})(.{1,18})(.{0,19})(.*)",
+			"match": "(^.{7})([TDQ].{4})(.{1,18})?(.{0,19})(.*)",
 			"name": "hex-line.testcontrolprotocol"
 		},
 		"hex-lines": {

@@ -175,7 +175,7 @@
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "variable.language.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"
@@ -202,7 +202,7 @@
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "variable.language.testcontrolprotocol"
 				},
 				"6": {
 					"name": "constant.language.testcontrolprotocol"

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.8.0
+
+- `GOTO,IR`'s 3rd operand (a range reference, e.g. `GOTO,IR SCHECK VALUE SIGNIF`) is now checked for undefined references and highlighted to match its target's colour. The special comparison keywords `RANGE`/`RANGE2` ("the range already associated with this test") are exempted, the same treatment `VALUE`/`TYPE`/`RESULT`/`ELEMENT` already had.
+
 ## 0.7.0
 
 - `PRINT`/`PRINT,H`/`PRINT,A`'s 2nd operand (a data reference — op1 is a print-column number) is now checked for undefined references and highlighted to match its target's colour, the same treatment `NORMAL`/`GROUP`/the `CR` family already had. `PRINT,R` (never has this operand) and `PRINT,J` (different real semantics — prints literal comparison text, not a box reference) are deliberately excluded.

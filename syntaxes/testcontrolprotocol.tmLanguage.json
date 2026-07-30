@@ -30,6 +30,9 @@
 			"include": "#goto-lines"
 		},
 		{
+			"include": "#goto-ir-lines"
+		},
+		{
 			"include": "#search-lines"
 		},
 		{
@@ -196,7 +199,34 @@
 					"name": "comment.line.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|GOSUB(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|DATE,(?:EQ|NE|GT|GE|LT|LE)|GET(?:,[EOA])?)\\s+)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO(?:,(?:EQ|NE|GT|GE|LT|LE|OR|MM|M))?|GOSUB(?:,(?:EQ|NE|GT|GE|LT|LE|OR|MM|M))?|DATE,(?:EQ|NE|GT|GE|LT|LE)|GET(?:,[EOA])?)\\s+)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"name": "instruction-line.testcontrolprotocol"
+		},
+		"goto-ir-lines": {
+			"captures": {
+				"2": {
+					"name": "entity.other.attribute-name.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
+					"name": "storage.testcontrolprotocol"
+				},
+				"8": {
+					"name": "comment.line.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO|GOSUB),IR\\b\\s{1,4})(.{1,9}\\s)?(.{1,9}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"search-lines": {

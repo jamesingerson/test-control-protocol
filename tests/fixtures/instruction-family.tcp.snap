@@ -147,4 +147,20 @@
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                    ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          GOTO,IR  SCHECK   VALUE    SIGNIF
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+>       I          GOTO,IR  FIN      VALUE    RANGE
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
 >

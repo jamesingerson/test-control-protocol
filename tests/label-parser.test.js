@@ -10,6 +10,7 @@ const {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findGotoIrDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
@@ -271,6 +272,22 @@ run('findPrintDataReferences does not check PRINT,R (never has op2) or PRINT,J (
 run('findPrintDataReferences resolves against the expanded implicit global catalogue (real DATE/TIME/NAME shapes)', () => {
   const lines = [iLine('', 'PRINT', '+1', 'DATE'), iLine('', 'PRINT', '+1', 'TIME'), iLine('', 'PRINT', '+1', 'NAME')];
   assert.strictEqual(findPrintDataReferences(lines).length, 0);
+});
+
+run('findGotoIrDataReferences resolves op3 (a range reference), not op1 (a branch label, checked elsewhere)', () => {
+  // Real shape: "GOTO,IR SCHECK VALUE SIGNIF" -- SCHECK is a branch label
+  // (findLabelReferences' job), SIGNIF is the range reference.
+  const lines = [iLine('', 'GOTO,IR', 'SCHECK', 'VALUE', 'SIGNIF')];
+  const refs = findGotoIrDataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['SIGNIF']
+  );
+});
+
+run('findGotoIrDataReferences excludes the special comparison keywords RANGE/RANGE2 (206+4 of 210 real "unresolved" instances)', () => {
+  const lines = [iLine('', 'GOTO,IR', 'FIN', 'VALUE', 'RANGE'), iLine('', 'GOTO,IR', 'FIN', 'VALUE', 'RANGE2')];
+  assert.strictEqual(findGotoIrDataReferences(lines).length, 0);
 });
 
 run('findDataReferences excludes the implicit built-in TCPNAME box (real GROUP TCPNAME shape)', () => {

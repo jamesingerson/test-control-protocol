@@ -133,6 +133,25 @@ const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQ)\b\s{
 // genuinely different instruction despite the shared "PRINT" prefix.
 const PRINT_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bPRINT(?:,[HA])?\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?/d;
 
+// GOTO,IR's op3 -- a genuinely different shape from GOTO's other condition
+// codes: `GOTO,IR <label> VALUE <range>` compares the current value
+// against a named reference/feasible range, e.g. `GOTO,IR SCHECK VALUE
+// SIGNIF`, where SIGNIF is a declared S/R-line label. Confirmed against
+// real production data: 424 real uses; of the 350 where op3 is present and
+// non-numeric, 140 (40%) resolve directly to a declared range label, and
+// the other 210 are ALL just two literal values, `RANGE` (206) and
+// `RANGE2` (4) -- a special comparison keyword (meaning "the range already
+// associated with this test"), the exact same pattern as MOVE,D's `VALUE`
+// rejection elsewhere in this file. Once RANGE/RANGE2 are treated as
+// implicit (see IMPLICIT_DATA_LABELS), the remaining named references
+// resolve 100% cleanly. GOSUB,IR has zero real occurrences in the corpus
+// (kept in the alternation anyway for symmetry with GOTO's own condition
+// codes, since every other one is shared between GOTO/GOSUB) -- this is
+// unverified for GOSUB specifically, purely a consistency choice. Op1 is
+// still validated as a branch label by the existing GOTO_TARGET_RE/
+// goto-lines machinery -- this regex only concerns op3.
+const GOTO_IR_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:GOTO|GOSUB),IR\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+
 // Keywords whose operand is confirmed NEVER genuinely blank in real
 // production data (Reference Manual Error 7, "Missing operand"). GROUP and
 // CR COM are deliberately excluded despite being in DATA_REFERENCE_RE
@@ -186,6 +205,17 @@ const IMPLICIT_DATA_LABELS = new Set([
   'REQNAME', 'REQNO', 'REQSPEC', 'RESULT', 'SEX', 'SURNAME',
   'TAV1', 'TAV2', 'TAV3', 'TAV4', 'TAV5', 'TAV6',
   'TCPUNITS', 'TESTCODE', 'TESTDESC', 'TESTNAME', 'TIME', 'TYPE', 'UCODE', 'UNAME',
+  // RANGE/RANGE2: GOTO,IR's special comparison keyword (see
+  // GOTO_IR_DATA_REFERENCE_RE) -- "the range already associated with this
+  // test", not a named data box. Confirmed as the ENTIRE unresolved bucket
+  // for GOTO,IR op3 (206 + 4 of 210 real instances). This set already mixes
+  // two conceptually different things (the Reference Manual's "Global
+  // Data" system fields above, e.g. DATE/TIME/NAME, vs. per-instruction
+  // special comparison keywords like TYPE/RESULT/ELEMENT above and
+  // RANGE/RANGE2 here) -- flagged for the planned colour-taxonomy revisit
+  // (TODO.md) that intends to give these categories visually distinct
+  // treatment instead of collapsing them into one "implicit" bucket.
+  'RANGE', 'RANGE2',
 ]);
 
 function isImplicitDataLabel(label) {
@@ -350,6 +380,24 @@ function findPrintDataReferences(lines) {
 }
 
 /**
+ * GOTO,IR's op3 (see GOTO_IR_DATA_REFERENCE_RE) -- a range reference,
+ * excluding the special RANGE/RANGE2 comparison keywords (handled via
+ * isImplicitDataLabel like everything else in that set).
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findGotoIrDataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, GOTO_IR_DATA_REFERENCE_RE, 7);
+    if (found && !isImplicitDataLabel(found.text)) {
+      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * Sites where a NORMAL/CR TEST/CR CRS instruction (never GROUP -- see
  * MISSING_OPERAND_KEYWORDS) has no operand at all. Anchors the diagnostic
  * range on the keyword itself, since there's no operand text to underline.
@@ -443,6 +491,7 @@ module.exports = {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findGotoIrDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,

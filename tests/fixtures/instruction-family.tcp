@@ -20,3 +20,5 @@
        I          PRINT,A  50       SPACE    5
        I          PRINT,R  21
        I          PRINT,J  31       AV0
+       I          GOTO,IR  SCHECK   VALUE    SIGNIF
+       I          GOTO,IR  FIN      VALUE    RANGE

@@ -25,6 +25,7 @@ const {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findGotoIrDataReferences,
   findMissingDataOperands,
   findOpcodeFields,
 } = require('./labelParser');
@@ -102,14 +103,16 @@ function computeDiagnostics(lines, options) {
     // instruction's data-reference operand should resolve to a declared
     // A/M/N/R/S/H label, exactly like a branch label does for GOTO -- but
     // scoped to a deliberately narrow keyword whitelist (see
-    // labelParser.js's DATA_REFERENCE_RE and PRINT_DATA_REFERENCE_RE)
-    // rather than every instruction, since most instructions' operands
-    // were confirmed NOT to be data references when sampled against the
-    // real corpus. Two different operand shapes feed this same check:
-    // NORMAL/GROUP/CR-family have the reference at op1; PRINT/PRINT,H/
-    // PRINT,A have it at op2 instead (op1 there is a print-column number).
-    // Warning severity, not error: this check is newer and less
-    // exhaustively validated than undefined-label.
+    // labelParser.js's DATA_REFERENCE_RE, PRINT_DATA_REFERENCE_RE, and
+    // GOTO_IR_DATA_REFERENCE_RE) rather than every instruction, since most
+    // instructions' operands were confirmed NOT to be data references when
+    // sampled against the real corpus. Three different operand shapes feed
+    // this same check: NORMAL/GROUP/CR-family have the reference at op1;
+    // PRINT/PRINT,H/PRINT,A have it at op2 (op1 there is a print-column
+    // number); GOTO,IR has it at op3 (op1 is still its own branch label,
+    // checked separately by findLabelReferences; op2 is always the special
+    // comparison keyword VALUE). Warning severity, not error: this check is
+    // newer and less exhaustively validated than undefined-label.
     const knownDataLabels = new Set(findDataDeclarations(blockLines).map((d) => d.label));
     if (opts.macroLabels) {
       for (const opcode of opcodesInBlock) {
@@ -123,7 +126,11 @@ function computeDiagnostics(lines, options) {
       for (const label of opts.globalDataLabels) knownDataLabels.add(label);
     }
 
-    const dataRefs = [...findDataReferences(blockLines), ...findPrintDataReferences(blockLines)];
+    const dataRefs = [
+      ...findDataReferences(blockLines),
+      ...findPrintDataReferences(blockLines),
+      ...findGotoIrDataReferences(blockLines),
+    ];
     for (const ref of dataRefs) {
       if (knownDataLabels.has(ref.label)) continue;
       diagnostics.push({

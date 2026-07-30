@@ -202,6 +202,27 @@ run('does not check PRINT,R or PRINT,J op2 (rejected: different real semantics)'
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags an undefined GOTO,IR op3 range reference (real "GOTO,IR SCHECK VALUE SIGNIF" shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('FIN', 'GOTO,IR', 'FIN', 'VALUE', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('resolves GOTO,IR op3 against a declared range label, and treats RANGE/RANGE2 as the special comparison keyword they are', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('S', 'SIGNIF', '0', '1'),
+    iLine('FIN', 'GOTO,IR', 'FIN', 'VALUE', 'SIGNIF'),
+    iLine('', 'GOTO,IR', 'FIN', 'VALUE', 'RANGE'),
+    iLine('', 'GOTO,IR', 'FIN', 'VALUE', 'RANGE2'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('does not flag a data reference resolved by a declaration in the same block', () => {
   const lines = [
     titleLine('T0302', 'Procalcitonin'),

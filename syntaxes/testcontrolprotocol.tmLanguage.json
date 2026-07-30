@@ -61,10 +61,10 @@
 		"title-lines": {
 			"captures": {
 				"2": {
-					"name": "storage.type.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				},
 				"3": {
-					"name": "storage.type.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				},
 				"4": {
 					"name": "string.testcontrolprotocol"
@@ -205,7 +205,7 @@
 					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"6": {
-					"name": "constant.language.testcontrolprotocol"
+					"name": "string.testcontrolprotocol"
 				},
 				"7": {
 					"name": "string.testcontrolprotocol"
@@ -229,7 +229,7 @@
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "storage.type.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"

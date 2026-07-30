@@ -1,7 +1,7 @@
 >       T0302 Procalcitonin
 #^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
-#       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
-#            ^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+#       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol support.type.testcontrolprotocol
+#            ^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol support.type.testcontrolprotocol
 >       A TITLE    Procalcitonin
 #^^^^^^^ source.testcontrolprotocol alpha-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol alpha-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol

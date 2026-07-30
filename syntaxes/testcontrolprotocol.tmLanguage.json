@@ -27,9 +27,6 @@
 			"include": "#gotcp-lines"
 		},
 		{
-			"include": "#get-lines"
-		},
-		{
 			"include": "#instruction-lines"
 		}
 	],
@@ -157,9 +154,9 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTO.{1,4}|GOSUB.{1,3}|SEARCH.{1,3}|DATE.{1,4}\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO.{1,4}|GOSUB.{1,3}|SEARCH.{0,2}|DATE.{1,4}|GET.{1,4})\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
-		}, 
+		},
 		"gotcp-lines": {
 			"captures": {
 				"2": {
@@ -187,33 +184,6 @@
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		}, 
-		"get-lines": {
-			"captures": {
-				"2": {
-					"name": "entity.other.attribute-name.testcontrolprotocol"
-				},
-				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
-				},
-				"4": {
-					"name": "keyword.control.testcontrolprotocol"
-				},
-				"5": {
-					"name": "entity.name.tag.testcontrolprotocol"
-				},
-				"6": {
-					"name": "string.testcontrolprotocol"
-				},
-				"7": {
-					"name": "string.testcontrolprotocol"
-				},
-				"8": {
-					"name": "invalid.testcontrolprotocol"
-				}
-			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGET.{1,4}\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
-			"name": "instruction-line.testcontrolprotocol"
-		},
 		"instruction-lines": {
 			"captures": {
 				"2": {

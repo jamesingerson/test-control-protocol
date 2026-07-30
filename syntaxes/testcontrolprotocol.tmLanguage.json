@@ -79,7 +79,7 @@
 		"macro-definition-lines": {
 			"captures": {
 				"2": {
-					"name": "entity.other.attribute-name.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				},
 				"3": {
 					"name": "support.type.testcontrolprotocol"

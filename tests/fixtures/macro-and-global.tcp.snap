@@ -1,10 +1,10 @@
 >       D SOMEMAC
 #^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
-#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol support.type.testcontrolprotocol
 #         ^^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol support.type.testcontrolprotocol
 >       D SHORT   a short description of what this macro does
 #^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
-#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol support.type.testcontrolprotocol
 #         ^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol support.type.testcontrolprotocol
 #              ^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
 #                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol comment.line.testcontrolprotocol

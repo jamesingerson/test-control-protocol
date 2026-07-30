@@ -2,7 +2,7 @@
     "name": "test-control-protocol",
     "displayName": "Test Control Protocol",
     "description": "Delphic LIS Test Control Protocol VS Code Syntax Highlighting",
-    "version": "0.0.10",
+    "version": "0.1.0",
     "author": "James Ingerson",
     "license": "MIT",
     "repository": {
@@ -16,16 +16,32 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "testcontrolprotocol",
-            "aliases": ["Test Control Protocol", "testcontrolprotocol"],
-            "extensions": [""],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "testcontrolprotocol",
-            "scopeName": "source.testcontrolprotocol",
-            "path": "./syntaxes/testcontrolprotocol.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "testcontrolprotocol",
+                "aliases": [
+                    "Test Control Protocol",
+                    "testcontrolprotocol"
+                ],
+                "extensions": [
+                    ""
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "testcontrolprotocol",
+                "scopeName": "source.testcontrolprotocol",
+                "path": "./syntaxes/testcontrolprotocol.tmLanguage.json"
+            }
+        ]
+    },
+    "devDependencies": {
+        "vscode-tmgrammar-test": "^0.1.3"
+    },
+    "scripts": {
+        "test": "vscode-tmgrammar-snap -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
+        "test:update": "vscode-tmgrammar-snap -u -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\""
     }
 }

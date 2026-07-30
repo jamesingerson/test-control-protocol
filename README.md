@@ -69,6 +69,14 @@ https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/l
 - Verify that syntax highlighting works.
 - You can also reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load saved changes.
 
+## Testing
+
+`npm install` then `npm test` runs [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test)'s snapshot mode against the fixture files in `tests/fixtures/*.tcp`, checking the exact scope assigned to every token against a committed `.snap` file. This is the same tokenizer VS Code itself uses, so it catches regressions without needing to eyeball a real editor window.
+
+If you deliberately change how a line type should be scoped, run `npm run test:update` to regenerate the affected `.snap` file(s), then **read the diff carefully** before committing — the snapshot only proves the grammar is consistent with itself, not that the new scopes are correct.
+
+Some fixtures are transcribed from real TCP content (see `images/tcp-highlighting-example.png`); others (`H`, `N`/`R`/`S`, `D`/`Q` title lines, `GOSUB`/`SEARCH`/`DATE`/`GOTCP`/`GET`) are synthesised directly from the grammar's regexes because no real example was available — treat those as best-effort and correct them against real (sanitised) files if the formatting doesn't match production.
+
 ## Add more language features
 
 - There's documentation on intellisense, hovers, and validators, etc at VS Code extenders documentation at https://code.visualstudio.com/docs

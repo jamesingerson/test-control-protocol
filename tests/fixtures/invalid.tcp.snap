@@ -1,0 +1,5 @@
+>      X                    
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol invalid.illegal-character.testcontrolprotocol
+>       A OVERFLOW XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol invalid.too-long.testcontrolprotocol
+>

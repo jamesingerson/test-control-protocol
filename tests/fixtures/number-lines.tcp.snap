@@ -1,0 +1,21 @@
+>       N REF     0.10     5.00     0.00     9.99
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                          ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                            ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+>       R RANGE   1.00     2.00
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                          ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+>       S SCALE   100      200
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                          ^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+>

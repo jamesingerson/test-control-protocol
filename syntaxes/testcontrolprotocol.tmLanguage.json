@@ -55,10 +55,10 @@
 		"title-lines": {
 			"captures": {
 				"2": {
-					"name": "support.type.testcontrolprotocol"
+					"name": "storage.type.testcontrolprotocol"
 				},
 				"3": {
-					"name": "support.type.testcontrolprotocol"
+					"name": "storage.type.testcontrolprotocol"
 				},
 				"4": {
 					"name": "string.testcontrolprotocol"
@@ -68,15 +68,15 @@
 				}
 			},
 			"match": "(^.{7})([TDQ].{4})(.{1,18})?(.{0,19})(.*)",
-			"name": "hex-line.testcontrolprotocol"
+			"name": "title-line.testcontrolprotocol"
 		},
 		"hex-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"4": {
 					"name": "string.control.testcontrolprotocol"
@@ -91,7 +91,7 @@
 		"number-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
 					"name": "storage.testcontrolprotocol"
@@ -118,7 +118,7 @@
 		"alpha-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
 					"name": "storage.testcontrolprotocol"
@@ -136,16 +136,16 @@
 		"goto-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"
@@ -163,16 +163,16 @@
 		"gotcp-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "support.type.testcontrolprotocol"
+					"name": "storage.type.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"
@@ -190,16 +190,16 @@
 		"get-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"
@@ -217,10 +217,10 @@
 		"instruction-lines": {
 			"captures": {
 				"2": {
-					"name": "variable.parameter.testcontrolprotocol"
+					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "entity.name.tag.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"

@@ -1,0 +1,28 @@
+       T0302 Procalcitonin
+       A TITLE    Procalcitonin
+       A G        G
+       A PCT1     PCT1
+       A PCT2     PCT2
+       A PCT3     PCT3
+       A PCT4     PCT4
+       A PCT5     PCT5
+       * Example Comment
+       I          WBHMIC
+       I          NORMALX
+       I          HL7NUMX  AV2      Y        Y
+       I          GOTO,LE  PCT1     VALUE    0.50
+       I          GOTO,LE  PCT2     VALUE    2.00
+       I          GOTO,LT  PCT3     VALUE    10.00
+       I          GOTO,M   PCT4     TYPE     G
+       I          GOTO,EQ  PCT3     VALUE    10.00
+       I          GOTO,GT  PCT4     VALUE    10.00
+       I          GOTO     FIN
+       I PCT1     COMMENT  PCT1
+       I          GOTO     FIN
+       I PCT2     COMMENT  PCT2
+       I          GOTO     FIN
+       I PCT3     COMMENT  PCT3
+       I          GOTO     FIN
+       I PCT4     COMMENT  PCT4
+       I FIN      COMMENT  PCT5
+       I END

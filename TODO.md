@@ -196,7 +196,7 @@ Asked directly: are there other operand positions across the whole instruction s
 ### Pure data-reference candidates (blue), not yet implemented
 
 By volume, largest first:
-- [ ] **`PRINT` op2 — by far the single largest opportunity**: 9,618 real uses, ~67% resolve to a real/global data label (`PRINT 1 TITLE`, `PRINT +1 NAME`, `PRINT 1 REQNO`). **Currently being investigated** — see below.
+- [x] **`PRINT` op2** (0.7.0) — see "PRINT op2 data reference" section below.
 - [ ] `MOVE,AV` op1 (2786, 76%)
 - [ ] `SENDRSLT` op1/op2 (1094 each, 100%) — surfaces the single-letter-constant question below (`SENDRSLT Y Y Y`)
 - [ ] `MOVE,AP` op1 (877, 62%)
@@ -238,8 +238,23 @@ By volume, largest first:
 
 ### Open design question, not yet resolved
 
-The real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Needs a decision (highlight everything technically correct, or exclude short/constant-like global tokens) before implementing any of the findings above that would surface this pattern at scale (`PRINT` op2, `SENDRSLT`, `MICSIGN`).
+The real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Needs a decision (highlight everything technically correct, or exclude short/constant-like global tokens) before implementing any of the findings above that would surface this pattern at scale (`SENDRSLT`, `MICSIGN`). Note: this did NOT block `PRINT` op2 below — its real unresolved values were meaningfully-named system fields (`DATE`, `TESTCODE`, `DRNAME`...), not single-letter constants, so this question remains genuinely open for the *other* candidates only.
 
 ### Related but separate opportunity, noted in passing
 
 `GOTO,EQ`'s own comparison-field operand (op2, e.g. `VALUE`/`ABN-RSLT`/`PROG-NO`) is ~98% one of a small fixed vocabulary — same shape as `SEARCH`'s already-implemented 12-word check. Not a label/data-reference coloring question; would be its own "unrecognized comparison field" diagnostic if wanted later.
+
+## PRINT op2 data reference (0.7.0)
+
+Investigated as the top item in the audit backlog above (9,618 real uses, by far the single largest candidate found).
+
+**The real blocker wasn't PRINT-specific — it was an entirely undocumented (to this project) third source of valid data references.** Checking why ~33% of real `PRINT` op2 values didn't resolve (`PRINT 1 TITLE` works, but `PRINT +1 DATE`/`PRINT 1 REQNO`/`PRINT 35 DRNAME` didn't) found that every single one of the 82 distinct unresolved values was an obviously meaningful system field name — never declared as an `A`-line anywhere (checked explicitly), yet clearly always valid. Traced this to the Reference Manual's "Global Data" catalogue (`Core Global Data`, `Global Data for Modules`, `Global Data in Alphabetical Order` — ~30 pages: patient demographics, request/specimen data, lab info, report-printing fields), a whole documented category of implicit boxes separate from both local declarations and the `TCP/GLOBAL` file's own constants. `TCPNAME` (already handled) turns out to be just one example the Introduction Manual happened to spell out in prose.
+
+**Extraction problem, worked around rather than solved cleanly:** the manual's own table for this section is a multi-column PDF layout that both `pdftotext -layout` and plain `pdftotext` scramble into misaligned fragments — not reliably parseable into a clean label list. Instead of hand-transcribing ~30 pages, took an empirical approach: collected all 82 real unresolved `PRINT` op2 values from the corpus, then cross-checked each against the manual's raw text. **73 of 82 (98.9% of the 2660 total instances) appear verbatim as real manual terms**; the remaining 9 are obvious numbered continuations of already-confirmed families (`TAV1`/`TAV2` confirmed → `TAV3`-`TAV5` are clearly the same convention). All 82 were added to `IMPLICIT_DATA_LABELS` (renamed in spirit, though not in code, from "just TCPNAME" to a real curated catalogue) — this is deliberately an empirically-derived subset (what's actually used in this corpus), not a claim to the full ~30-page catalogue; extend the same way if more surface.
+
+**A second, PRINT-specific finding:** the data reference sits at **op2**, not op1 like `NORMAL`/`GROUP`/the `CR` family — op1 is a print-column number (confirmed always numeric or blank across all real bare-`PRINT` uses, never itself a reference). Required a new regex shape (`PRINT_DATA_REFERENCE_RE`) rather than reusing `DATA_REFERENCE_RE`. Two comma-suffixed variants were checked and **handled differently**:
+- `PRINT,H` and `PRINT,A` share the exact same op2-is-data-reference shape (`PRINT,H 1 DATE8`, `PRINT,A 50 SPACE 5`) — included.
+- `PRINT,R` **excluded**: op2 is blank 100% of the time (349/349 real uses) — no data-reference slot exists at all.
+- `PRINT,J` **excluded**: op2 only resolves ~30% of the time; real values look like literal comparison text (e.g. `PRINT,J 31 >60`), not a box reference — a genuinely different instruction despite the shared prefix.
+
+**Validation**: new grammar rule `print-data-reference-lines` (op2 → `storage.testcontrolprotocol`, matching every other data reference), new fixture coverage for all five variants (`PRINT`, `PRINT,H`, `PRINT,A` included; `PRINT,R`, `PRINT,J` confirmed to fall through unchanged), snapshot diff reviewed. Ran the full corpus check after implementing — first pass showed 1160 false positives (`SPACE`/`STARS`/single characters), traced to a bug in the *validation script* itself (an ad-hoc harness that predated `globalDataLabels` and never passed it to `computeDiagnostics` — not a bug in the shipped code, which already passes the whole index via `extension.js`). Fixed the harness and re-ran: zero diagnostics across the entire real corpus.

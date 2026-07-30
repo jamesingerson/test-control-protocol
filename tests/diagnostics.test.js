@@ -103,7 +103,7 @@ run('resolves CR TEST/CR CRS branch labels declared elsewhere in the same block'
     titleLine('T0302', 'Procalcitonin'),
     dataLine('R', 'FLK-P', '1.00', '2.00'),
     iLine('', 'CR TEST', 'FLK-P', 'FLK-H', 'RES1-C'),
-    iLine('FLK-H', 'PRINT', '1', 'FLK'),
+    iLine('FLK-H', 'PRINT', '1', 'TCPNAME'),
     iLine('RES1-C', 'MOVE', '1', 'LITPRINT'),
     iLine('', 'END'),
   ];
@@ -117,7 +117,7 @@ run('resolves CR REQ (the fourth CR-family member) the same way as CR TEST/CR CR
     dataLine('N', 'REQ-P', '9', '7'),
     iLine('', 'CR REQ', 'REQ-P', 'REQ-H', 'REQ-L'),
     iLine('REQ-H', 'MOVE,A', 'DATESPEC', 'DATE8'),
-    iLine('REQ-L', 'PRINT', '1', 'REF'),
+    iLine('REQ-L', 'PRINT', '1', 'TCPNAME'),
     iLine('', 'END'),
   ];
   const diags = computeDiagnostics(lines);
@@ -169,6 +169,37 @@ run('flags an undefined data reference (NORMAL/CR TEST/CR CRS/GROUP whitelist, A
   assert.strictEqual(diags[0].code, 'undefined-data-reference');
   assert.strictEqual(diags[0].severity, 'warning');
   assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('flags an undefined PRINT op2 reference (real shape: op1 is a column number, op2 is the data reference)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'PRINT', '1', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('resolves PRINT/PRINT,H/PRINT,A op2 against an implicit global field (real "PRINT 1 TCPNAME" shape)', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'PRINT', '1', 'TCPNAME'),
+    iLine('', 'PRINT,H', '1', 'DATE8'),
+    iLine('', 'PRINT,A', '50', 'REQNO', '5'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not check PRINT,R or PRINT,J op2 (rejected: different real semantics)', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'PRINT,R', '21'),
+    iLine('', 'PRINT,J', '31', '>60'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
 });
 
 run('does not flag a data reference resolved by a declaration in the same block', () => {

@@ -9,6 +9,7 @@ const {
   findGotcpReferences,
   findDataDeclarations,
   findDataReferences,
+  findPrintDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
@@ -250,6 +251,26 @@ run('findDataReferences resolves CR REQ/CR COM operand1 too (confirmed as two mo
 run('findDataReferences does not require an operand for a bare CR COM (real, common, 4 of 6 real occurrences)', () => {
   const lines = [iLine('', 'CR COM')];
   assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findPrintDataReferences resolves op2 (not op1, which is a print-column number) for PRINT/PRINT,H/PRINT,A', () => {
+  // Real shapes: "PRINT 1 TITLE", "PRINT,H 1 DATA1", "PRINT,A 50 DATA2 5".
+  const lines = [iLine('', 'PRINT', '1', 'TITLE'), iLine('', 'PRINT,H', '1', 'DATA1'), iLine('', 'PRINT,A', '50', 'DATA2', '5')];
+  const refs = findPrintDataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['TITLE', 'DATA1', 'DATA2']
+  );
+});
+
+run('findPrintDataReferences does not check PRINT,R (never has op2) or PRINT,J (different real semantics)', () => {
+  const lines = [iLine('', 'PRINT,R', '21'), iLine('', 'PRINT,J', '31', '>60')];
+  assert.strictEqual(findPrintDataReferences(lines).length, 0);
+});
+
+run('findPrintDataReferences resolves against the expanded implicit global catalogue (real DATE/TIME/NAME shapes)', () => {
+  const lines = [iLine('', 'PRINT', '+1', 'DATE'), iLine('', 'PRINT', '+1', 'TIME'), iLine('', 'PRINT', '+1', 'NAME')];
+  assert.strictEqual(findPrintDataReferences(lines).length, 0);
 });
 
 run('findDataReferences excludes the implicit built-in TCPNAME box (real GROUP TCPNAME shape)', () => {

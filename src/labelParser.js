@@ -117,6 +117,22 @@ const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS
 // regex from DATA_REFERENCE_RE, not a generalization of it.
 const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQ)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
 
+// PRINT/PRINT,H/PRINT,A's op2 -- a genuinely different shape from
+// DATA_REFERENCE_RE's family: the data reference sits at op2, not op1
+// (op1 is a print-column number, confirmed always numeric or blank across
+// all 9618+ real bare-PRINT uses, never itself a reference). Confirmed via
+// the corpus-wide audit: bare PRINT op2 resolves to a real/global data
+// label in ~99% of non-numeric, non-blank cases once the expanded
+// IMPLICIT_DATA_LABELS catalogue above is accounted for (67% direct before
+// that). PRINT,H and PRINT,A share the identical shape (`PRINT,H 1
+// DATE8`, `PRINT,A 50 SPACE 5`). PRINT,R and PRINT,J are deliberately
+// EXCLUDED -- checked and rejected: PRINT,R's op2 is blank 100% of the
+// time (349/349, no data-reference slot at all), and PRINT,J's op2 only
+// resolves ~30% of the time (many real values look like literal
+// comparison text, e.g. `PRINT,J 31 >60`, not a box reference) -- a
+// genuinely different instruction despite the shared "PRINT" prefix.
+const PRINT_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bPRINT(?:,[HA])?\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?/d;
+
 // Keywords whose operand is confirmed NEVER genuinely blank in real
 // production data (Reference Manual Error 7, "Missing operand"). GROUP and
 // CR COM are deliberately excluded despite being in DATA_REFERENCE_RE
@@ -130,13 +146,47 @@ const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQ)\b\s{
 const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ']);
 
 // Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
-// declaration, per the TCP Introduction Manual (e.g. "there is a box with
-// the label TCPNAME. This contains the Test Name as entered on the Title
-// line."). Confirmed as a real false-positive source: a real `GROUP TITLE`
-// vs `GROUP TCPNAME` comparison in production data showed TCPNAME never
-// declared locally, yet clearly valid. Not exhaustive -- only what's been
-// directly confirmed so far.
-const IMPLICIT_DATA_LABELS = new Set(['TCPNAME']);
+// declaration -- the Reference Manual documents an entire "Global Data"
+// catalogue (Core Global Data, Global Data for Modules, Global Data in
+// Alphabetical Order -- ~30 pages: patient demographics, request/specimen
+// data, lab info, report-printing fields, etc.), separate from both local
+// declarations and the TCP/GLOBAL file's own A-line constants. TCPNAME is
+// just the one example the Introduction Manual spells out in prose ("there
+// is a box with the label TCPNAME...").
+//
+// The manual's own table for this section defeated clean extraction (a
+// multi-column PDF table that both `pdftotext -layout` and plain
+// `pdftotext` scramble into misaligned fragments), so this list is NOT
+// transcribed from the manual directly. Instead: every genuinely
+// unresolved (non-numeric, not locally/macro/globally declared) `PRINT`
+// op2 value across the entire real corpus was collected (82 distinct
+// values, 2660 total instances), then cross-checked against the manual's
+// raw text -- 73 of 82 (covering 98.9% of instances) appear verbatim as
+// real terms in the manual; the remaining 9 (`TAV3`-`TAV5`, `LONGV3`-
+// `LONGV5`, `LONGAV3`-`LONGAV4`) are obvious numbered continuations of
+// already-confirmed families (`TAV1`/`TAV2`, `LONGV1`/`LONGV2`,
+// `LONGAV1` are all directly confirmed). This is an empirically-derived
+// subset of the real catalogue -- what's actually used in this specific
+// production corpus, not an attempt at the full ~30-page list. Extend it
+// the same way (real corpus usage + manual cross-reference) if more
+// surface later; see TODO.md's "PRINT op2 data reference" section.
+const IMPLICIT_DATA_LABELS = new Set([
+  'TCPNAME',
+  'AGEUNITS', 'ALPHAAGE', 'ANTNAME', 'AV0', 'AV1', 'AV2', 'AV3', 'AV4',
+  'CLINICNO', 'COMMENT1', 'COMMENT2', 'CUMPAGE',
+  'DATE', 'DATE6', 'DATE7', 'DATE8', 'DATE11', 'DATEYEAR',
+  'DOCREF', 'DRADDR1', 'DRADDR2', 'DRADDR3', 'DRADDR4', 'DRADDR5', 'DRALPHA',
+  'DRBILL', 'DRCPN', 'DRDAYPH1', 'DREXT1', 'DREXT2', 'DRFACLTY', 'DRFAXNO',
+  'DRNAME', 'DRNUM', 'DRSMRTKR',
+  'ELEMENT', 'ENCOUNTR', 'ETHNICTY', 'FEECODE', 'FIRSTNAM', 'FREQNO',
+  'HOSPNO', 'IREQNO', 'LABNAME',
+  'LONGAV1', 'LONGAV2', 'LONGAV3', 'LONGAV4', 'LONGAV5',
+  'LONGV1', 'LONGV2', 'LONGV3', 'LONGV4', 'LONGV5',
+  'NAME', 'ONAME', 'PAGENO', 'PATCITY', 'PATSADDR', 'PATSUBUR', 'PTID',
+  'REQNAME', 'REQNO', 'REQSPEC', 'RESULT', 'SEX', 'SURNAME',
+  'TAV1', 'TAV2', 'TAV3', 'TAV4', 'TAV5', 'TAV6',
+  'TCPUNITS', 'TESTCODE', 'TESTDESC', 'TESTNAME', 'TIME', 'TYPE', 'UCODE', 'UNAME',
+]);
 
 function isImplicitDataLabel(label) {
   return IMPLICIT_DATA_LABELS.has(label);
@@ -282,6 +332,24 @@ function findDataReferences(lines) {
 }
 
 /**
+ * Operand2 of PRINT/PRINT,H/PRINT,A (see PRINT_DATA_REFERENCE_RE) -- a
+ * separate shape from DATA_REFERENCE_RE's family, since the reference sits
+ * at op2 rather than op1.
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findPrintDataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, PRINT_DATA_REFERENCE_RE, 6);
+    if (found && !isImplicitDataLabel(found.text)) {
+      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * Sites where a NORMAL/CR TEST/CR CRS instruction (never GROUP -- see
  * MISSING_OPERAND_KEYWORDS) has no operand at all. Anchors the diagnostic
  * range on the keyword itself, since there's no operand text to underline.
@@ -374,6 +442,7 @@ module.exports = {
   findGotcpReferences,
   findDataDeclarations,
   findDataReferences,
+  findPrintDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,

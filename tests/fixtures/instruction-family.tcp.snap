@@ -112,4 +112,39 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+>       I          PRINT    1        TITLE
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+>       I          PRINT,H  1        DATE8
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+>       I          PRINT,A  50       SPACE    5
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                             ^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          PRINT,R  21
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          PRINT,J  31       AV0
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >

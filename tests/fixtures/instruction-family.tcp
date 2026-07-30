@@ -15,3 +15,8 @@
        I          CR REQ   REQA-P   REQA-H   REQA-L
        I HBACOMS  CR COM   HBAC-P
        I          CR COM
+       I          PRINT    1        TITLE
+       I          PRINT,H  1        DATE8
+       I          PRINT,A  50       SPACE    5
+       I          PRINT,R  21
+       I          PRINT,J  31       AV0

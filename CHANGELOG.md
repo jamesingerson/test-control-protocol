@@ -2,6 +2,11 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.7.0
+
+- `PRINT`/`PRINT,H`/`PRINT,A`'s 2nd operand (a data reference — op1 is a print-column number) is now checked for undefined references and highlighted to match its target's colour, the same treatment `NORMAL`/`GROUP`/the `CR` family already had. `PRINT,R` (never has this operand) and `PRINT,J` (different real semantics — prints literal comparison text, not a box reference) are deliberately excluded.
+- Significantly expanded the set of implicit built-in data boxes (previously just `TCPNAME`) to ~80 real Delphic LIS system fields (patient/request/report metadata like `DATE`, `TIME`, `NAME`, `SEX`, `TESTCODE`, `DRNAME`...), documented in the Reference Manual's "Global Data" catalogue and confirmed against real corpus usage — this was the missing piece keeping `PRINT`'s resolve rate at ~67%; with it, real usage resolves at ~99%.
+
 ## 0.6.0
 
 - Added `CR REQ` and `CR COM` as two more members of the same "cumulative report" family as `CR TEST`/`CR CRS`, found via a corpus-wide operand audit. `CR REQ` shares `CR TEST`/`CR CRS`'s exact shape (op1 = data reference, op2/op3 = branch labels, either can be blank) and is now checked/highlighted identically. `CR COM` only ever has op1 (a data reference, sometimes omitted — confirmed against all 6 real occurrences in the corpus) — no label operands.

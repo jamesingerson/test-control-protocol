@@ -18,4 +18,22 @@
 #         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
 #                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                          ^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+>       R AGERNG  70       66       84                70  Years
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                          ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                            ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                                     ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol invalid.testcontrolprotocol
+>       R AGERNG  999      64       82                adult
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                 ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                          ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                            ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                                     ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol invalid.testcontrolprotocol
 >

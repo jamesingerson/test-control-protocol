@@ -142,7 +142,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\b[NRS]\\b\\s)(.{8}\\s*)([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)?([+-.]?\\d*[+-.]?\\d*\\s+)([+-.]?\\d*[+-.]?\\d*\\s+)?(.*)",
+			"match": "(^.{7})(\\b[NRS]\\b\\s)(.{8}\\s*)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.*)",
 			"name": "number-line.testcontrolprotocol"
 		},
 		"alpha-lines": {

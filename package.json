@@ -23,9 +23,6 @@
                     "Test Control Protocol",
                     "testcontrolprotocol"
                 ],
-                "extensions": [
-                    ""
-                ],
                 "configuration": "./language-configuration.json"
             }
         ],

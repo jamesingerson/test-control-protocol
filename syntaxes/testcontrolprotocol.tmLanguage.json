@@ -94,7 +94,7 @@
 		"global-header-lines": {
 			"captures": {
 				"2": {
-					"name": "markup.heading.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(GLOBAL\\s+ALPHA\\s+DATA.*)",

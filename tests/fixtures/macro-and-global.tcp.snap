@@ -13,7 +13,7 @@
 #       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol comment.line.testcontrolprotocol
 >       GLOBAL ALPHA DATA
 #^^^^^^^ source.testcontrolprotocol global-header-line.testcontrolprotocol
-#       ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol global-header-line.testcontrolprotocol markup.heading.testcontrolprotocol
+#       ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol global-header-line.testcontrolprotocol support.type.testcontrolprotocol
 >       * ---------------------------------------
 #^^^^^^^ source.testcontrolprotocol
 #       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol comment.line.testcontrolprotocol

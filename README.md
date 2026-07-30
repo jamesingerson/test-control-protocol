@@ -75,7 +75,7 @@ https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/l
 
 If you deliberately change how a line type should be scoped, run `npm run test:update` to regenerate the affected `.snap` file(s), then **read the diff carefully** before committing — the snapshot only proves the grammar is consistent with itself, not that the new scopes are correct.
 
-Some fixtures are transcribed from real TCP content (see `images/tcp-highlighting-example.png`); others (`H`, `N`/`R`/`S`, `D`/`Q` title lines, `GOSUB`/`SEARCH`/`DATE`/`GOTCP`/`GET`) are synthesised from the real TCP Introduction/Reference manuals (see `TODO.md`) rather than from a real example file — treat those as best-effort and correct them against real (sanitised) files if the formatting doesn't match production.
+Some fixtures are transcribed from real TCP content (see `images/tcp-highlighting-example.png`); others (`H`, `N`/`R`/`S` lines, `GOSUB`/`SEARCH`/`DATE`/`GOTCP`/`GET` operand shapes) are re-created generically rather than copied verbatim, since the source is proprietary — but their exact structure (field widths, valid keyword suffixes, `D`/`G` line shapes) has been checked against both the TCP Introduction/Reference manuals and real production TCP files, not just guessed from the grammar's own regexes. See `TODO.md` for what's been validated this way.
 
 ## Add more language features
 

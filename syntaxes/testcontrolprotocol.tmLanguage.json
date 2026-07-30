@@ -12,6 +12,12 @@
 			"include": "#title-lines"
 		},
 		{
+			"include": "#macro-definition-lines"
+		},
+		{
+			"include": "#global-header-lines"
+		},
+		{
 			"include": "#hex-lines"
 		},
 		{
@@ -67,8 +73,32 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})([TDQ].{4})(.{1,18})?(.{0,19})(.*)",
+			"match": "(^.{7})([TQ].{4})(.{1,18})?(.{0,19})(.*)",
 			"name": "title-line.testcontrolprotocol"
+		},
+		"macro-definition-lines": {
+			"captures": {
+				"2": {
+					"name": "entity.other.attribute-name.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.tag.testcontrolprotocol"
+				},
+				"4": {
+					"name": "comment.line.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bD\\b\\s)([^ ]{1,8})?\\s*(.*)",
+			"name": "macro-definition-line.testcontrolprotocol"
+		},
+		"global-header-lines": {
+			"captures": {
+				"2": {
+					"name": "markup.heading.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(GLOBAL\\s+ALPHA\\s+DATA.*)",
+			"name": "global-header-line.testcontrolprotocol"
 		},
 		"hex-lines": {
 			"captures": {
@@ -211,7 +241,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP.{1,3}\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\\s+)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		}, 
 		"instruction-lines": {

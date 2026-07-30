@@ -2,10 +2,6 @@
 #^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
 #       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
 #            ^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
->       D0100 Full Blood Count
-#^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
-#       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
-#            ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
 >       Q0500 Quality Flag
 #^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
 #       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol

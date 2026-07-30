@@ -1,0 +1,30 @@
+>       D SOMEMAC
+#^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+>       D SHORT   a short description of what this macro does
+#^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#              ^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol
+#                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol macro-definition-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       * ---------------------------------------
+#^^^^^^^ source.testcontrolprotocol
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol comment.line.testcontrolprotocol
+>       GLOBAL ALPHA DATA
+#^^^^^^^ source.testcontrolprotocol global-header-line.testcontrolprotocol
+#       ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol global-header-line.testcontrolprotocol markup.heading.testcontrolprotocol
+>       * ---------------------------------------
+#^^^^^^^ source.testcontrolprotocol
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol comment.line.testcontrolprotocol
+>       A SPACE    _
+#^^^^^^^ source.testcontrolprotocol alpha-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol alpha-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol alpha-line.testcontrolprotocol storage.testcontrolprotocol
+#                  ^ source.testcontrolprotocol alpha-line.testcontrolprotocol string.testcontrolprotocol
+>       A PLUS     +
+#^^^^^^^ source.testcontrolprotocol alpha-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol alpha-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol alpha-line.testcontrolprotocol storage.testcontrolprotocol
+#                  ^ source.testcontrolprotocol alpha-line.testcontrolprotocol string.testcontrolprotocol
+>

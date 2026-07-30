@@ -1,0 +1,7 @@
+       D SOMEMAC
+       D SHORT   a short description of what this macro does
+       * ---------------------------------------
+       GLOBAL ALPHA DATA
+       * ---------------------------------------
+       A SPACE    _
+       A PLUS     +

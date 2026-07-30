@@ -150,6 +150,37 @@ run('does not flag a GOTCP target that matches a workspace test code', () => {
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags a NORMALX target with no matching test code in the workspace index', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'NORMALX', '9999'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0302', '0500']) });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'normalx-test-not-found');
+  assert.strictEqual(diags[0].severity, 'warning');
+});
+
+run('resolves a NORMALX target that matches a workspace test code, including a real 3-digit-no-leading-zero shape', () => {
+  const lines = [
+    titleLine('T0400', 'Other'),
+    iLine('', 'NORMALX', '0770'),
+    iLine('', 'NORMALX', '770'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0770']) });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not flag a bare NORMALX with no operand (real, common pattern -- 157 of 366 real occurrences)', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'NORMALX'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0302']) });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('skips NORMALX validation entirely when no testCodes index is supplied', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'NORMALX', '9999'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('skips GOTCP validation entirely when no testCodes index is supplied', () => {
   const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
   const diags = computeDiagnostics(lines);

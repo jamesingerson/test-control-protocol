@@ -7,6 +7,7 @@ const {
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findNormalxTestReferences,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -153,6 +154,27 @@ run('findGotcpReferences extracts the 4-digit test code, not treating it as a la
   assert.deepStrictEqual(refs.map((r) => r.code), ['T0400', 'T0500']);
   // GOTCP targets must never leak into label-reference results.
   assert.strictEqual(findLabelReferences(lines).length, 0);
+});
+
+run('findNormalxTestReferences extracts op1 as a test-code reference (real "NORMALX 0710" shape), not a data box or label', () => {
+  const lines = [iLine('TPX', 'NORMALX', '0710')];
+  const refs = findNormalxTestReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.code),
+    ['0710']
+  );
+  assert.strictEqual(findDataReferences(lines).length, 0);
+  assert.strictEqual(findLabelReferences(lines).length, 0);
+});
+
+run('findNormalxTestReferences does not require an operand for a bare NORMALX (real, common, 157 of 366 real occurrences)', () => {
+  const lines = [iLine('', 'NORMALX')];
+  assert.strictEqual(findNormalxTestReferences(lines).length, 0);
+});
+
+run('findNormalxTestReferences is unaffected by NORMAL matching (the existing \\b boundary already excludes NORMALX from DATA_REFERENCE_RE)', () => {
+  const lines = [iLine('', 'NORMALX', '0710')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
 });
 
 run('a well-formed GOTO,MM target line reports correct column ranges', () => {

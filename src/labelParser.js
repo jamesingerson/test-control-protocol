@@ -31,6 +31,25 @@ const SEARCH_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bSEARCH\s+)(.{1,9}\s)?/d;
 // not a label in this file. Mirrors gotcp-lines' match.
 const GOTCP_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\s+)(.{1,8}\s)?/d;
 
+// NORMALX's op1 -- a test-code reference (like GOTCP's target), NOT a data
+// box, despite NORMALX's name/family resemblance to NORMAL (which the
+// existing `\b` boundary in DATA_REFERENCE_RE already correctly excludes
+// NORMALX from matching). Confirmed against real production data: 366 real
+// uses -- 157 bare (a legitimate common pattern, see MISSING_OPERAND_-
+// style exclusions elsewhere), and of the 209 with an operand, ALL 209
+// (100%) are purely numeric and resolve to a real test code somewhere in
+// the workspace. 203 are exactly 4 digits and match a `testCodes` entry
+// directly; the other 6 are the same real codes without a leading zero
+// (`770`/`299`/`120`/`290` matching real `T0770`/`T0299`/`T0120`/`T0290`
+// headers) -- `findNormalxTestReferences` zero-pads before checking, same
+// as GOTCP already effectively does via 4-digit `testCodes` entries. The
+// separator is bounded to `\s{1,4}` (NORMALX is 7 chars + 2 padding in its
+// own 9-char field), unlike GOTCP_TARGET_RE's older unbounded `\s+` above
+// -- no real "blank operand + distant trailing comment" case has been
+// found for NORMALX, but there's no reason to risk it when a bounded
+// pattern costs nothing.
+const NORMALX_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bNORMALX\b\s{1,4})(.{1,8}\s)?/d;
+
 // Any I-line's opcode field -- whatever token sits immediately after the own
 // label, regardless of whether it's a recognized keyword (GOTO, PRINT, ...)
 // or a macro invocation. Used to find macro-invocation sites: a bare
@@ -323,6 +342,23 @@ function findGotcpReferences(lines) {
 }
 
 /**
+ * NORMALX's op1 (see NORMALX_TARGET_RE) -- a test-code reference, same
+ * category as GOTCP's target, not a data box.
+ * @param {string[]} lines
+ * @returns {Array<{code: string, line: number, startCol: number, endCol: number}>}
+ */
+function findNormalxTestReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, NORMALX_TARGET_RE, 5);
+    if (found) {
+      results.push({ code: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * A/M/N/R/S/H-line data declarations (the box a label identifies, per the
  * Introduction Manual's "every item of data is held in a box... identified
  * by a LABEL" model) -- a separate namespace from I-line branch labels.
@@ -488,6 +524,7 @@ module.exports = {
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findNormalxTestReferences,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,

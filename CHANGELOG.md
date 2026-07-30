@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.9.0
+
+- `NORMALX`'s operand (e.g. `NORMALX 0710`) is a test-code reference, not a data box — confirmed against real data (209 real occurrences with an operand, 100% resolving to a real test code once a handful of non-zero-padded codes are accounted for). Now highlighted teal (matching `GOTCP`'s target) and checked against the workspace's known test codes, the same way a `GOTCP` reference is.
+
 ## 0.8.0
 
 - `GOTO,IR`'s 3rd operand (a range reference, e.g. `GOTO,IR SCHECK VALUE SIGNIF`) is now checked for undefined references and highlighted to match its target's colour. The special comparison keywords `RANGE`/`RANGE2` ("the range already associated with this test") are exempted, the same treatment `VALUE`/`TYPE`/`RESULT`/`ELEMENT` already had.

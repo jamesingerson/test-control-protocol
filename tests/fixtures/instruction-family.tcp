@@ -22,3 +22,6 @@
        I          PRINT,J  31       AV0
        I          GOTO,IR  SCHECK   VALUE    SIGNIF
        I          GOTO,IR  FIN      VALUE    RANGE
+       I TPX      NORMALX  0710
+       I          NORMALX  0770     DATE REG
+       I          NORMALX

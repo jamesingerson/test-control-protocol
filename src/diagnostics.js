@@ -22,6 +22,7 @@ const {
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findNormalxTestReferences,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -39,7 +40,8 @@ const {
  *   added to its own known-label set before undefined-label checking.
  * @param {Set<string>} [options.testCodes] all 4-digit test codes found
  *   anywhere in the workspace, from buildWorkspaceIndex. When provided,
- *   GOTCP targets not present in this set are flagged.
+ *   GOTCP targets and NORMALX test-code references not present in this
+ *   set are flagged.
  * @param {Set<string>} [options.globalDataLabels] A-line data labels
  *   declared in the workspace's GLOBAL file, from buildWorkspaceIndex --
  *   available in every block regardless of local declarations.
@@ -54,6 +56,7 @@ function computeDiagnostics(lines, options) {
     const defs = findLabelDefinitions(blockLines);
     const refs = findLabelReferences(blockLines);
     const gotcpRefs = findGotcpReferences(blockLines);
+    const normalxRefs = findNormalxTestReferences(blockLines);
 
     const defsByLabel = new Map();
     for (const def of defs) {
@@ -171,6 +174,23 @@ function computeDiagnostics(lines, options) {
           severity: 'warning',
           code: 'gotcp-not-found',
           message: `GOTCP target '${gotcp.code}' does not match any test code found in the workspace`,
+        });
+      }
+
+      // NORMALX's op1: same "does this test code exist" check as GOTCP,
+      // but zero-padded to 4 digits first -- confirmed against real data
+      // that a handful of real occurrences write the code without a
+      // leading zero (e.g. `770` for the real test `T0770`).
+      for (const normalx of normalxRefs) {
+        const digits = normalx.code.padStart(4, '0');
+        if (opts.testCodes.has(digits)) continue;
+        diagnostics.push({
+          line: block.startLine + normalx.line,
+          startCol: normalx.startCol,
+          endCol: normalx.endCol,
+          severity: 'warning',
+          code: 'normalx-test-not-found',
+          message: `NORMALX target '${normalx.code}' does not match any test code found in the workspace`,
         });
       }
     }

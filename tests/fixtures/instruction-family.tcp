@@ -9,5 +9,6 @@
        I          NORMAL   RRANGE
        I          CR TEST  TESTA    TESTB    RESA-C
        I          CR CRS   CRSA-P
+       I          CR CRS   CRSB-P            CRSB-C
        I          GROUP    TITLE
        I NEXT     GROUP

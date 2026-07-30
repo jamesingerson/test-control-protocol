@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.5.0
+
+- `CR TEST`/`CR CRS`'s 2nd and 3rd operands are real `I`-line branch labels (e.g. `CR TEST FLK-P FLK-H RES1-C` — `FLK-H`/`RES1-C` are declared elsewhere in the block as `I FLK-H ...`/`I RES1-C ...`), not data references. They're now highlighted the same colour as other branch labels (matching GOTO targets) instead of plain operand text, and checked by the existing undefined-label diagnostic the same way a GOTO target is — including tolerating a genuinely blank op2 (e.g. `CR CRS EPP-P` with only op3 present), a real, common pattern.
+
 ## 0.4.0
 
 - Added a missing-data-operand diagnostic: `NORMAL`, `CR TEST`, and `CR CRS` are flagged when used with a blank operand (Reference Manual Error 7). `GROUP` is deliberately excluded — a bare `GROUP` with no operand is a real, common pattern in production (101 occurrences across the corpus), not an omission.

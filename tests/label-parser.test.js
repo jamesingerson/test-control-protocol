@@ -101,6 +101,28 @@ run('findLabelReferences finds SEARCH op1 (branch target) but not the item keywo
   assert.strictEqual(refs[0].label, 'NOTFND');
 });
 
+run('findLabelReferences finds CR TEST/CR CRS op2 and op3 as branch labels, not op1 (real BIO shape)', () => {
+  // Real shape: "CR TEST FLK-P FLK-H RES1-C" -- FLK-P is a data reference
+  // (covered by findDataReferences instead), FLK-H/RES1-C are real I-line
+  // branch labels declared elsewhere in the block.
+  const lines = [iLine('', 'CR TEST', 'FLK-P', 'FLK-H', 'RES1-C'), iLine('', 'CR CRS', 'GLOC-P')];
+  const refs = findLabelReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['FLK-H', 'RES1-C']
+  );
+});
+
+run('findLabelReferences tolerates a blank op2 for CR CRS without swallowing op3 (real EPP-P/EPP-C shape)', () => {
+  // Real shape: op1=EPP-P (data ref), op2 genuinely blank, op3=EPP-C (label).
+  const line = LN + 'I ' + ''.padEnd(9) + 'CR CRS'.padEnd(9) + 'EPP-P'.padEnd(18) + 'EPP-C';
+  const refs = findLabelReferences([line]);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['EPP-C']
+  );
+});
+
 run('findLabelReferences excludes ~-prefixed macro-internal targets', () => {
   const lines = [iLine('', 'GOTO', '~1')];
   assert.strictEqual(findLabelReferences(lines).length, 0);

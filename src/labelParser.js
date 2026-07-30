@@ -93,6 +93,20 @@ const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
 // comment, wrongly flagged as an undefined reference to that word).
 const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
 
+// CR TEST/CR CRS's op2 and op3 -- confirmed against real production data
+// (BIO) to be genuine I-line BRANCH labels, not data references: e.g. `CR
+// TEST FLK-P FLK-H RES1-C` has `FLK-H`/`RES1-C` declared elsewhere in the
+// same block as `I FLK-H PRINT 1 FLK` / `I RES1-C MOVE 1 LITPRINT`. Either
+// or both can be legitimately blank (e.g. `CR CRS EPP-P` alone, or `CR CRS
+// EPP-P <blank> EPP-C`) -- each field is independently bounded (no shared
+// unbounded separator between op1/op2/op3), so a blank middle field can't
+// be crossed into by a later field the way the keyword's own separator bug
+// could; confirmed by mapping real field boundaries exactly before trusting
+// this. NORMAL/GROUP do NOT share this shape (their extra operands are
+// numeric/keyword flags, not labels) -- this is intentionally a separate
+// regex from DATA_REFERENCE_RE, not a generalization of it.
+const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+
 // Keywords whose operand is confirmed NEVER genuinely blank in real
 // production data (Reference Manual Error 7, "Missing operand"). GROUP is
 // deliberately excluded despite being in DATA_REFERENCE_RE above: a bare
@@ -186,10 +200,17 @@ function findLabelDefinitions(lines) {
 function findLabelReferences(lines) {
   const results = [];
   lines.forEach((line, lineIndex) => {
-    let found = extractGroup(line, GOTO_TARGET_RE, 5);
-    if (!found) found = extractGroup(line, SEARCH_TARGET_RE, 5);
-    if (found && !isMacroInternalLabel(found.text)) {
-      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    const candidates = [
+      extractGroup(line, GOTO_TARGET_RE, 5) || extractGroup(line, SEARCH_TARGET_RE, 5),
+      // CR TEST/CR CRS can reference up to two branch labels (op2 and op3);
+      // either, both, or neither may be present on a given line.
+      extractGroup(line, CR_LABEL_RE, 6),
+      extractGroup(line, CR_LABEL_RE, 7),
+    ];
+    for (const found of candidates) {
+      if (found && !isMacroInternalLabel(found.text)) {
+        results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+      }
     }
   });
   return results;

@@ -84,6 +84,33 @@ run('resolves a reference to a label injected by an invoked macro (real BIO/DRUG
   assert.strictEqual(diagsWithIndex.length, 0);
 });
 
+run('flags an undefined CR TEST/CR CRS branch label (op2/op3, real BIO shape) as undefined-label', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('R', 'FLK-P', '1.00', '2.00'),
+    iLine('', 'CR TEST', 'FLK-P', 'MISSING1', 'MISSING2'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.deepStrictEqual(
+    diags.map((d) => d.code),
+    ['undefined-label', 'undefined-label']
+  );
+});
+
+run('resolves CR TEST/CR CRS branch labels declared elsewhere in the same block', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('R', 'FLK-P', '1.00', '2.00'),
+    iLine('', 'CR TEST', 'FLK-P', 'FLK-H', 'RES1-C'),
+    iLine('FLK-H', 'PRINT', '1', 'FLK'),
+    iLine('RES1-C', 'MOVE', '1', 'LITPRINT'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('flags a GOTCP target with no matching test code in the workspace index', () => {
   const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
   const diags = computeDiagnostics(lines, { testCodes: new Set(['0302', '0500']) });

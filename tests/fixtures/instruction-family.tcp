@@ -1,5 +1,7 @@
        I          GOSUB    SUB1
-       I          SEARCH   PCT1     FOUND
-       I          DATE     TODAY    FMT
+       I          SEARCH   NOTFND   TEST     FIRST
+       I          DATE,GT  TODAY    FMT
        I          GOTCP    T0400    START
        I          GET      RESULT   PCT1
+       I          GOTO,MM  PCT1     TEMPLATE
+       I          GOTO,XX  PCT1     VALUE

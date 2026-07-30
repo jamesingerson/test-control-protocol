@@ -4,14 +4,15 @@
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
->       I          SEARCH   PCT1     FOUND
+>       I          SEARCH   NOTFND   TEST     FIRST
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
-#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
->       I          DATE     TODAY    FMT
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol constant.language.testcontrolprotocol
+#                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          DATE,GT  TODAY    FMT
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
@@ -29,7 +30,21 @@
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
-#                  ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                          ^^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
 #                                    ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          GOTO,MM  PCT1     TEMPLATE
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          GOTO,XX  PCT1     VALUE
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >

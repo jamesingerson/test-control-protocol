@@ -24,6 +24,9 @@
 			"include": "#goto-lines"
 		},
 		{
+			"include": "#search-lines"
+		},
+		{
 			"include": "#gotcp-lines"
 		},
 		{
@@ -154,7 +157,34 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO.{1,4}|GOSUB.{1,3}|SEARCH.{0,2}|DATE.{1,4}|GET.{1,4})\\s)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|GOSUB(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|DATE,(?:EQ|NE|GT|GE|LT|LE)|GET(?:,[EOA])?)\\s+)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"name": "instruction-line.testcontrolprotocol"
+		},
+		"search-lines": {
+			"captures": {
+				"2": {
+					"name": "entity.other.attribute-name.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.tag.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "entity.name.tag.testcontrolprotocol"
+				},
+				"6": {
+					"name": "constant.language.testcontrolprotocol"
+				},
+				"7": {
+					"name": "string.testcontrolprotocol"
+				},
+				"8": {
+					"name": "invalid.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bSEARCH\\s+)(.{1,9}\\s)?(\\b(?:PATIENT|DATETIME|ARRSET|REPORTED|TRACKED|TESTDEPT|REQUEST|CONSTIT|ANTIBODY|PRODUCT|GROUP|TEST|NAME)\\b\\s*)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"gotcp-lines": {

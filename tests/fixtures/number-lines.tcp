@@ -3,3 +3,4 @@
        S SCALE   100      200
        R AGERNG  70       66       84                70  Years
        R AGERNG  999      64       82                adult
+       R VRANGE                                      Venous range

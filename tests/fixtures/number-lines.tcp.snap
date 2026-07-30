@@ -36,4 +36,13 @@
 #                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                            ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                                     ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       R VRANGE                                      Venous range
+#^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol storage.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                             ^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
+#                                                     ^^^^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol comment.line.testcontrolprotocol
 >

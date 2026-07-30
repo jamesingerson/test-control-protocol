@@ -7,6 +7,15 @@
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                                     ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
->       I COPY     COPYTO   51456             send fax notice to the front desk on arrival
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol invalid.too-long.testcontrolprotocol
+>       I COPY     COPYTO   51456             send fax notice to the front desk o
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                             ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+#                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       I COPY     COPYTO   51456             send fax notice to the front desk on
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol invalid.too-long.testcontrolprotocol
 >

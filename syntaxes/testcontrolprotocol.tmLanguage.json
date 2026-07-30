@@ -82,7 +82,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "comment.line.testcontrolprotocol"
@@ -106,7 +106,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "string.control.testcontrolprotocol"
@@ -169,13 +169,13 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "variable.language.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"6": {
 					"name": "string.testcontrolprotocol"
@@ -196,13 +196,13 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "variable.language.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"6": {
 					"name": "constant.language.testcontrolprotocol"
@@ -223,7 +223,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"
@@ -250,7 +250,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.tag.testcontrolprotocol"
+					"name": "entity.name.function.testcontrolprotocol"
 				},
 				"4": {
 					"name": "keyword.control.testcontrolprotocol"

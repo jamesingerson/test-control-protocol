@@ -43,17 +43,17 @@
 >       I          WBHMIC
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 >       I          NORMALX
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 >       I          HL7NUMX  AV2      Y        Y
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
@@ -61,107 +61,107 @@
 >       I          GOTO,LE  PCT1     VALUE    0.50
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,LE  PCT2     VALUE    2.00
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,LT  PCT3     VALUE    10.00
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,M   PCT4     TYPE     G
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,EQ  PCT3     VALUE    10.00
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,GT  PCT4     VALUE    10.00
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO     FIN
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I PCT1     COMMENT  PCT1
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO     FIN
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I PCT2     COMMENT  PCT2
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO     FIN
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I PCT3     COMMENT  PCT3
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO     FIN
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol variable.language.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I PCT4     COMMENT  PCT4
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I FIN      COMMENT  PCT5
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I END
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.tag.testcontrolprotocol
+#         ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >

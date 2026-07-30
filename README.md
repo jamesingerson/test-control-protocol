@@ -46,6 +46,7 @@ In the directory where you're working, if it does not already exist create a .vs
 - Assumed line numbers will be systemically removed in the future, so they are not validated or coloured.
 - Missing support for EOL comments as their validity is unclear, should probably be moved to their own lines.
 - Some instructions should have more intelligent highlighting, e.g. NORMAL's first operand is a reference range so the colours should match.
+- An instruction's own label (e.g. `PCT1` in `I PCT1 COMMENT PCT1`) and a GOTO/GOSUB/DATE/GET/SEARCH target referencing a label (e.g. `PCT1` in `GOTO,LE PCT1 ...`) are deliberately the same colour (`entity.name.function`) — both are "a label," whether declared or referenced, and are intentionally not visually distinguished from each other. Under the legacy "Dark (Visual Studio)"/"Light (Visual Studio)" themes specifically, `entity.name.function` has no colour rule at all, so labels render as plain unstyled text there rather than colliding with anything — accepted tradeoff, Dark+/Light+ (the modern defaults) were prioritised since that's what's actually used for review. Run `node scripts/download-themes.js` then `npm run check-colors` to check any scope's actual rendered colour against a given theme before assuming coverage.
 
 ## Contributing
 

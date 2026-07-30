@@ -73,50 +73,61 @@ const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
 // something else entirely. Two plausible-looking candidates were checked
 // and REJECTED: SIGNOUT's operand is a numeric test code (not a data
 // label), and MOVE,D's operand is almost always the special word `VALUE`
-// -- neither is actually "referencing declared data." See TODO.md's
-// "Undefined data reference" section for the frequency analysis behind
-// this list; it is intentionally not exhaustive (the manual documents 100+
-// instructions, most with unvalidated operand semantics).
+// -- neither is actually "referencing declared data." `CR REQ`/`CR COM`
+// confirmed as two more genuine members of the same "CR" (cumulative
+// report) family as `CR TEST`/`CR CRS`, found via a corpus-wide audit
+// after the fact rather than the original manual-driven pass -- see
+// TODO.md's "Undefined data reference" and "Comprehensive operand audit"
+// sections for the frequency analysis; this list is intentionally not
+// exhaustive (the manual documents 100+ instructions, most with
+// unvalidated operand semantics).
 //
 // The separator after the keyword is bounded to \s{1,4} (enough to finish
 // out its own 9-char field: "GROUP" + 4 spaces, "NORMAL" + 3, "CR TEST"/"CR
-// CRS" + 2 -- all confirmed against real spacing), NOT unbounded \s+. A
-// real production line can use one of these keywords with a genuinely
-// blank operand1 followed, many blank fields later, by a distant trailing
-// comment (e.g. `I NEXT GROUP <lots of blank fields> No`) -- unbounded
-// \s+ would greedily cross every blank field in between and let the
-// optional operand-capture group latch onto that far-away comment word
-// instead of correctly seeing operand1 as blank. Same bug class as the
-// "number-line label field swallowed its own comment" fix elsewhere in
+// CRS"/"CR REQ"/"CR COM" + 2 -- all confirmed against real spacing), NOT
+// unbounded \s+. A real production line can use one of these keywords with
+// a genuinely blank operand1 followed, many blank fields later, by a
+// distant trailing comment (e.g. `I NEXT GROUP <lots of blank fields> No`)
+// -- unbounded \s+ would greedily cross every blank field in between and
+// let the optional operand-capture group latch onto that far-away comment
+// word instead of correctly seeing operand1 as blank. Same bug class as
+// the "number-line label field swallowed its own comment" fix elsewhere in
 // this grammar; confirmed via a real false positive here too (`GROUP`
 // lines in HAEM/HISTO/PALMSAP each followed by a distant `No`/`for ...`
 // comment, wrongly flagged as an undefined reference to that word).
-const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
+const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|CR REQ|CR COM|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
 
-// CR TEST/CR CRS's op2 and op3 -- confirmed against real production data
-// (BIO) to be genuine I-line BRANCH labels, not data references: e.g. `CR
-// TEST FLK-P FLK-H RES1-C` has `FLK-H`/`RES1-C` declared elsewhere in the
-// same block as `I FLK-H PRINT 1 FLK` / `I RES1-C MOVE 1 LITPRINT`. Either
-// or both can be legitimately blank (e.g. `CR CRS EPP-P` alone, or `CR CRS
-// EPP-P <blank> EPP-C`) -- each field is independently bounded (no shared
-// unbounded separator between op1/op2/op3), so a blank middle field can't
-// be crossed into by a later field the way the keyword's own separator bug
-// could; confirmed by mapping real field boundaries exactly before trusting
-// this. NORMAL/GROUP do NOT share this shape (their extra operands are
-// numeric/keyword flags, not labels) -- this is intentionally a separate
+// CR TEST/CR CRS/CR REQ's op2 and op3 -- confirmed against real production
+// data (BIO) to be genuine I-line BRANCH labels, not data references: e.g.
+// `CR TEST FLK-P FLK-H RES1-C` has `FLK-H`/`RES1-C` declared elsewhere in
+// the same block as `I FLK-H PRINT 1 FLK` / `I RES1-C MOVE 1 LITPRINT`;
+// `CR REQ REQ-P REQ-H REQ-L` likewise (`REQ-H`/`REQ-L` are real I-line
+// labels, `REQ-P` is a declared `N` numeric label). Either or both can be
+// legitimately blank (e.g. `CR CRS EPP-P` alone, or `CR CRS EPP-P <blank>
+// EPP-C`; `CR REQ REQ-P REQ-H` with op3 omitted) -- each field is
+// independently bounded (no shared unbounded separator between
+// op1/op2/op3), so a blank middle field can't be crossed into by a later
+// field the way the keyword's own separator bug could; confirmed by
+// mapping real field boundaries exactly before trusting this.
+// `CR COM` does NOT share this shape -- confirmed against all 6 real
+// occurrences in the corpus, it never has op2/op3 at all (just an optional
+// op1) -- so it's in DATA_REFERENCE_RE above but deliberately excluded
+// here. NORMAL/GROUP also do NOT share this shape (their extra operands
+// are numeric/keyword flags, not labels). This is intentionally a separate
 // regex from DATA_REFERENCE_RE, not a generalization of it.
-const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQ)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
 
 // Keywords whose operand is confirmed NEVER genuinely blank in real
-// production data (Reference Manual Error 7, "Missing operand"). GROUP is
-// deliberately excluded despite being in DATA_REFERENCE_RE above: a bare
-// `GROUP` with no operand at all occurs 101 times across the real corpus
-// (23% of all GROUP usage) -- a legitimate, common pattern (its own
-// meaning, not an omission), confirmed by checking real matching lines, not
-// just an aggregate count. NORMAL/CR TEST/CR CRS have zero blank-operand
-// instances across 1656 combined real uses, so a blank operand for those
-// three is safe to treat as a genuine mistake.
-const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS']);
+// production data (Reference Manual Error 7, "Missing operand"). GROUP and
+// CR COM are deliberately excluded despite being in DATA_REFERENCE_RE
+// above: a bare `GROUP` with no operand at all occurs 101 times across the
+// real corpus (23% of all GROUP usage), and a bare `CR COM` occurs 4 of
+// its 6 total real uses (67%) -- both legitimate, common patterns (their
+// own meaning, not an omission), confirmed by checking real matching
+// lines, not just an aggregate count. NORMAL/CR TEST/CR CRS/CR REQ have
+// zero blank-operand instances across 1688 combined real uses, so a blank
+// operand for those four is safe to treat as a genuine mistake.
+const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ']);
 
 // Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
 // declaration, per the TCP Introduction Manual (e.g. "there is a box with

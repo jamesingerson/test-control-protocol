@@ -274,7 +274,7 @@
 					"name": "comment.line.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:NORMAL|GROUP)\\b\\s{1,4})(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:NORMAL|GROUP|CR COM)\\b\\s{1,4})(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"cr-report-lines": {
@@ -301,7 +301,7 @@
 					"name": "comment.line.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:CR TEST|CR CRS)\\b\\s{1,4})(.{1,9}\\s)?(.{1,9}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:CR TEST|CR CRS|CR REQ)\\b\\s{1,4})(.{1,9}\\s)?(.{1,9}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

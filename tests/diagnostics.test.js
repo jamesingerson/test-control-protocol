@@ -111,6 +111,31 @@ run('resolves CR TEST/CR CRS branch labels declared elsewhere in the same block'
   assert.strictEqual(diags.length, 0);
 });
 
+run('resolves CR REQ (the fourth CR-family member) the same way as CR TEST/CR CRS', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('N', 'REQ-P', '9', '7'),
+    iLine('', 'CR REQ', 'REQ-P', 'REQ-H', 'REQ-L'),
+    iLine('REQ-H', 'MOVE,A', 'DATESPEC', 'DATE8'),
+    iLine('REQ-L', 'PRINT', '1', 'REF'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('CR COM has no label operands: a bare CR COM or CR COM + data ref never triggers undefined-label/missing-operand', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('N', 'HBAC-P', '4889', '33'),
+    iLine('HBACOMS', 'CR COM', 'HBAC-P'),
+    iLine('', 'CR COM'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('flags a GOTCP target with no matching test code in the workspace index', () => {
   const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
   const diags = computeDiagnostics(lines, { testCodes: new Set(['0302', '0500']) });

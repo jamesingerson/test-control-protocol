@@ -12,3 +12,6 @@
        I          CR CRS   CRSB-P            CRSB-C
        I          GROUP    TITLE
        I NEXT     GROUP
+       I          CR REQ   REQA-P   REQA-H   REQA-L
+       I HBACOMS  CR COM   HBAC-P
+       I          CR COM

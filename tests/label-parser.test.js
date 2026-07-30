@@ -123,6 +123,20 @@ run('findLabelReferences tolerates a blank op2 for CR CRS without swallowing op3
   );
 });
 
+run('findLabelReferences finds CR REQ op2/op3 as branch labels, the same shape as CR TEST/CR CRS (real BIO shape)', () => {
+  const lines = [iLine('', 'CR REQ', 'REQ-P', 'REQ-H', 'REQ-L')];
+  const refs = findLabelReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['REQ-H', 'REQ-L']
+  );
+});
+
+run('findLabelReferences does not treat CR COM as having label operands (confirmed: never has op2/op3 in the real corpus)', () => {
+  const lines = [iLine('HBACOMS', 'CR COM', 'HBAC-P')];
+  assert.strictEqual(findLabelReferences(lines).length, 0);
+});
+
 run('findLabelReferences excludes ~-prefixed macro-internal targets', () => {
   const lines = [iLine('', 'GOTO', '~1')];
   assert.strictEqual(findLabelReferences(lines).length, 0);
@@ -223,6 +237,21 @@ run('findDataReferences resolves NORMAL/CR TEST/CR CRS/GROUP operand1 against de
   );
 });
 
+run('findDataReferences resolves CR REQ/CR COM operand1 too (confirmed as two more members of the same CR family)', () => {
+  // Real shapes: "CR REQ REQ-P REQ-H REQ-L", "CR COM HBAC-P" (or bare "CR COM").
+  const lines = [iLine('', 'CR REQ', 'REQ-P', 'REQ-H', 'REQ-L'), iLine('HBACOMS', 'CR COM', 'HBAC-P')];
+  const refs = findDataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['REQ-P', 'HBAC-P']
+  );
+});
+
+run('findDataReferences does not require an operand for a bare CR COM (real, common, 4 of 6 real occurrences)', () => {
+  const lines = [iLine('', 'CR COM')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
 run('findDataReferences excludes the implicit built-in TCPNAME box (real GROUP TCPNAME shape)', () => {
   const lines = [iLine('', 'GROUP', 'TCPNAME')];
   assert.ok(isImplicitDataLabel('TCPNAME'));
@@ -245,17 +274,17 @@ run('findDataReferences does not mistake a distant trailing comment for a blank 
   assert.strictEqual(findDataReferences([line]).length, 0);
 });
 
-run('findMissingDataOperands flags NORMAL/CR TEST/CR CRS used with a blank operand', () => {
-  const lines = [iLine('', 'NORMAL'), iLine('', 'CR TEST'), iLine('', 'CR CRS')];
+run('findMissingDataOperands flags NORMAL/CR TEST/CR CRS/CR REQ used with a blank operand', () => {
+  const lines = [iLine('', 'NORMAL'), iLine('', 'CR TEST'), iLine('', 'CR CRS'), iLine('', 'CR REQ')];
   const missing = findMissingDataOperands(lines);
   assert.deepStrictEqual(
     missing.map((m) => m.keyword),
-    ['NORMAL', 'CR TEST', 'CR CRS']
+    ['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ']
   );
 });
 
-run('findMissingDataOperands does not flag a bare GROUP with no operand (real, common, 101 occurrences in production)', () => {
-  const lines = [iLine('', 'GROUP')];
+run('findMissingDataOperands does not flag a bare GROUP or CR COM with no operand (real, common patterns in production)', () => {
+  const lines = [iLine('', 'GROUP'), iLine('', 'CR COM')];
   assert.strictEqual(findMissingDataOperands(lines).length, 0);
 });
 

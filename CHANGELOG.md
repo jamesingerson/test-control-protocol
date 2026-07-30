@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.6.0
+
+- Added `CR REQ` and `CR COM` as two more members of the same "cumulative report" family as `CR TEST`/`CR CRS`, found via a corpus-wide operand audit. `CR REQ` shares `CR TEST`/`CR CRS`'s exact shape (op1 = data reference, op2/op3 = branch labels, either can be blank) and is now checked/highlighted identically. `CR COM` only ever has op1 (a data reference, sometimes omitted — confirmed against all 6 real occurrences in the corpus) — no label operands.
+
 ## 0.5.0
 
 - `CR TEST`/`CR CRS`'s 2nd and 3rd operands are real `I`-line branch labels (e.g. `CR TEST FLK-P FLK-H RES1-C` — `FLK-H`/`RES1-C` are declared elsewhere in the block as `I FLK-H ...`/`I RES1-C ...`), not data references. They're now highlighted the same colour as other branch labels (matching GOTO targets) instead of plain operand text, and checked by the existing undefined-label diagnostic the same way a GOTO target is — including tolerating a genuinely blank op2 (e.g. `CR CRS EPP-P` with only op3 present), a real, common pattern.

@@ -26,7 +26,7 @@
 #                          ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                            ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
-#                                                     ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol invalid.testcontrolprotocol
+#                                                     ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol comment.line.testcontrolprotocol
 >       R AGERNG  999      64       82                adult
 #^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol number-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
@@ -35,5 +35,5 @@
 #                          ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                   ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
 #                                            ^^^^^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol string.testcontrolprotocol
-#                                                     ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol invalid.testcontrolprotocol
+#                                                     ^^^^^ source.testcontrolprotocol number-line.testcontrolprotocol comment.line.testcontrolprotocol
 >

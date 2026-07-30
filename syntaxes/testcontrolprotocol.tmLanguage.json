@@ -70,7 +70,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"5": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})([TQ]\\d{4})(.{1,17})?(.{1,62})?(.*)",
@@ -112,7 +112,7 @@
 					"name": "string.control.testcontrolprotocol"
 				},
 				"5": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\bH\\b\\s)(.{1,8}\\s)?(.{1,61})(.*)",
@@ -139,7 +139,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"8": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\b[NRS]\\b\\s)(.{8}\\s*)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.*)",
@@ -184,7 +184,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"8": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:GOTO(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|GOSUB(?:,(?:EQ|NE|GT|GE|LT|LE|IR|OR|MM|M))?|DATE,(?:EQ|NE|GT|GE|LT|LE)|GET(?:,[EOA])?)\\s+)(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
@@ -211,7 +211,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"8": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bSEARCH\\s+)(.{1,9}\\s)?(\\b(?:PATIENT|DATETIME|ARRSET|REPORTED|TRACKED|TESTDEPT|REQUEST|CONSTIT|ANTIBODY|PRODUCT|GROUP|TEST|NAME)\\b\\s*)?(.{1,8})?(.*)",
@@ -238,7 +238,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"8": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\\s+)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
@@ -265,7 +265,7 @@
 					"name": "string.testcontrolprotocol"
 				},
 				"8": {
-					"name": "invalid.testcontrolprotocol"
+					"name": "comment.line.testcontrolprotocol"
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",

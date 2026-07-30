@@ -170,25 +170,76 @@ Raised by the user after using the shipped feature: `CR TEST`/`CR CRS`'s 2nd and
 - [x] Grammar: split the shared `data-reference-lines` rule into `data-reference-lines` (`NORMAL`/`GROUP`, unchanged) and a new `cr-report-lines` (`CR TEST`/`CR CRS`, op2/op3 now `entity.name.function.testcontrolprotocol` — yellow, matching branch labels) — a single shared rule couldn't give op2/op3 different capture scopes depending on which keyword matched.
 - [x] **Validation**: re-ran the full undefined-label check against the entire real corpus after this change (since it extends an already-shipped, previously-zero-false-positive check) — still zero diagnostics. New fixture coverage added for both the two-label case and the blank-op2-then-op3 case, snapshot diff reviewed.
 
-## Comprehensive operand highlighting audit (2026-07-30)
+## Comprehensive operand highlighting audit (2026-07-30) — tracked backlog
 
-Asked directly: are there other operand positions across the whole instruction set that are consistently labels (should be yellow) or data references (should be blue) but aren't highlighted that way yet? Built a one-off (not committed) corpus-wide script: for every real I-line in every T/Q block, split into opcode + up to 4 generic 9-char operand fields, then classify each value against that block's known branch labels (incl. macro-injected), known data declarations (incl. macro-injected and `GLOBAL`), or a plain numeric literal. Aggregated resolve rates per (opcode, operand-position) across the whole corpus, spot-checked the highest-volume/highest-confidence findings against real lines before trusting any of it (same discipline as the `SIGNOUT`/`MOVE,D` false-signal catch earlier).
+Asked directly: are there other operand positions across the whole instruction set that are consistently labels (should be yellow) or data references (should be blue) but aren't highlighted that way yet? Built a one-off (not committed) corpus-wide script: for every real I-line in every T/Q block, split into opcode + up to 4 generic 9-char operand fields, then classify each value against that block's known branch labels (incl. macro-injected), known data declarations (incl. macro-injected and `GLOBAL`), or a plain numeric literal. Aggregated resolve rates per (opcode, operand-position) across the whole corpus, spot-checked the highest-volume/highest-confidence findings against real lines before trusting any of it (same discipline as the `SIGNOUT`/`MOVE,D` false-signal catch earlier). This section is a live backlog — check items off as they land, add anything newly discovered.
 
-**Confirmed real findings, not yet all implemented:**
-- **`PRINT` op2 — by far the single largest opportunity**: 9,618 real uses, ~67% resolve to a real/global data label (`PRINT 1 TITLE`, `PRINT +1 NAME`, `PRINT 1 REQNO`). Not yet implemented — the ~28% "other" bucket needs understanding first before committing to exact scope/severity.
-- New unhandled keywords where op1 is a clean (95-100%) branch label: `REQPRIOR` (`REQPRIOR FIN`), `COPYDR` (`COPYDR PRG-RET FIRST`), `CRDX` (`CRDX HEAD 5`), `REQUEST` (`REQUEST ERREND TAV1`, confirmed even an oddly-named real label like `2ND` resolves correctly). Not yet implemented.
-- New unhandled keywords/positions with high (70-100%) data-reference rates: `MOVE,AV` op1 (2786 uses, 76%), `TESTRES` op2 (278, 81%), `MOLPCR`/`HL7NUM`/`HL7NUMX` op2 (100% each), `MICSIGN` op1-3 (100%), `SENDGRP`/`SENDORD`/`ALPHA`/`QIAMCR`/`CHARGE` op1 (100% each), and roughly a dozen smaller ones. Not yet implemented.
-- Additional operand positions on already-handled keyword families: `GOTO,M` op2/op3 (2894 uses, 80%/79% data), `GOTO,EQ`/`GOTO,NE` op3 when non-numeric (~71%). Not yet implemented.
-- **`CR REQ` and `CR COM`** — confirmed as two more members of the exact `CR TEST`/`CR CRS` family. **Implemented in 0.6.0**, see below.
+### Done
 
-**Open design question, not yet resolved:** the real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Needs a decision (highlight everything technically correct, or exclude short/constant-like global tokens) before implementing any of the remaining findings above that would surface this pattern at scale (e.g. `PRINT` op2, `SENDRSLT`, `MICSIGN`).
+- [x] **`CR REQ`** (0.6.0) — identical shape to `CR TEST`/`CR CRS`: `I CR REQ REQ-P REQ-H REQ-L`, `REQ-P` a declared `N` numeric label (data), `REQ-H`/`REQ-L` real `I`-line branch labels. Op1 never blank across 32 real occurrences — in `MISSING_OPERAND_KEYWORDS` too.
+- [x] **`CR COM`** (0.6.0) — genuine fourth "CR" family member (`I HBACOMS CR COM HBAC-P`, alongside `CR TEST`/`CR CRS` in the same real block in `BIOCUM`) but narrower: never has op2/op3 across all 6 real occurrences, and bare (no op1) 4 of those 6 times — same "legitimate common bare usage" as `GROUP`, excluded from `MISSING_OPERAND_KEYWORDS`.
 
-**Related but separate opportunity, noted in passing:** `GOTO,EQ`'s own comparison-field operand (op2, e.g. `VALUE`/`ABN-RSLT`/`PROG-NO`) is ~98% one of a small fixed vocabulary — same shape as `SEARCH`'s already-implemented 12-word check. Not a label/data-reference coloring question; would be its own "unrecognized comparison field" diagnostic if wanted later.
+### Newly found while re-auditing, not yet implemented
 
-### CR REQ / CR COM confirmed and implemented (0.6.0)
+- [ ] **`CR REQL`** — a **sixth** "CR" family member, missed in the first pass. 6 real occurrences, 100% clean on all three operand positions: op1 data reference, op2 always a real branch label, op3 a branch label when present (blank 2 of 6 times). Same shape as `CR REQ` — should be a trivial addition to `cr-report-lines`/`CR_LABEL_RE`/`DATA_REFERENCE_RE` once picked up, following the exact same verification steps as `CR REQ`.
 
-Investigated on request after the `CR TEST`/`CR CRS` fix, using the audit above as the starting signal (`CR REQ` op1: 100% data, 0% blank; `CR REQ` op2/op3: 100% label; `CR COM` op1: 100% data among non-blank, but blank 4 of 6 total real uses).
+### Pure branch-label candidates (op1, 95–100% label rate), not yet implemented
 
-- **`CR REQ`**: confirmed identical shape to `CR TEST`/`CR CRS` — `I CR REQ REQ-P REQ-H REQ-L`, where `REQ-P` is a declared `N` numeric label (`N REQ-P 9 7`, a data reference) and `REQ-H`/`REQ-L` are real `I`-line branch labels (`I REQ-H MOVE,A ...`, `I REQ-L PRINT ...`). Op1 is never blank across all 32 real occurrences — added to `MISSING_OPERAND_KEYWORDS` alongside `NORMAL`/`CR TEST`/`CR CRS`. Added to both `DATA_REFERENCE_RE` (op1) and `CR_LABEL_RE` (op2/op3), and to the grammar's `cr-report-lines` rule.
-- **`CR COM`**: confirmed a genuine fourth "CR" family member (`I HBACOMS CR COM HBAC-P`, sitting directly alongside `CR TEST`/`CR CRS` in the same real cumulative-report block in `BIOCUM`; `HBAC-P` is a declared `N` numeric label) — but with a narrower shape than the other three: enumerated all 6 real occurrences in the corpus by hand, and it **never** has op2/op3 at all, and is bare (no op1 either) in 4 of the 6 (67%) — a legitimate, common pattern like `GROUP`. Added to `DATA_REFERENCE_RE` (op1) and the grammar's `data-reference-lines` rule (not `cr-report-lines`, since it has no label operands), but deliberately excluded from `CR_LABEL_RE` and from `MISSING_OPERAND_KEYWORDS`.
-- **Validation**: re-ran the full corpus check after adding both (this extends the already-shipped, previously-zero-false-positive undefined-label/undefined-data-reference/missing-operand checks) — zero diagnostics. New fixture coverage for all three shapes (`CR REQ` with both labels, `CR COM` with a data ref, bare `CR COM`), snapshot diff reviewed.
+- [ ] `REQPRIOR` op1 (41 uses, 95% — `REQPRIOR FIN`)
+- [ ] `OPENFILE` op1 (73, 100%)
+- [ ] `COPYDR` op1 (34, 100% — `COPYDR PRG-RET FIRST`)
+- [ ] `CRDX` op1 (23, 100% — `CRDX HEAD 5`)
+- [ ] `REQUEST` op1 (7, 100% — `REQUEST ERREND TAV1`; confirmed even an oddly-named real label like `2ND` resolves)
+- [ ] `REQNEXT` op1 (7, 100%)
+- [ ] `GETSPEC` op1 (6, 100%)
+
+### Pure data-reference candidates (blue), not yet implemented
+
+By volume, largest first:
+- [ ] **`PRINT` op2 — by far the single largest opportunity**: 9,618 real uses, ~67% resolve to a real/global data label (`PRINT 1 TITLE`, `PRINT +1 NAME`, `PRINT 1 REQNO`). **Currently being investigated** — see below.
+- [ ] `MOVE,AV` op1 (2786, 76%)
+- [ ] `SENDRSLT` op1/op2 (1094 each, 100%) — surfaces the single-letter-constant question below (`SENDRSLT Y Y Y`)
+- [ ] `MOVE,AP` op1 (877, 62%)
+- [ ] `TESTRES` op2 (278, 81%)
+- [ ] `SENDGRP`/`SENDORD` op1 (261 each, 100%)
+- [ ] `PRINT,H` op2 (208, 82%)
+- [ ] `TESTADD` op1 (200, 81% of non-numeric)
+- [ ] `HL7NUM` op2 (151, 100%)
+- [ ] `HL7SET` op1 (137, 62%)
+- [ ] `HL7NUMX` op2 (139, 100%)
+- [ ] `MOLPCR` op2 (129, 100%)
+- [ ] `SIGNOUT`-style false positives already excluded — not a real candidate, listed here only as a reminder not to re-add it
+- [ ] `MICSIGN` op1/op2/op3 (92 each, 100%)
+- [ ] `ALPHA` op1 (89, 100% of non-blank)
+- [ ] `PRINT,A` op2 (83, 100%)
+- [ ] `QIAMCR` op1 (64, 100%)
+- [ ] `ERROR,NE` op3 (60, 89%)
+- [ ] `CHARGE` op1 (48, 100%)
+- [ ] `ERROR,OR` op3 (41, 98%)
+- [ ] `HAEMNUM` op2 (35, 100% of non-blank)
+- [ ] `GOTO,OR` op3 (35, 100%)
+- [ ] `STATS` op2 (33, 100% of non-blank)
+- [ ] `SERO-INT` op2 (27, 100%)
+- [ ] `RESPREF` op2 (25, 100%)
+- [ ] `CHECK*` op1 (21, 100%) — note the literal `*` is part of the keyword name
+- [ ] Long tail (5–12 uses each, all ≥89%): `QLINKPN` op1, `BGASNUM` op2/op3, `URINEMC1` op2, `PCR-CT` op1, `REPTKEY` op1, `ERROR,M` op2, `EPCRMCR` op2/op3, `NUMERIC` op2, `ENA-INT` op1, `HAMHL7N2` op2, `PNMCR3` op1, `PLNOREP` op1, `SPOREMAC` op1, `COVRNA` op1, `WHKPNEGE` op1, `PTESTMCR` op1/op2
+
+### Additional operand positions on already-handled keyword families, not yet implemented
+
+- [ ] `GOTO,M` op2/op3 (2894 uses, 80%/79% data)
+- [ ] `GOTO,EQ` op3 when non-numeric (4651, 71% of non-numeric)
+- [ ] `GOTO,NE` op3 when non-numeric (1343, 67% of non-numeric)
+- [ ] `GOTO,MM` op2/op3 (524, 55%/91%)
+- [ ] `GOSUB,EQ` op3 (193, 97% of non-numeric)
+- [ ] `GOSUB,M` op2/op3 (119, 63%/100%)
+- [ ] `ERROR,MM` op2/op3 (813, 98%/58%)
+- [ ] `ERROR,EQ` op3 (92, 67% of non-numeric)
+- [ ] Borderline, needs more scrutiny before trusting (50–65% range, could be a mixed-semantics field like `MOVE,D`'s `VALUE`): `GOTO,GE` op3 (54%), `GOSUB,M` op2 (63%)
+
+### Open design question, not yet resolved
+
+The real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Needs a decision (highlight everything technically correct, or exclude short/constant-like global tokens) before implementing any of the findings above that would surface this pattern at scale (`PRINT` op2, `SENDRSLT`, `MICSIGN`).
+
+### Related but separate opportunity, noted in passing
+
+`GOTO,EQ`'s own comparison-field operand (op2, e.g. `VALUE`/`ABN-RSLT`/`PROG-NO`) is ~98% one of a small fixed vocabulary — same shape as `SEARCH`'s already-implemented 12-word check. Not a label/data-reference coloring question; would be its own "unrecognized comparison field" diagnostic if wanted later.

@@ -22,6 +22,8 @@ const {
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findDataDeclarations,
+  findDataReferences,
   findOpcodeFields,
 } = require('./labelParser');
 
@@ -35,6 +37,9 @@ const {
  * @param {Set<string>} [options.testCodes] all 4-digit test codes found
  *   anywhere in the workspace, from buildWorkspaceIndex. When provided,
  *   GOTCP targets not present in this set are flagged.
+ * @param {Set<string>} [options.globalDataLabels] A-line data labels
+ *   declared in the workspace's GLOBAL file, from buildWorkspaceIndex --
+ *   available in every block regardless of local declarations.
  * @returns {Array<{line: number, startCol: number, endCol: number, severity: 'error'|'warning', code: string, message: string}>}
  */
 function computeDiagnostics(lines, options) {
@@ -67,9 +72,11 @@ function computeDiagnostics(lines, options) {
       }
     }
 
+    const opcodesInBlock = findOpcodeFields(blockLines);
+
     const knownLabels = new Set(defsByLabel.keys());
     if (opts.macroLabels) {
-      for (const opcode of findOpcodeFields(blockLines)) {
+      for (const opcode of opcodesInBlock) {
         const injected = opts.macroLabels.get(opcode.text);
         if (injected) {
           for (const label of injected) knownLabels.add(label);
@@ -86,6 +93,39 @@ function computeDiagnostics(lines, options) {
         severity: 'error',
         code: 'undefined-label',
         message: `Undefined label '${ref.label}' has no matching definition in ${block.name}`,
+      });
+    }
+
+    // Undefined data reference (Reference Manual Errors 8/10): NORMAL/CR
+    // TEST/CR CRS/GROUP's operand should resolve to a declared A/M/N/R/S/H
+    // data label, exactly like a branch label does for GOTO -- but scoped
+    // to a deliberately narrow keyword whitelist (see labelParser.js's
+    // DATA_REFERENCE_RE) rather than every instruction, since most
+    // instructions' operands were confirmed NOT to be data references when
+    // sampled against the real corpus. Warning severity, not error: this
+    // check is newer and less exhaustively validated than undefined-label.
+    const knownDataLabels = new Set(findDataDeclarations(blockLines).map((d) => d.label));
+    if (opts.macroLabels) {
+      for (const opcode of opcodesInBlock) {
+        const injected = opts.macroLabels.get(opcode.text);
+        if (injected) {
+          for (const label of injected) knownDataLabels.add(label);
+        }
+      }
+    }
+    if (opts.globalDataLabels) {
+      for (const label of opts.globalDataLabels) knownDataLabels.add(label);
+    }
+
+    for (const ref of findDataReferences(blockLines)) {
+      if (knownDataLabels.has(ref.label)) continue;
+      diagnostics.push({
+        line: block.startLine + ref.line,
+        startCol: ref.startCol,
+        endCol: ref.endCol,
+        severity: 'warning',
+        code: 'undefined-data-reference',
+        message: `'${ref.label}' has no matching A/M/N/R/S/H data declaration in ${block.name}`,
       });
     }
 

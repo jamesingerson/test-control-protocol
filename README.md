@@ -50,8 +50,11 @@ As you edit, this extension flags:
 - GOTO/GOSUB/DATE/GET/SEARCH references to a label with no matching definition
 - Duplicate label definitions
 - GOTCP references to a test code that doesn't exist anywhere in the workspace
+- `NORMAL`/`CR TEST`/`CR CRS`/`GROUP` operands with no matching `A`/`M`/`N`/`R`/`S`/`H` data declaration (a warning, not an error — see below)
 
-Checks run on-change, debounced, so they don't run on every keystroke. They're scoped per `T`/`Q` test-definition block, not per file — a single file can legitimately bundle many separate test scripts, each with its own label namespace — and are macro-aware, so a block that invokes a `D`-defined macro inherits that macro's internal labels as valid targets. `~`-prefixed macro-internal labels are exempted from all checks, since they're only disambiguated at assembly time. See `TODO.md`'s "Label and GOTCP verification feature" section for the full design and how it was validated against real production data.
+Checks run on-change, debounced, so they don't run on every keystroke. They're scoped per `T`/`Q` test-definition block, not per file — a single file can legitimately bundle many separate test scripts, each with its own label namespace — and are macro-aware, so a block that invokes a `D`-defined macro inherits that macro's internal labels and data declarations as valid targets. Data-reference checks also resolve against the workspace's `GLOBAL` file and one confirmed built-in (`TCPNAME`). `~`-prefixed macro-internal labels are exempted from all checks, since they're only disambiguated at assembly time. See `TODO.md`'s "Label and GOTCP verification feature" and "Undefined data reference feature" sections for the full design and how each was validated against real production data.
+
+The data-reference check is deliberately narrow — only `NORMAL`/`CR TEST`/`CR CRS`/`GROUP`, not every instruction that might reference data. Sampling real usage showed most instructions' first operand isn't a data reference at all (numeric literals, special keywords, or something else), and a blanket check would have been mostly noise; see `TODO.md` for the analysis and why two plausible-looking candidates (`SIGNOUT`, `MOVE,D`) were rejected.
 
 A few things worth knowing before relying on or sharing this:
 

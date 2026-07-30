@@ -48,6 +48,64 @@ const I_LINE_OPCODE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)?(.{1,8}\s)?/d;
 // the real production MACRO file (254 macros, each delimited this way).
 const D_LINE_NAME_RE = /^(.{7})(\bD\b\s)([^ ]{1,8})?/d;
 
+// A/M-line's own label (alpha data declaration) -- mirrors alpha-lines' match.
+const ALPHA_DATA_LABEL_RE = /^(.{7})(\b[AM]\b\s)(.{1,8}\s)/d;
+
+// N/R/S-line's own label (numeric/range data declaration) -- mirrors
+// number-lines' match.
+const NUMBER_DATA_LABEL_RE = /^(.{7})(\b[NRS]\b\s)(.{1,8}\s)/d;
+
+// H-line's own label (hex data declaration, optional field) -- mirrors
+// hex-lines' match.
+const HEX_DATA_LABEL_RE = /^(.{7})(\bH\b\s)(.{1,8}\s)?/d;
+
+// The real `GLOBAL` file's header -- mirrors global-header-lines' match.
+// Every A-line in a file containing this header is a globally available
+// data label, not scoped to any block -- confirmed against the real
+// production `GLOBAL` file (130 lines: this header, comments, and A-lines
+// only, nothing else).
+const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
+
+// Operand1 of a small, deliberately narrow whitelist of instructions whose
+// operand is confirmed (by sampling the real production corpus) to
+// genuinely reference a declared A/M/N/R/S/H data label, not a numeric
+// literal, a special CRS-parsing keyword (TYPE/RESULT/VALUE/ELEMENT), or
+// something else entirely. Two plausible-looking candidates were checked
+// and REJECTED: SIGNOUT's operand is a numeric test code (not a data
+// label), and MOVE,D's operand is almost always the special word `VALUE`
+// -- neither is actually "referencing declared data." See TODO.md's
+// "Undefined data reference" section for the frequency analysis behind
+// this list; it is intentionally not exhaustive (the manual documents 100+
+// instructions, most with unvalidated operand semantics).
+//
+// The separator after the keyword is bounded to \s{1,4} (enough to finish
+// out its own 9-char field: "GROUP" + 4 spaces, "NORMAL" + 3, "CR TEST"/"CR
+// CRS" + 2 -- all confirmed against real spacing), NOT unbounded \s+. A
+// real production line can use one of these keywords with a genuinely
+// blank operand1 followed, many blank fields later, by a distant trailing
+// comment (e.g. `I NEXT GROUP <lots of blank fields> No`) -- unbounded
+// \s+ would greedily cross every blank field in between and let the
+// optional operand-capture group latch onto that far-away comment word
+// instead of correctly seeing operand1 as blank. Same bug class as the
+// "number-line label field swallowed its own comment" fix elsewhere in
+// this grammar; confirmed via a real false positive here too (`GROUP`
+// lines in HAEM/HISTO/PALMSAP each followed by a distant `No`/`for ...`
+// comment, wrongly flagged as an undefined reference to that word).
+const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
+
+// Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
+// declaration, per the TCP Introduction Manual (e.g. "there is a box with
+// the label TCPNAME. This contains the Test Name as entered on the Title
+// line."). Confirmed as a real false-positive source: a real `GROUP TITLE`
+// vs `GROUP TCPNAME` comparison in production data showed TCPNAME never
+// declared locally, yet clearly valid. Not exhaustive -- only what's been
+// directly confirmed so far.
+const IMPLICIT_DATA_LABELS = new Set(['TCPNAME']);
+
+function isImplicitDataLabel(label) {
+  return IMPLICIT_DATA_LABELS.has(label);
+}
+
 // A test/query definition's header line -- mirrors title-lines' match.
 // Confirmed against real production data (e.g. a single physical file named
 // `BIO` bundles 623 separate T/Q-delimited test scripts): GOTO/GOSUB/label
@@ -142,6 +200,56 @@ function findGotcpReferences(lines) {
 }
 
 /**
+ * A/M/N/R/S/H-line data declarations (the box a label identifies, per the
+ * Introduction Manual's "every item of data is held in a box... identified
+ * by a LABEL" model) -- a separate namespace from I-line branch labels.
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findDataDeclarations(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found =
+      extractGroup(line, ALPHA_DATA_LABEL_RE, 3) ||
+      extractGroup(line, NUMBER_DATA_LABEL_RE, 3) ||
+      extractGroup(line, HEX_DATA_LABEL_RE, 3);
+    if (found) {
+      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
+ * Operand1 of the narrow NORMAL/CR TEST/CR CRS/GROUP whitelist (see
+ * DATA_REFERENCE_RE) -- references into the A/M/N/R/S/H data-declaration
+ * namespace, not the branch-label namespace findLabelReferences covers.
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findDataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, DATA_REFERENCE_RE, 5);
+    if (found && !isImplicitDataLabel(found.text)) {
+      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
+ * Whether this document is the (or a) global-data file -- every A-line
+ * label it declares is available everywhere in the workspace, not scoped
+ * to a block.
+ * @param {string[]} lines
+ * @returns {boolean}
+ */
+function isGlobalDataFile(lines) {
+  return lines.some((line) => GLOBAL_HEADER_RE.test(line));
+}
+
+/**
  * Every I-line's opcode field (see I_LINE_OPCODE_RE), regardless of whether
  * it's a recognized keyword or a macro name -- the caller cross-references
  * against a known macro-name index to find macro invocations.
@@ -197,9 +305,13 @@ function findTestBlocks(lines) {
 
 module.exports = {
   isMacroInternalLabel,
+  isImplicitDataLabel,
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findDataDeclarations,
+  findDataReferences,
+  isGlobalDataFile,
   findOpcodeFields,
   findMacroDefinitions,
   findTestBlocks,

@@ -7,6 +7,9 @@ const LN = ' '.repeat(7);
 function iLine(label, ...fields) {
   return LN + 'I ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
 }
+function dataLine(type, label, ...fields) {
+  return LN + type + ' ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
+}
 
 function run(name, fn) {
   try {
@@ -51,6 +54,29 @@ run('buildWorkspaceIndex merges labels for the same macro name defined in more t
   ];
   const index = buildWorkspaceIndex(documents);
   assert.deepStrictEqual([...index.macroLabels.get('SHAREMAC')].sort(), ['BAR', 'FOO']);
+});
+
+run('buildWorkspaceIndex includes a macro body\'s data declarations (A/N/R/S/H), not just its branch labels', () => {
+  const documents = [
+    {
+      uri: 'MACRO',
+      lines: [LN + 'D SOMEMAC', dataLine('N', 'REF', '0.10', '5.00'), iLine('', 'END')],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.deepStrictEqual([...index.macroLabels.get('SOMEMAC')].sort(), ['REF']);
+});
+
+run('buildWorkspaceIndex collects data labels from the real GLOBAL header shape, workspace-wide', () => {
+  const documents = [
+    {
+      uri: 'GLOBAL',
+      lines: [LN + 'GLOBAL ALPHA DATA', dataLine('A', 'SPACE', '_'), dataLine('A', 'DASH', '-')],
+    },
+    { uri: 'BIO', lines: [LN + 'T0302 Procalcitonin', dataLine('A', 'TITLE', 'x')] },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.deepStrictEqual([...index.globalDataLabels].sort(), ['DASH', 'SPACE']);
 });
 
 console.log('all workspace-index tests passed');

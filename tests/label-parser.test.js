@@ -3,9 +3,13 @@
 const assert = require('assert');
 const {
   isMacroInternalLabel,
+  isImplicitDataLabel,
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
+  findDataDeclarations,
+  findDataReferences,
+  isGlobalDataFile,
   findOpcodeFields,
   findMacroDefinitions,
   findTestBlocks,
@@ -17,6 +21,12 @@ const {
 const LN = ' '.repeat(7);
 function iLine(label, ...fields) {
   return LN + 'I ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
+}
+
+// Builds a fixed-column data-declaration line (A/M/N/R/S/H): the type
+// letter, then the label field, then any remaining fields.
+function dataLine(type, label, ...fields) {
+  return LN + type + ' ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
 }
 
 function run(name, fn) {
@@ -162,6 +172,61 @@ run('findOpcodeFields extracts the field after the label on every I-line, matchi
   const opcodes = findOpcodeFields(lines);
   assert.strictEqual(opcodes.length, 1);
   assert.strictEqual(opcodes[0].text, 'DRUGMCR');
+});
+
+run('findDataDeclarations finds A/M/N/R/S/H-line labels, a separate namespace from I-line branch labels', () => {
+  const lines = [
+    dataLine('A', 'TITLE', 'Procalcitonin'),
+    dataLine('M', 'MASK1', 'x'),
+    dataLine('N', 'REF', '0.10', '5.00'),
+    dataLine('R', 'RRANGE', '1.00', '2.00'),
+    dataLine('S', 'SRANGE', '0', '10'),
+    dataLine('H', 'CRLF', '0D0A'),
+  ];
+  const decls = findDataDeclarations(lines);
+  assert.deepStrictEqual(
+    decls.map((d) => d.label),
+    ['TITLE', 'MASK1', 'REF', 'RRANGE', 'SRANGE', 'CRLF']
+  );
+});
+
+run('findDataReferences resolves NORMAL/CR TEST/CR CRS/GROUP operand1 against declared data labels (real BIO shape)', () => {
+  // Real production shapes: "NORMAL RRANGE", "CR TEST FLK-P ...", "GROUP TITLE".
+  const lines = [iLine('', 'NORMAL', 'RRANGE'), iLine('', 'CR TEST', 'FLK-P', 'FLK-H'), iLine('', 'GROUP', 'TITLE')];
+  const refs = findDataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['RRANGE', 'FLK-P', 'TITLE']
+  );
+});
+
+run('findDataReferences excludes the implicit built-in TCPNAME box (real GROUP TCPNAME shape)', () => {
+  const lines = [iLine('', 'GROUP', 'TCPNAME')];
+  assert.ok(isImplicitDataLabel('TCPNAME'));
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findDataReferences does not treat SIGNOUT or MOVE,D operands as data references (rejected candidates)', () => {
+  // Real shapes: "SIGNOUT 9966" (a test code, not a data label) and
+  // "MOVE,D VALUE TV2" (VALUE is the special CRS-parsing keyword, not a
+  // declared data box) -- neither keyword is in the whitelist.
+  const lines = [iLine('', 'SIGNOUT', '9966'), iLine('', 'MOVE,D', 'VALUE', 'TV2')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findDataReferences does not mistake a distant trailing comment for a blank GROUP/NORMAL operand (real HAEM/HISTO shape)', () => {
+  // Real shape: "I NEXT     GROUP                               No" --
+  // GROUP's own operand1 field is genuinely blank; "No" is a trailing
+  // free-text comment many blank fields later, not an operand.
+  const line = LN + 'I NEXT     GROUP' + ' '.repeat(31) + 'No';
+  assert.strictEqual(findDataReferences([line]).length, 0);
+});
+
+run('isGlobalDataFile detects the real GLOBAL header shape', () => {
+  const globalFile = [LN + 'GLOBAL ALPHA DATA', dataLine('A', 'SPACE', '_')];
+  const normalFile = [LN + 'T0302 Procalcitonin', dataLine('A', 'TITLE', 'x')];
+  assert.strictEqual(isGlobalDataFile(globalFile), true);
+  assert.strictEqual(isGlobalDataFile(normalFile), false);
 });
 
 console.log('all label-parser tests passed');

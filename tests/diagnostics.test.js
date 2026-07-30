@@ -10,6 +10,9 @@ function iLine(label, ...fields) {
 function titleLine(code, name) {
   return LN + code + ' ' + name;
 }
+function dataLine(type, label, ...fields) {
+  return LN + type + ' ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
+}
 
 function run(name, fn) {
   try {
@@ -103,6 +106,68 @@ run('skips GOTCP validation entirely when no testCodes index is supplied', () =>
 
 run('does not check content outside any T/Q block (macro-only files, GLOBAL headers, etc.)', () => {
   const lines = [LN + 'D SOMEMAC', iLine('', 'GOTO', 'NOWHERE'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags an undefined data reference (NORMAL/CR TEST/CR CRS/GROUP whitelist, Assembly Error 8/10 shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'NORMAL', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('does not flag a data reference resolved by a declaration in the same block', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('R', 'RRANGE', '1.00', '2.00'),
+    iLine('', 'NORMAL', 'RRANGE'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('resolves a data reference injected by an invoked macro', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'SOMEMAC'),
+    iLine('', 'GROUP', 'REF'),
+    iLine('', 'END'),
+  ];
+  const macroLabels = new Map([['SOMEMAC', new Set(['REF'])]]);
+  const diagsWithoutIndex = computeDiagnostics(lines);
+  assert.strictEqual(diagsWithoutIndex.length, 1);
+  assert.strictEqual(diagsWithoutIndex[0].code, 'undefined-data-reference');
+
+  const diagsWithIndex = computeDiagnostics(lines, { macroLabels });
+  assert.strictEqual(diagsWithIndex.length, 0);
+});
+
+run('resolves a data reference against the workspace-wide GLOBAL data labels', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GROUP', 'SPACE'), iLine('', 'END')];
+  const diagsWithoutIndex = computeDiagnostics(lines);
+  assert.strictEqual(diagsWithoutIndex.length, 1);
+
+  const diagsWithIndex = computeDiagnostics(lines, { globalDataLabels: new Set(['SPACE']) });
+  assert.strictEqual(diagsWithIndex.length, 0);
+});
+
+run('does not flag the implicit built-in TCPNAME box', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GROUP', 'TCPNAME'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not flag SIGNOUT or MOVE,D operands as data references (outside the whitelist)', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'SIGNOUT', '9966'),
+    iLine('', 'MOVE,D', 'VALUE', 'TV2'),
+    iLine('', 'END'),
+  ];
   const diags = computeDiagnostics(lines);
   assert.strictEqual(diags.length, 0);
 });

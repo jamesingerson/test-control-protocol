@@ -2,6 +2,11 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.3.0
+
+- Added an undefined-data-reference diagnostic: `NORMAL`, `CR TEST`, `CR CRS`, and `GROUP`'s operand is flagged if it doesn't match a declared `A`/`M`/`N`/`R`/`S`/`H` data label anywhere it could legitimately come from (the same block, an invoked macro's body, or the workspace's `GLOBAL` file). Deliberately scoped to just these four keywords — sampling operand behaviour across the real production corpus showed most other instructions' first operand isn't a data reference at all (numeric literals, special CRS-parsing keywords, or something else entirely), and a couple of plausible-looking candidates (`SIGNOUT`, `MOVE,D`) were checked and rejected for exactly that reason. See `TODO.md` for the full analysis.
+- Fixed a false positive in that same check: a keyword used with a genuinely blank operand, followed many blank fields later by a distant trailing comment, had that comment's first word mistaken for the operand (same bug class as an earlier number-line fix elsewhere in the grammar).
+
 ## 0.2.0
 
 - Added label and GOTCP verification diagnostics: flags GOTO/GOSUB/DATE/GET/SEARCH references to labels with no matching definition, duplicate label definitions, and GOTCP targets with no matching test code anywhere in the workspace. Runs on-change (debounced) via a real diagnostics-producing extension activation (`onLanguage:testcontrolprotocol`) — the first non-declarative code in this extension.

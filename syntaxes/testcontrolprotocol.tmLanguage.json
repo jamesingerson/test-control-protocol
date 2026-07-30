@@ -82,7 +82,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "support.type.testcontrolprotocol"
 				},
 				"4": {
 					"name": "comment.line.testcontrolprotocol"

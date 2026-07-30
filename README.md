@@ -12,7 +12,7 @@ Also has folding:
 
 <img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/images/collapse-tcp.gif?raw=true" alt="Example TCP Folding" width="800px" />
 
-As you edit, GOTO/GOSUB/DATE/GET/SEARCH references to a label with no matching definition, duplicate label definitions, and GOTCP references to a test code that doesn't exist anywhere in the workspace are flagged as problems (debounced, so it doesn't run on every keystroke). Checks are scoped per `T`/`Q` test-definition block, not per file — see `TODO.md`'s "Label and GOTCP verification feature" section for why that distinction matters and how it was validated against real production data. `~`-prefixed macro-internal labels are exempted, since they're only disambiguated at assembly time.
+Also flags undefined/duplicate labels and unresolved GOTCP targets as you edit — see the Diagnostics section below.
 
 ## Requirements
 
@@ -41,11 +41,28 @@ In the directory where you're working, if it does not already exist create a .vs
 ## Installation
 
 - In `<user home>/.vscode/extensions` folder `git clone https://github.com/pl-jamesi/test-control-protocol.git` and restart VS Code.
+- If you're updating an existing install (`git pull` in that folder), **reload or restart VS Code afterwards**. Since 0.2.0 this extension runs real code on activation (previously it was pure declarative syntax highlighting) — VS Code won't pick up a changed activation entry point in an already-running extension host without a reload.
+
+## Diagnostics
+
+As you edit, this extension flags:
+
+- GOTO/GOSUB/DATE/GET/SEARCH references to a label with no matching definition
+- Duplicate label definitions
+- GOTCP references to a test code that doesn't exist anywhere in the workspace
+
+Checks run on-change, debounced, so they don't run on every keystroke. They're scoped per `T`/`Q` test-definition block, not per file — a single file can legitimately bundle many separate test scripts, each with its own label namespace — and are macro-aware, so a block that invokes a `D`-defined macro inherits that macro's internal labels as valid targets. `~`-prefixed macro-internal labels are exempted from all checks, since they're only disambiguated at assembly time. See `TODO.md`'s "Label and GOTCP verification feature" section for the full design and how it was validated against real production data.
+
+A few things worth knowing before relying on or sharing this:
+
+- **Nothing leaves your machine.** All of this runs against files already in your workspace — no network calls, no telemetry.
+- **Cross-file checks (GOTCP targets, macro-injected labels) depend on `files.associations` already covering every relevant file**, the same requirement highlighting already has (see Requirements above). If it doesn't, those specific checks silently under-report rather than break outright — a document's own internal label checks are unaffected either way.
+- To find files workspace-wide, this scans everything (`**/*`) and watches everything for changes, then filters by `files.associations` itself — TCP files have no fixed extension to filter on up front, so there's no narrower pattern to watch instead. The cost of an unrelated file changing elsewhere in the workspace is just a debounce timer reset, not repeated file I/O.
+- **There's currently no way to turn diagnostics off independently of highlighting** — it's all-or-nothing for now.
 
 ## Known Issues
 
-- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros/globals — the label/GOTCP diagnostics described above are the one exception, and even those don't expand macro bodies beyond injecting their labels (a macro's own internal GOTO/GOTCP references, which use `OP1`/`OP2`/`OP3`-style parameter placeholders, are never checked).
-- The workspace-wide index used for GOTCP/macro resolution relies on `files.associations` to find other TCP files (see Requirements above) — if that's not configured, cross-file checks silently only see whatever's currently open; a document's own internal label checks are unaffected.
+- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros/globals — the label/GOTCP diagnostics (see Diagnostics above) are the one exception, and even those don't expand macro bodies beyond injecting their labels (a macro's own internal GOTO/GOTCP references, which use `OP1`/`OP2`/`OP3`-style parameter placeholders, are never checked).
 - Assumed line numbers will be systemically removed in the future, so they are not validated or coloured.
 - Trailing/overhanging free-text comments (anything left over after a line's declared fields) are highlighted as comments on every line type except `A` lines, as long as the whole line stays within 80 characters — past that, `invalid.too-long` takes over for the whole line, matching real compiler behaviour. `A` lines are excluded because their character-string field already spans the full remaining line width, leaving no room for a separate comment to exist.
 - Some instructions should have more intelligent highlighting, e.g. NORMAL's first operand is a reference range so the colours should match.

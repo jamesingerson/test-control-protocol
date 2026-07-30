@@ -6,6 +6,7 @@ Notable changes to this extension. Versions prior to 0.1.0 predate this file —
 
 - Added label and GOTCP verification diagnostics: flags GOTO/GOSUB/DATE/GET/SEARCH references to labels with no matching definition, duplicate label definitions, and GOTCP targets with no matching test code anywhere in the workspace. Runs on-change (debounced) via a real diagnostics-producing extension activation (`onLanguage:testcontrolprotocol`) — the first non-declarative code in this extension.
 - Checks are scoped per `T`/`Q` test-definition block (not per physical file — a single file can legitimately bundle hundreds of separate scripts, each with its own label namespace) and are macro-aware (a block invoking a `D`-defined macro inherits that macro's internal labels as valid targets). `~`-prefixed macro-internal labels are exempted from all checks.
+- Fixed a false-positive GOTCP diagnostic when the workspace root folder is itself the TCP files' folder: the workspace-wide file scan was reusing `files.associations` glob patterns with `vscode.workspace.findFiles()`, which matches relative-to-root paths rather than full paths like `files.associations` does — this silently found zero files whenever the pattern relied on the root folder's own name (e.g. `"**/TCP/**/*"` with root `C:\repos\TCP`), making every cross-file GOTCP/macro reference look unresolved.
 
 ## 0.1.0
 

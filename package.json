@@ -43,7 +43,7 @@
         "vscode-tmgrammar-test": "^0.1.3"
     },
     "scripts": {
-        "test": "node tests/label-parser.test.js && node tests/workspace-index.test.js && node tests/diagnostics.test.js && vscode-tmgrammar-snap -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
+        "test": "node tests/label-parser.test.js && node tests/workspace-index.test.js && node tests/diagnostics.test.js && node tests/glob-match.test.js && vscode-tmgrammar-snap -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
         "test:update": "vscode-tmgrammar-snap -u -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
         "check-colors": "node scripts/download-themes.js && node scripts/resolve-theme-colors.js"
     }

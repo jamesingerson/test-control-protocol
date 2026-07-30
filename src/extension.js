@@ -9,6 +9,7 @@
 const vscode = require('vscode');
 const { computeDiagnostics } = require('./diagnostics');
 const { buildWorkspaceIndex } = require('./workspaceIndex');
+const { matchesGlob } = require('./globMatch');
 
 const LANGUAGE_ID = 'testcontrolprotocol';
 const DOCUMENT_DEBOUNCE_MS = 500;
@@ -28,17 +29,40 @@ function activate(context) {
   // `files.associations`. Any currently-open document already carrying this
   // language ID is included too, so a file opened without matching one of
   // these patterns (e.g. manually set via "Change Language Mode") still
-  // contributes to the index even though findFiles won't discover it.
-  function getWorkspaceGlobPatterns() {
+  // contributes to the index.
+  //
+  // IMPORTANT: association patterns must NOT be passed straight into
+  // `vscode.workspace.findFiles()` -- that API matches its glob against
+  // each file's path RELATIVE TO THE WORKSPACE ROOT, while
+  // `files.associations` matches against a file's FULL path. These produce
+  // different results whenever the workspace root's own name would have
+  // been part of the pattern (e.g. root = C:\repos\TCP with pattern
+  // "**/TCP/**/*" -- no relative path ever contains a "TCP" segment, since
+  // the root's name is excluded from every relative path, so findFiles
+  // would silently match nothing even though the pattern correctly assigns
+  // the language to individual files). Confirmed as a real false positive:
+  // a GOTCP reference in an open file to a test code defined in a
+  // different, unopened file was flagged as missing, because the
+  // workspace-wide scan never found that other file. Fixed by scanning
+  // broadly with findFiles('**/*') and matching each result's full path
+  // ourselves via globMatch.js, the same way files.associations actually
+  // works.
+  function getAssociationPatterns() {
     const associations = vscode.workspace.getConfiguration('files').get('associations') || {};
     return Object.keys(associations).filter((pattern) => associations[pattern] === LANGUAGE_ID);
   }
 
   async function collectWorkspaceUris() {
     const uriMap = new Map();
-    for (const pattern of getWorkspaceGlobPatterns()) {
-      const found = await vscode.workspace.findFiles(pattern);
-      for (const uri of found) uriMap.set(uri.toString(), uri);
+    const patterns = getAssociationPatterns();
+    if (patterns.length > 0) {
+      const candidates = await vscode.workspace.findFiles('**/*');
+      for (const uri of candidates) {
+        const fsPath = uri.fsPath.replace(/\\/g, '/');
+        if (patterns.some((pattern) => matchesGlob(fsPath, pattern))) {
+          uriMap.set(uri.toString(), uri);
+        }
+      }
     }
     for (const doc of vscode.workspace.textDocuments) {
       if (doc.languageId === LANGUAGE_ID) uriMap.set(doc.uri.toString(), doc.uri);

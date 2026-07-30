@@ -73,7 +73,7 @@
 					"name": "invalid.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})([TQ].{4})(.{1,18})?(.{0,19})(.*)",
+			"match": "(^.{7})([TQ]\\d{4})(.{1,17})?(.{1,62})?(.*)",
 			"name": "title-line.testcontrolprotocol"
 		},
 		"macro-definition-lines": {

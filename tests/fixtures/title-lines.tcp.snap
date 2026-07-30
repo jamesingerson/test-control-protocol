@@ -6,4 +6,14 @@
 #^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
 #       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
 #            ^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+>       T0030 Calcium          mmol/L
+#^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
+#       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+#            ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+#                             ^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol string.testcontrolprotocol
+>       T0013 General Link Description    - See linked TCP for details
+#^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol
+#       ^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+#            ^^^^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol storage.type.testcontrolprotocol
+#                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.testcontrolprotocol title-line.testcontrolprotocol string.testcontrolprotocol
 >

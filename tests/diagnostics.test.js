@@ -1,0 +1,110 @@
+'use strict';
+
+const assert = require('assert');
+const { computeDiagnostics } = require('../src/diagnostics');
+
+const LN = ' '.repeat(7);
+function iLine(label, ...fields) {
+  return LN + 'I ' + label.padEnd(9) + fields.map((f) => f.padEnd(9)).join('').trimEnd();
+}
+function titleLine(code, name) {
+  return LN + code + ' ' + name;
+}
+
+function run(name, fn) {
+  try {
+    fn();
+    console.log(`ok - ${name}`);
+  } catch (err) {
+    console.error(`FAIL - ${name}`);
+    throw err;
+  }
+}
+
+run('flags an undefined label reference (Assembly Error 14 shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GOTO', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-label');
+  assert.strictEqual(diags[0].severity, 'error');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('does not flag a label reference resolved within the same block', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GOTO', 'FIN'), iLine('FIN', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags every occurrence of a duplicate label (Assembly Error 5 shape)', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('FIN', 'COMMENT', 'A'),
+    iLine('FIN', 'COMMENT', 'B'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 2);
+  assert.ok(diags.every((d) => d.code === 'duplicate-label'));
+  assert.strictEqual(diags[0].line, 1);
+  assert.strictEqual(diags[1].line, 2);
+});
+
+run('scopes checks per T/Q block: a duplicate/undefined label in one block does not leak into another', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('FIN', 'COMMENT', 'A'),
+    iLine('', 'END'),
+    titleLine('T0400', 'Other'),
+    iLine('FIN', 'COMMENT', 'B'), // same label name, different block -- not a duplicate
+    iLine('', 'GOTO', 'FIN'), // resolves within this block
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('resolves a reference to a label injected by an invoked macro (real BIO/DRUGMCR shape)', () => {
+  const lines = [
+    titleLine('T0750', 'Digoxin'),
+    iLine('CHKAB', 'GOTO,EQ', 'CONT', 'ABN-RSLT', '0'),
+    iLine('DRUGM', 'DRUGMCR'),
+    iLine('FIN', 'REMAUTH'),
+    iLine('', 'END'),
+  ];
+  const macroLabels = new Map([['DRUGMCR', new Set(['CONT', 'DCHECK', 'ENDMCR'])]]);
+  const diagsWithoutIndex = computeDiagnostics(lines);
+  assert.strictEqual(diagsWithoutIndex.length, 1);
+  assert.strictEqual(diagsWithoutIndex[0].code, 'undefined-label');
+
+  const diagsWithIndex = computeDiagnostics(lines, { macroLabels });
+  assert.strictEqual(diagsWithIndex.length, 0);
+});
+
+run('flags a GOTCP target with no matching test code in the workspace index', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0302', '0500']) });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'gotcp-not-found');
+  assert.strictEqual(diags[0].severity, 'warning');
+});
+
+run('does not flag a GOTCP target that matches a workspace test code', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T0302', 'START'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0302', '0500']) });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('skips GOTCP validation entirely when no testCodes index is supplied', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not check content outside any T/Q block (macro-only files, GLOBAL headers, etc.)', () => {
+  const lines = [LN + 'D SOMEMAC', iLine('', 'GOTO', 'NOWHERE'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+console.log('all diagnostics tests passed');

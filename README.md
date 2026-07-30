@@ -1,6 +1,6 @@
 # test-control-protocol README
 
-Naive syntax highlighting for Test Control Protocol (TCP) files for the Delphic LIS.
+Naive syntax highlighting for Test Control Protocol (TCP) files for the Delphic LIS, plus basic label/GOTCP verification diagnostics.
 
 ## Features
 
@@ -11,6 +11,8 @@ Primitive support based on existing Pathlab TCP's:
 Also has folding:
 
 <img src="https://github.com/pl-jamesi/test-control-protocol/blob/master/images/collapse-tcp.gif?raw=true" alt="Example TCP Folding" width="800px" />
+
+As you edit, GOTO/GOSUB/DATE/GET/SEARCH references to a label with no matching definition, duplicate label definitions, and GOTCP references to a test code that doesn't exist anywhere in the workspace are flagged as problems (debounced, so it doesn't run on every keystroke). Checks are scoped per `T`/`Q` test-definition block, not per file — see `TODO.md`'s "Label and GOTCP verification feature" section for why that distinction matters and how it was validated against real production data. `~`-prefixed macro-internal labels are exempted, since they're only disambiguated at assembly time.
 
 ## Requirements
 
@@ -42,7 +44,8 @@ In the directory where you're working, if it does not already exist create a .vs
 
 ## Known Issues
 
-- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros/globals.
+- Highlights if line structure is more or less correct, but does not verify the validity of instructions/keywords/macros/globals — the label/GOTCP diagnostics described above are the one exception, and even those don't expand macro bodies beyond injecting their labels (a macro's own internal GOTO/GOTCP references, which use `OP1`/`OP2`/`OP3`-style parameter placeholders, are never checked).
+- The workspace-wide index used for GOTCP/macro resolution relies on `files.associations` to find other TCP files (see Requirements above) — if that's not configured, cross-file checks silently only see whatever's currently open; a document's own internal label checks are unaffected.
 - Assumed line numbers will be systemically removed in the future, so they are not validated or coloured.
 - Trailing/overhanging free-text comments (anything left over after a line's declared fields) are highlighted as comments on every line type except `A` lines, as long as the whole line stays within 80 characters — past that, `invalid.too-long` takes over for the whole line, matching real compiler behaviour. `A` lines are excluded because their character-string field already spans the full remaining line width, leaving no room for a separate comment to exist.
 - Some instructions should have more intelligent highlighting, e.g. NORMAL's first operand is a reference range so the colours should match.
@@ -74,7 +77,7 @@ https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/l
 
 ## Testing
 
-`npm install` then `npm test` runs [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test)'s snapshot mode against the fixture files in `tests/fixtures/*.tcp`, checking the exact scope assigned to every token against a committed `.snap` file. This is the same tokenizer VS Code itself uses, so it catches regressions without needing to eyeball a real editor window.
+`npm install` then `npm test` runs, in order: plain-Node unit tests (`tests/label-parser.test.js`, `tests/workspace-index.test.js`, `tests/diagnostics.test.js`) for the label/GOTCP diagnostics logic, then [vscode-tmgrammar-test](https://github.com/PanAeon/vscode-tmgrammar-test)'s snapshot mode against the fixture files in `tests/fixtures/*.tcp`, checking the exact scope assigned to every token against a committed `.snap` file. The snapshot tests use the same tokenizer VS Code itself uses, so they catch highlighting regressions without needing to eyeball a real editor window; `src/extension.js` itself (the `vscode`-dependent activation wrapper) isn't covered by either — it needs a real Extension Development Host (`F5`) to exercise.
 
 If you deliberately change how a line type should be scoped, run `npm run test:update` to regenerate the affected `.snap` file(s), then **read the diff carefully** before committing — the snapshot only proves the grammar is consistent with itself, not that the new scopes are correct.
 

@@ -21,7 +21,7 @@ Backlog from the grammar/colour review and testing work-through. Grouped by area
 
 - [x] **`"extensions": [""]` was dead weight.** Removed — the README already requires every user to manually set `files.associations`, so this empty-string extension entry never matched anything real.
 - [x] **No `CHANGELOG.md`** despite repeated version bumps — added, with a 0.1.0 entry covering this pass; versions prior to 0.1.0 aren't backfilled (see `git log`).
-- [ ] `author` is a bare string (`"James Ingerson"`) — fine as-is, but worth a conscious decision on whether this should attribute to Pathlab as an org given it governs internal/proprietary Delphic LIS tooling, vs. staying personal (matches the current `pl-jamesi` GitHub org in the repo URL). Left alone — not something to decide unilaterally.
+- [x] `author` attribution decided: stays personal (`"James Ingerson"`) rather than switching to a Pathlab org — no code change needed, it already read this way.
 
 ## Version bump
 

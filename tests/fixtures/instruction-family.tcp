@@ -6,3 +6,8 @@
        I          GET      RESULT   PCT1
        I          GOTO,MM  PCT1     TEMPLATE
        I          GOTO,XX  PCT1     VALUE
+       I          NORMAL   RRANGE
+       I          CR TEST  TESTA    TESTB    RESA-C
+       I          CR CRS   CRSA-P
+       I          GROUP    TITLE
+       I NEXT     GROUP

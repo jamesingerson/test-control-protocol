@@ -24,6 +24,7 @@ const {
   findGotcpReferences,
   findDataDeclarations,
   findDataReferences,
+  findMissingDataOperands,
   findOpcodeFields,
 } = require('./labelParser');
 
@@ -126,6 +127,23 @@ function computeDiagnostics(lines, options) {
         severity: 'warning',
         code: 'undefined-data-reference',
         message: `'${ref.label}' has no matching A/M/N/R/S/H data declaration in ${block.name}`,
+      });
+    }
+
+    // Missing data operand (Reference Manual Error 7): NORMAL/CR TEST/CR
+    // CRS never appear with a blank operand anywhere in the real corpus
+    // (1656 combined uses) -- unlike GROUP, which is deliberately excluded
+    // here (a bare GROUP with no operand is a legitimate, common pattern,
+    // 101 real occurrences, not an omission). No workspace context needed:
+    // a blank operand is wrong regardless of what's declared elsewhere.
+    for (const missing of findMissingDataOperands(blockLines)) {
+      diagnostics.push({
+        line: block.startLine + missing.line,
+        startCol: missing.startCol,
+        endCol: missing.endCol,
+        severity: 'warning',
+        code: 'missing-data-operand',
+        message: `'${missing.keyword}' is missing its data-reference operand in ${block.name}`,
       });
     }
 

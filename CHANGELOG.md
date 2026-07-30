@@ -2,6 +2,11 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.4.0
+
+- Added a missing-data-operand diagnostic: `NORMAL`, `CR TEST`, and `CR CRS` are flagged when used with a blank operand (Reference Manual Error 7). `GROUP` is deliberately excluded — a bare `GROUP` with no operand is a real, common pattern in production (101 occurrences across the corpus), not an omission.
+- `NORMAL`/`CR TEST`/`CR CRS`/`GROUP`'s operand (the data reference these instructions check for undefined-reference/missing-operand) is now highlighted the same colour as the `A`/`M`/`N`/`R`/`S` label it points to, instead of the generic instruction-operand colour — visually tying the reference to its declaration.
+
 ## 0.3.0
 
 - Added an undefined-data-reference diagnostic: `NORMAL`, `CR TEST`, `CR CRS`, and `GROUP`'s operand is flagged if it doesn't match a declared `A`/`M`/`N`/`R`/`S`/`H` data label anywhere it could legitimately come from (the same block, an invoked macro's body, or the workspace's `GLOBAL` file). Deliberately scoped to just these four keywords — sampling operand behaviour across the real production corpus showed most other instructions' first operand isn't a data reference at all (numeric literals, special CRS-parsing keywords, or something else entirely), and a couple of plausible-looking candidates (`SIGNOUT`, `MOVE,D`) were checked and rejected for exactly that reason. See `TODO.md` for the full analysis.

@@ -9,6 +9,7 @@ const {
   findGotcpReferences,
   findDataDeclarations,
   findDataReferences,
+  findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
   findMacroDefinitions,
@@ -220,6 +221,25 @@ run('findDataReferences does not mistake a distant trailing comment for a blank 
   // free-text comment many blank fields later, not an operand.
   const line = LN + 'I NEXT     GROUP' + ' '.repeat(31) + 'No';
   assert.strictEqual(findDataReferences([line]).length, 0);
+});
+
+run('findMissingDataOperands flags NORMAL/CR TEST/CR CRS used with a blank operand', () => {
+  const lines = [iLine('', 'NORMAL'), iLine('', 'CR TEST'), iLine('', 'CR CRS')];
+  const missing = findMissingDataOperands(lines);
+  assert.deepStrictEqual(
+    missing.map((m) => m.keyword),
+    ['NORMAL', 'CR TEST', 'CR CRS']
+  );
+});
+
+run('findMissingDataOperands does not flag a bare GROUP with no operand (real, common, 101 occurrences in production)', () => {
+  const lines = [iLine('', 'GROUP')];
+  assert.strictEqual(findMissingDataOperands(lines).length, 0);
+});
+
+run('findMissingDataOperands does not flag NORMAL/CR TEST/CR CRS when a real operand is present', () => {
+  const lines = [iLine('', 'NORMAL', 'RRANGE'), iLine('', 'CR TEST', 'FLK-P')];
+  assert.strictEqual(findMissingDataOperands(lines).length, 0);
 });
 
 run('isGlobalDataFile detects the real GLOBAL header shape', () => {

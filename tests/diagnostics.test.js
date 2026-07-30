@@ -172,4 +172,19 @@ run('does not flag SIGNOUT or MOVE,D operands as data references (outside the wh
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags NORMAL/CR TEST/CR CRS used with a blank operand (Assembly Error 7 shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'NORMAL'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-data-operand');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('NORMAL'));
+});
+
+run('does not flag a bare GROUP with no operand (real, common pattern, excluded by design)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GROUP'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 console.log('all diagnostics tests passed');

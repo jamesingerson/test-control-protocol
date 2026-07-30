@@ -93,6 +93,17 @@ const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
 // comment, wrongly flagged as an undefined reference to that word).
 const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
 
+// Keywords whose operand is confirmed NEVER genuinely blank in real
+// production data (Reference Manual Error 7, "Missing operand"). GROUP is
+// deliberately excluded despite being in DATA_REFERENCE_RE above: a bare
+// `GROUP` with no operand at all occurs 101 times across the real corpus
+// (23% of all GROUP usage) -- a legitimate, common pattern (its own
+// meaning, not an omission), confirmed by checking real matching lines, not
+// just an aggregate count. NORMAL/CR TEST/CR CRS have zero blank-operand
+// instances across 1656 combined real uses, so a blank operand for those
+// three is safe to treat as a genuine mistake.
+const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS']);
+
 // Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
 // declaration, per the TCP Introduction Manual (e.g. "there is a box with
 // the label TCPNAME. This contains the Test Name as entered on the Title
@@ -239,6 +250,26 @@ function findDataReferences(lines) {
 }
 
 /**
+ * Sites where a NORMAL/CR TEST/CR CRS instruction (never GROUP -- see
+ * MISSING_OPERAND_KEYWORDS) has no operand at all. Anchors the diagnostic
+ * range on the keyword itself, since there's no operand text to underline.
+ * @param {string[]} lines
+ * @returns {Array<{keyword: string, line: number, startCol: number, endCol: number}>}
+ */
+function findMissingDataOperands(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const keyword = extractGroup(line, DATA_REFERENCE_RE, 4);
+    if (!keyword || !MISSING_OPERAND_KEYWORDS.has(keyword.text)) return;
+    const operand = extractGroup(line, DATA_REFERENCE_RE, 5);
+    if (!operand) {
+      results.push({ keyword: keyword.text, line: lineIndex, startCol: keyword.startCol, endCol: keyword.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * Whether this document is the (or a) global-data file -- every A-line
  * label it declares is available everywhere in the workspace, not scoped
  * to a block.
@@ -311,6 +342,7 @@ module.exports = {
   findGotcpReferences,
   findDataDeclarations,
   findDataReferences,
+  findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
   findMacroDefinitions,

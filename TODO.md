@@ -300,8 +300,21 @@ Raised for later, investigated and implemented on request. `NORMALX` (distinct f
 
 - `src/labelParser.js`: new `NORMALX_TARGET_RE` (bounded `\s{1,4}` separator, matching the now-standard convention for new rules rather than `GOTCP_TARGET_RE`'s older unbounded `\s+`) and `findNormalxTestReferences`.
 - `src/diagnostics.js`: new `normalx-test-not-found` diagnostic (warning severity, matching `gotcp-not-found`'s treatment) — a separate code rather than reusing `gotcp-not-found`, since it's a different keyword; both share the same `opts.testCodes` check logic inline rather than a shared helper, consistent with how the rest of this file is structured.
-- Grammar: new `normalx-lines` rule, op1 → `support.type.testcontrolprotocol` (teal, matching `GOTCP`'s target colour). Real `NORMALX` lines occasionally have free text after op1 (e.g. `NORMALX 0770 DATE REG`) — confirmed there's no genuine second structured operand, just trailing description text, so it's scoped `comment.line` directly rather than adding an unused middle "string" field the way `gotcp-lines`/`data-reference-lines` do for their genuinely multi-operand keywords.
+- Grammar: new `normalx-lines` rule, op1 → `support.type.testcontrolprotocol` (teal, matching `GOTCP`'s target colour).
 - **Validation**: full corpus check — zero diagnostics. New fixture coverage for all three shapes (with a 4-digit operand, with a 4-digit operand plus trailing comment, bare), snapshot diff reviewed; confirmed the pre-existing bare `I NORMALX` line in `tests/fixtures/basic.tcp` renders identically to before (no fixture update needed there).
+
+### Correction (0.10.0): op2 is a genuine documented operand, not free text
+
+The user supplied the exact Reference Manual wording: *"Optional. If present, this operand must be one of the following global dates: DATE REG, DATE ARR, DATE COL, DATESPEC, ENTDATE, AUTHDATE. If not specified or left blank, the system uses DATE REG as the default."* What the 0.9.0 pass above treated as trailing free-text comment (e.g. the `DATE REG` in `NORMALX 0770 DATE REG`) is actually a real, documented, fixed-vocabulary 2nd operand — the manual reference resolved something real-data sampling alone hadn't caught, since a real 8-character enum word looks exactly like short trailing prose without the documentation to say otherwise.
+
+**Confirmed against real data**: 54 real instances of op2, ALL 54 (100%) exactly one of the six documented words — zero deviations. Op1 and op2 are independent (13 of the 54 have op2 present with op1 blank, e.g. `NORMALX           DATE REG` — applies to the current test's own range, just overriding which date field is used for age-based lookups).
+
+- `src/labelParser.js`: `NORMALX_TARGET_RE` extended to capture op2; new `NORMALX_DATE_TYPES` set and `findInvalidNormalxDateTypes`.
+- `src/diagnostics.js`: new `invalid-normalx-date-type` diagnostic (warning) — the **first enumerated-value check in this codebase** (every other check here concerns label/data references, not "is this token one of a fixed set of keywords"). No workspace context needed.
+- Grammar: `normalx-lines` extended with a 6-word alternation for op2, scoped `string.testcontrolprotocol` — matching `search-lines`' existing precedent for its own 12-word fixed vocabulary (also plain `string`, not a distinct "keyword" colour), rather than inventing a new convention. An unrecognised op2 value simply doesn't match the alternation and falls through to the generic catch-all (`comment.line`) exactly like `SEARCH`'s own unrecognised item words do — the diagnostic warning is the actual signal that something's wrong, not the colour.
+- **Validation**: full corpus check after the correction — zero diagnostics. Fixture updated to cover the "op2 without op1" shape; snapshot diff reviewed and confirmed `DATE REG` moved from `comment.line` to `string`.
+
+**Lesson**: real-data sampling alone won't always distinguish "genuine short fixed-vocabulary operand" from "coincidentally short trailing free text" — both can look identical from field-position and character-count alone. When the user or a manual explicitly documents a shape, that's a stronger signal than corpus inference and should prompt re-checking a "trailing comment" classification already made.
 
 ## Highlight the Global Data catalogue in a distinct colour (not started)
 

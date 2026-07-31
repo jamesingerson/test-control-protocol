@@ -181,6 +181,27 @@ run('skips NORMALX validation entirely when no testCodes index is supplied', () 
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags a NORMALX date-type value outside the six documented global dates (Reference Manual enum)', () => {
+  const lines = [titleLine('T0400', 'Other'), iLine('', 'NORMALX', '0770', 'DATE XXX'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'invalid-normalx-date-type');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('DATE XXX'));
+});
+
+run('does not flag any of the six documented NORMALX global-date values, with or without op1', () => {
+  const lines = [
+    titleLine('T0400', 'Other'),
+    iLine('', 'NORMALX', '0770', 'DATE REG'),
+    iLine('', 'NORMALX', '', 'DATE ARR'),
+    iLine('', 'NORMALX', '', 'ENTDATE'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines, { testCodes: new Set(['0770']) });
+  assert.strictEqual(diags.length, 0);
+});
+
 run('skips GOTCP validation entirely when no testCodes index is supplied', () => {
   const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
   const diags = computeDiagnostics(lines);

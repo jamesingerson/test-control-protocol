@@ -24,4 +24,5 @@
        I          GOTO,IR  FIN      VALUE    RANGE
        I TPX      NORMALX  0710
        I          NORMALX  0770     DATE REG
+       I          NORMALX           ENTDATE
        I          NORMALX

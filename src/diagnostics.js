@@ -23,6 +23,7 @@ const {
   findLabelReferences,
   findGotcpReferences,
   findNormalxTestReferences,
+  findInvalidNormalxDateTypes,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -143,6 +144,23 @@ function computeDiagnostics(lines, options) {
         severity: 'warning',
         code: 'undefined-data-reference',
         message: `'${ref.label}' has no matching A/M/N/R/S/H data declaration in ${block.name}`,
+      });
+    }
+
+    // NORMALX's op2 (Reference Manual: "Optional. If present, this operand
+    // must be one of the following global dates: DATE REG, DATE ARR, DATE
+    // COL, DATESPEC, ENTDATE, AUTHDATE"). The first enumerated-value check
+    // in this codebase, rather than a label/data-reference check -- no
+    // workspace context needed. Confirmed against the real corpus: 54 real
+    // instances, all 54 (100%) one of these six words, zero deviations.
+    for (const invalid of findInvalidNormalxDateTypes(blockLines)) {
+      diagnostics.push({
+        line: block.startLine + invalid.line,
+        startCol: invalid.startCol,
+        endCol: invalid.endCol,
+        severity: 'warning',
+        code: 'invalid-normalx-date-type',
+        message: `'${invalid.value}' is not one of NORMALX's documented global dates (DATE REG, DATE ARR, DATE COL, DATESPEC, ENTDATE, AUTHDATE)`,
       });
     }
 

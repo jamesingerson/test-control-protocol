@@ -301,10 +301,13 @@
 					"name": "support.type.testcontrolprotocol"
 				},
 				"6": {
+					"name": "string.testcontrolprotocol"
+				},
+				"7": {
 					"name": "comment.line.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bNORMALX\\b\\s{1,4})(.{1,8}\\s)?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bNORMALX\\b\\s{1,4})(.{1,9}\\s)?(\\b(?:DATE REG|DATE ARR|DATE COL|DATESPEC|ENTDATE|AUTHDATE)\\b\\s*)?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"data-reference-lines": {

@@ -175,7 +175,14 @@
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol support.type.testcontrolprotocol
-#                                    ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          NORMALX           ENTDATE
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                             ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol support.type.testcontrolprotocol
+#                                    ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          NORMALX
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol

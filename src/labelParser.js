@@ -48,7 +48,24 @@ const GOTCP_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bGOTCP(?:,(?:EQ|NE|GT|GE|LT
 // -- no real "blank operand + distant trailing comment" case has been
 // found for NORMALX, but there's no reason to risk it when a bounded
 // pattern costs nothing.
-const NORMALX_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bNORMALX\b\s{1,4})(.{1,8}\s)?/d;
+//
+// NORMALX also documents a genuine op2 (confirmed via the Reference
+// Manual, not just corpus sampling this time): "Optional. If present, this
+// operand must be one of the following global dates: DATE REG, DATE ARR,
+// DATE COL, DATESPEC, ENTDATE, AUTHDATE. If not specified or left blank,
+// the system uses DATE REG as the default." Confirmed against the real
+// corpus: 54 real instances of op2, ALL 54 (100%) exactly one of these six
+// words -- zero deviations. Op1 and op2 are independent (13 of the 54 have
+// op2 present with op1 blank, e.g. `NORMALX           DATE REG` -- applies
+// to the current test's own range, just overriding which date field is
+// used). This was originally miscategorised as free-text trailing comment
+// before the documented operand was found -- see NORMALX_DATE_TYPES below.
+const NORMALX_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bNORMALX\b\s{1,4})(.{1,9}\s)?(.{1,8})?/d;
+
+// NORMALX's fixed op2 vocabulary (see NORMALX_TARGET_RE above). Matches the
+// two-word entries' exact real spacing (`DATE REG` etc. are 8 characters,
+// fitting the same single field as the one-word entries).
+const NORMALX_DATE_TYPES = new Set(['DATE REG', 'DATE ARR', 'DATE COL', 'DATESPEC', 'ENTDATE', 'AUTHDATE']);
 
 // Any I-line's opcode field -- whatever token sits immediately after the own
 // label, regardless of whether it's a recognized keyword (GOTO, PRINT, ...)
@@ -359,6 +376,26 @@ function findNormalxTestReferences(lines) {
 }
 
 /**
+ * NORMALX's op2 values that are NOT one of the six documented global-date
+ * words (see NORMALX_DATE_TYPES) -- a genuine enumerated-value check, the
+ * first of its kind in this codebase (every other check here concerns
+ * label/data references, not "is this token one of a fixed set of
+ * keywords"). Op2 is independent of op1 (op1 blank is fine here too).
+ * @param {string[]} lines
+ * @returns {Array<{value: string, line: number, startCol: number, endCol: number}>}
+ */
+function findInvalidNormalxDateTypes(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, NORMALX_TARGET_RE, 6);
+    if (found && !NORMALX_DATE_TYPES.has(found.text)) {
+      results.push({ value: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * A/M/N/R/S/H-line data declarations (the box a label identifies, per the
  * Introduction Manual's "every item of data is held in a box... identified
  * by a LABEL" model) -- a separate namespace from I-line branch labels.
@@ -525,6 +562,7 @@ module.exports = {
   findLabelReferences,
   findGotcpReferences,
   findNormalxTestReferences,
+  findInvalidNormalxDateTypes,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,

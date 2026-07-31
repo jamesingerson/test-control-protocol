@@ -8,6 +8,7 @@ const {
   findLabelReferences,
   findGotcpReferences,
   findNormalxTestReferences,
+  findInvalidNormalxDateTypes,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -175,6 +176,32 @@ run('findNormalxTestReferences does not require an operand for a bare NORMALX (r
 run('findNormalxTestReferences is unaffected by NORMAL matching (the existing \\b boundary already excludes NORMALX from DATA_REFERENCE_RE)', () => {
   const lines = [iLine('', 'NORMALX', '0710')];
   assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findInvalidNormalxDateTypes accepts all six documented values, independent of op1 (real "NORMALX  DATE REG" shape)', () => {
+  const lines = [
+    iLine('', 'NORMALX', '0710', 'DATE REG'),
+    iLine('', 'NORMALX', '', 'DATE ARR'),
+    iLine('', 'NORMALX', '', 'DATE COL'),
+    iLine('', 'NORMALX', '', 'DATESPEC'),
+    iLine('', 'NORMALX', '', 'ENTDATE'),
+    iLine('', 'NORMALX', '', 'AUTHDATE'),
+  ];
+  assert.strictEqual(findInvalidNormalxDateTypes(lines).length, 0);
+});
+
+run('findInvalidNormalxDateTypes flags a value outside the six documented global dates', () => {
+  const lines = [iLine('', 'NORMALX', '0710', 'DATE XXX')];
+  const invalid = findInvalidNormalxDateTypes(lines);
+  assert.deepStrictEqual(
+    invalid.map((i) => i.value),
+    ['DATE XXX']
+  );
+});
+
+run('findInvalidNormalxDateTypes does not require op2 (optional, defaults to DATE REG per the manual)', () => {
+  const lines = [iLine('', 'NORMALX', '0710'), iLine('', 'NORMALX')];
+  assert.strictEqual(findInvalidNormalxDateTypes(lines).length, 0);
 });
 
 run('a well-formed GOTO,MM target line reports correct column ranges', () => {

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.10.0
+
+- `NORMALX` has a documented 2nd operand (per the Reference Manual: "Optional. If present, this operand must be one of the following global dates: DATE REG, DATE ARR, DATE COL, DATESPEC, ENTDATE, AUTHDATE. If not specified... the system uses DATE REG as the default"), confirmed against real data with zero deviations across 54 real occurrences. Previously miscategorised as free-text trailing comment. Now recognised and highlighted like `SEARCH`'s item keyword, and validated with a new enumerated-value check — the first of its kind in this extension — flagging anything outside those six documented words.
+
 ## 0.9.0
 
 - `NORMALX`'s operand (e.g. `NORMALX 0710`) is a test-code reference, not a data box — confirmed against real data (209 real occurrences with an operand, 100% resolving to a real test code once a handful of non-zero-padded codes are accounted for). Now highlighted teal (matching `GOTCP`'s target) and checked against the workspace's known test codes, the same way a `GOTCP` reference is.

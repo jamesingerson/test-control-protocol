@@ -19,6 +19,7 @@
 
 const {
   findTestBlocks,
+  findTestCodeDeclarations,
   findLabelDefinitions,
   findLabelReferences,
   findGotcpReferences,
@@ -48,6 +49,11 @@ const {
  * @param {Set<string>} [options.globalDataLabels] A-line data labels
  *   declared in the workspace's GLOBAL file, from buildWorkspaceIndex --
  *   available in every block regardless of local declarations.
+ * @param {Map<string, string[]>} [options.duplicateTestCodes] T/Q code ->
+ *   list of files declaring it, from buildWorkspaceIndex, already filtered
+ *   to only codes with more than one declaration (REJECT.DJS excluded).
+ *   When provided, every declaration of a listed code in this document is
+ *   flagged.
  * @returns {Array<{line: number, startCol: number, endCol: number, severity: 'error'|'warning', code: string, message: string}>}
  */
 function computeDiagnostics(lines, options) {
@@ -250,6 +256,57 @@ function computeDiagnostics(lines, options) {
         });
       }
     }
+  }
+
+  // The two checks below concern the T/Q header lines THEMSELVES, not
+  // content inside any one block -- run once per document, not per block.
+  const testCodeDeclarations = findTestCodeDeclarations(lines);
+
+  // Duplicate test-code definitions across the workspace: the same T/Q
+  // code declared more than once, whether in the same file (confirmed
+  // genuine, e.g. two differently-titled `Q9029` blocks in the real
+  // BOPSEARCH) or across different files (e.g. `T4692` in both BIO and
+  // HAEM) -- either way, GOTCP/NORMALX references to that code would
+  // resolve ambiguously. REJECT.DJS is excluded entirely from
+  // contributing to (or being flagged by) this check -- see
+  // workspaceIndex.js's isDisregardedFile for why. Error severity,
+  // matching duplicate-label's treatment of the equivalent per-block
+  // case: this is an unambiguous naming collision, not a heuristic.
+  if (opts.duplicateTestCodes) {
+    for (const decl of testCodeDeclarations) {
+      const files = opts.duplicateTestCodes.get(decl.code);
+      if (!files) continue;
+      diagnostics.push({
+        line: decl.line,
+        startCol: decl.startCol,
+        endCol: decl.endCol,
+        severity: 'error',
+        code: 'duplicate-test-code',
+        message: `Test code '${decl.code}' is defined ${files.length} times across the workspace (${files.join(', ')})`,
+      });
+    }
+  }
+
+  // Tests declared in ascending numeric order: confirmed real and mostly
+  // followed (a handful of out-of-order codes per file in the real
+  // corpus) -- compares each header's numeric value against its
+  // immediate predecessor in this same document (T/Q letter prefix is
+  // ignored, since no real file mixes both types). No workspace context
+  // needed -- purely a within-document ordering check.
+  let previous = null;
+  for (const decl of testCodeDeclarations) {
+    const value = parseInt(decl.code.slice(1), 10);
+    if (previous && value < previous.value) {
+      diagnostics.push({
+        line: decl.line,
+        startCol: decl.startCol,
+        endCol: decl.endCol,
+        severity: 'error',
+        code: 'test-code-out-of-order',
+        message: `Test code '${decl.code}' is out of ascending order (follows '${previous.code}')`,
+      });
+    }
+    previous = { code: decl.code, value };
   }
 
   return diagnostics;

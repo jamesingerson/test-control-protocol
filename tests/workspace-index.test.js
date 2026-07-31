@@ -67,6 +67,64 @@ run('buildWorkspaceIndex includes a macro body\'s data declarations (A/N/R/S/H),
   assert.deepStrictEqual([...index.macroLabels.get('SOMEMAC')].sort(), ['REF']);
 });
 
+run('buildWorkspaceIndex flags a test code declared in more than one file', () => {
+  const documents = [
+    { uri: 'BIO', lines: [LN + 'T4692 Something', iLine('', 'END')] },
+    { uri: 'HAEM', lines: [LN + 'T4692 Something Else', iLine('', 'END')] },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.deepStrictEqual(index.duplicateTestCodes.get('T4692'), ['BIO', 'HAEM']);
+});
+
+run('buildWorkspaceIndex flags a test code declared twice in the SAME file (real BOPSEARCH Q9029 shape)', () => {
+  const documents = [
+    {
+      uri: 'BOPSEARCH',
+      lines: [
+        LN + 'Q9029 SEARCH FOR ESR STD STATISTICS',
+        iLine('', 'END'),
+        LN + 'Q9029 Search for Sendaways / numbers done',
+        iLine('', 'END'),
+      ],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.deepStrictEqual(index.duplicateTestCodes.get('Q9029'), ['BOPSEARCH', 'BOPSEARCH']);
+});
+
+run('buildWorkspaceIndex does not flag a test code declared only once', () => {
+  const documents = [{ uri: 'BIO', lines: [LN + 'T0302 Procalcitonin', iLine('', 'END')] }];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.duplicateTestCodes.has('T0302'), false);
+});
+
+run('buildWorkspaceIndex disregards REJECT.DJS entirely for duplicate-test-code purposes (real MICRO/REJECT.DJS shape)', () => {
+  const documents = [
+    { uri: 'MICRO', lines: [LN + 'T2631 Something', iLine('', 'END')] },
+    { uri: 'REJECT.DJS', lines: [LN + 'T2631 Rejection notice text', iLine('', 'END')] },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.duplicateTestCodes.has('T2631'), false);
+});
+
+run('buildWorkspaceIndex still resolves REJECT.DJS-only codes for testCodes (GOTCP existence checks are unaffected)', () => {
+  const documents = [{ uri: 'REJECT.DJS', lines: [LN + 'T2631 Rejection notice text', iLine('', 'END')] }];
+  const index = buildWorkspaceIndex(documents);
+  assert.ok(index.testCodes.has('2631'));
+});
+
+run('buildWorkspaceIndex matches REJECT.DJS case-insensitively and by basename, not substring, of a full path/URI', () => {
+  const documents = [
+    { uri: 'C:/repos/TCP/reject.djs', lines: [LN + 'T9999 x', iLine('', 'END')] },
+    { uri: 'C:/repos/TCP/MICRO', lines: [LN + 'T9999 y', iLine('', 'END')] },
+    { uri: 'C:/repos/TCP/NOT-REJECT.DJS-BACKUP', lines: [LN + 'T8888 x', iLine('', 'END')] },
+    { uri: 'C:/repos/TCP/OTHER', lines: [LN + 'T8888 y', iLine('', 'END')] },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.duplicateTestCodes.has('T9999'), false);
+  assert.deepStrictEqual(index.duplicateTestCodes.get('T8888'), ['NOT-REJECT.DJS-BACKUP', 'OTHER']);
+});
+
 run('buildWorkspaceIndex collects data labels from the real GLOBAL header shape, workspace-wide', () => {
   const documents = [
     {

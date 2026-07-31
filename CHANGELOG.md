@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.16.0
+
+- New diagnostics: a `T`/`Q` test code declared more than once across the workspace (or twice in the same file), and a test code declared out of ascending numeric order — both errors. `REJECT.DJS` (an auxiliary reference file, not a compiled TCP source) is disregarded entirely for the duplicate check, dropping the count from 32 originally-found duplicates to the 15 genuine ones. Validated against the full corpus: 30 duplicate and 41 out-of-order diagnostics, matching the pre-implementation census exactly.
+
 ## 0.15.0
 
 - A typo'd `NORMALX` global-date or `SEARCH` item keyword now renders as `invalid` (red) instead of falling through to the neutral catch-all colour — both diagnostics already caught these, but the highlighting didn't reflect it. Grammar-only change; validated against every real `NORMALX`/`SEARCH` line in the corpus (2201 lines) with zero misclassifications.

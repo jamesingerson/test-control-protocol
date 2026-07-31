@@ -293,6 +293,89 @@ run('does not check content outside any T/Q block (macro-only files, GLOBAL head
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags every occurrence of a test code declared more than once across the workspace (Duplicate test-code definitions)', () => {
+  const lines = [titleLine('T4692', 'Something'), iLine('', 'END')];
+  const duplicateTestCodes = new Map([['T4692', ['BIO', 'HAEM']]]);
+  const diags = computeDiagnostics(lines, { duplicateTestCodes });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'duplicate-test-code');
+  assert.strictEqual(diags[0].severity, 'error');
+  assert.ok(diags[0].message.includes('T4692'));
+  assert.ok(diags[0].message.includes('BIO'));
+  assert.ok(diags[0].message.includes('HAEM'));
+});
+
+run('flags a test code declared twice within the SAME document (real BOPSEARCH Q9029 shape)', () => {
+  const lines = [
+    titleLine('Q9029', 'SEARCH FOR ESR STD STATISTICS'),
+    iLine('', 'END'),
+    titleLine('Q9029', 'Search for Sendaways / numbers done'),
+    iLine('', 'END'),
+  ];
+  const duplicateTestCodes = new Map([['Q9029', ['BOPSEARCH', 'BOPSEARCH']]]);
+  const diags = computeDiagnostics(lines, { duplicateTestCodes });
+  assert.strictEqual(diags.length, 2);
+  assert.ok(diags.every((d) => d.code === 'duplicate-test-code'));
+});
+
+run('does not flag a test code absent from the duplicateTestCodes index', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'END')];
+  const duplicateTestCodes = new Map([['T4692', ['BIO', 'HAEM']]]);
+  const diags = computeDiagnostics(lines, { duplicateTestCodes });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('skips duplicate-test-code validation entirely when no duplicateTestCodes index is supplied', () => {
+  const lines = [titleLine('T4692', 'Something'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags a test code out of ascending numeric order (real BIO T0114/T0112 shape)', () => {
+  const lines = [
+    titleLine('T0114', 'First'),
+    iLine('', 'END'),
+    titleLine('T0112', 'Second'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'test-code-out-of-order');
+  assert.strictEqual(diags[0].severity, 'error');
+  assert.ok(diags[0].message.includes('T0112'));
+  assert.ok(diags[0].message.includes('T0114'));
+});
+
+run('does not flag test codes already in ascending order', () => {
+  const lines = [
+    titleLine('T0100', 'First'),
+    iLine('', 'END'),
+    titleLine('T0200', 'Second'),
+    iLine('', 'END'),
+    titleLine('T0300', 'Third'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('compares each test code against its immediate predecessor, not the last non-violating one', () => {
+  // Real BIO shape: T0114 -> T0112 (violation) -> T0253 (NOT a violation,
+  // since 253 > 112, even though 253 < 114 would have been if compared
+  // against the pre-violation value instead).
+  const lines = [
+    titleLine('T0114', 'First'),
+    iLine('', 'END'),
+    titleLine('T0112', 'Second'),
+    iLine('', 'END'),
+    titleLine('T0253', 'Third'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.ok(diags[0].message.includes('T0112'));
+});
+
 run('flags an undefined data reference (NORMAL/CR TEST/CR CRS/GROUP whitelist, Assembly Error 8/10 shape)', () => {
   const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'NORMAL', 'MISSING'), iLine('', 'END')];
   const diags = computeDiagnostics(lines);

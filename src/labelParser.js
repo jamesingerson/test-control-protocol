@@ -707,15 +707,29 @@ function findMacroDefinitions(lines) {
 }
 
 /**
+ * Every T/Q test-definition header in this document, with the exact column
+ * position of the code itself -- unlike findTestBlocks below (which only
+ * needs the code and line to build block boundaries), the duplicate-test-
+ * code and ascending-order checks need to anchor a diagnostic directly on
+ * the header's own code token.
+ * @param {string[]} lines
+ * @returns {Array<{code: string, line: number, startCol: number, endCol: number}>}
+ */
+function findTestCodeDeclarations(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, TITLE_LINE_RE, 2);
+    if (found) results.push({ code: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+  });
+  return results;
+}
+
+/**
  * @param {string[]} lines
  * @returns {Array<{name: string, startLine: number, endLine: number}>}
  */
 function findTestBlocks(lines) {
-  const headers = [];
-  lines.forEach((line, lineIndex) => {
-    const found = extractGroup(line, TITLE_LINE_RE, 2);
-    if (found) headers.push({ name: found.text, line: lineIndex });
-  });
+  const headers = findTestCodeDeclarations(lines).map((d) => ({ name: d.code, line: d.line }));
   return toBlocks(headers, lines.length);
 }
 
@@ -738,4 +752,5 @@ module.exports = {
   findUnrecognizedOpcodes,
   findMacroDefinitions,
   findTestBlocks,
+  findTestCodeDeclarations,
 };

@@ -31,26 +31,59 @@
 // many different files.
 
 const {
-  findTestBlocks,
+  findTestCodeDeclarations,
   findMacroDefinitions,
   findLabelDefinitions,
   findDataDeclarations,
   isGlobalDataFile,
 } = require('./labelParser');
 
+// REJECT.DJS is not a compiled TCP source at all -- it only contains
+// rejection-notice text fragments (a `.DJS` extension, not a real script),
+// which happens to reuse the same 4-digit numbering scheme as genuine T/Q
+// test codes purely by coincidence. Confirmed against the real corpus: 17
+// of the original 32 workspace-wide "duplicate" test codes found were
+// entirely REJECT.DJS/MICRO pairs (T2631-T2647) -- excluding REJECT.DJS
+// from contributing to the duplicate-test-code map drops these 17 false
+// positives, leaving the 15 genuine cross-file/same-file duplicates (see
+// TODO.md's "Duplicate test-code definitions" section). Matched against
+// the basename only (not a substring test), case-insensitively.
+function isDisregardedFile(uri) {
+  return /(^|[\\/])reject\.djs$/i.test(uri);
+}
+
+// Extracts a short display name from a document identifier for use in
+// diagnostic messages -- `doc.uri` is a full (possibly percent-encoded)
+// vscode Uri string in the real extension (e.g.
+// "file:///c%3A/repos/TCP/BIO"), but just a plain filename in tests.
+function basename(uri) {
+  const withoutQuery = uri.split(/[?#]/)[0];
+  const last = withoutQuery.split(/[\\/]/).pop();
+  try {
+    return decodeURIComponent(last);
+  } catch {
+    return last;
+  }
+}
+
 /**
  * @param {Array<{uri: string, lines: string[]}>} documents
- * @returns {{ testCodes: Set<string>, macroLabels: Map<string, Set<string>>, globalDataLabels: Set<string> }}
+ * @returns {{ testCodes: Set<string>, macroLabels: Map<string, Set<string>>, globalDataLabels: Set<string>, duplicateTestCodes: Map<string, string[]> }}
  */
 function buildWorkspaceIndex(documents) {
   const testCodes = new Set();
   const macroLabels = new Map();
   const globalDataLabels = new Set();
+  const testCodeFiles = new Map();
 
   for (const doc of documents) {
-    for (const block of findTestBlocks(doc.lines)) {
-      // block.name is e.g. "T0302" or "Q0500" -- the code is the 4 digits.
-      testCodes.add(block.name.slice(1));
+    const disregarded = isDisregardedFile(doc.uri);
+    for (const decl of findTestCodeDeclarations(doc.lines)) {
+      // decl.code is e.g. "T0302" or "Q0500" -- the code is the 4 digits.
+      testCodes.add(decl.code.slice(1));
+      if (disregarded) continue;
+      if (!testCodeFiles.has(decl.code)) testCodeFiles.set(decl.code, []);
+      testCodeFiles.get(decl.code).push(basename(doc.uri));
     }
 
     for (const macro of findMacroDefinitions(doc.lines)) {
@@ -66,7 +99,12 @@ function buildWorkspaceIndex(documents) {
     }
   }
 
-  return { testCodes, macroLabels, globalDataLabels };
+  const duplicateTestCodes = new Map();
+  for (const [code, files] of testCodeFiles) {
+    if (files.length > 1) duplicateTestCodes.set(code, files);
+  }
+
+  return { testCodes, macroLabels, globalDataLabels, duplicateTestCodes };
 }
 
 module.exports = { buildWorkspaceIndex };

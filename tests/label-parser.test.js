@@ -20,6 +20,7 @@ const {
   findUnrecognizedOpcodes,
   findMacroDefinitions,
   findTestBlocks,
+  findTestCodeDeclarations,
 } = require('../src/labelParser');
 
 // Builds a fixed-column I-line: 7-char blank line-number field, "I ", then
@@ -297,6 +298,17 @@ run('findTestBlocks splits a file into per-T/Q-header blocks (real files bundle 
   assert.strictEqual(blocks[1].name, 'T0400');
   assert.strictEqual(blocks[1].startLine, 3);
   assert.strictEqual(blocks[1].endLine, 6);
+});
+
+run('findTestCodeDeclarations extracts the code with exact column position, unlike findTestBlocks', () => {
+  const lines = [LN + 'T0302 Procalcitonin', LN + 'Q9029 Search for something'];
+  const decls = findTestCodeDeclarations(lines);
+  assert.deepStrictEqual(
+    decls.map((d) => d.code),
+    ['T0302', 'Q9029']
+  );
+  assert.strictEqual(decls[0].startCol, 7);
+  assert.strictEqual(decls[0].endCol, 12);
 });
 
 run('findMacroDefinitions splits a file into per-D-header macro bodies', () => {

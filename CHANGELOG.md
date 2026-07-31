@@ -2,6 +2,12 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.20.0
+
+- New data-reference diagnostics for 11 more confirmed Delphic built-in keywords: `MOVE,AV`/`MOVE,AP`/`TESTADD`/`HL7SET`/`ALPHA`/`CHARGE`/`CHECK*`/`REPTKEY` (1st operand) and `TESTRES`/`STATS`/`NUMERIC` (2nd operand), plus `ERROR`'s and `GOTO`/`GOSUB`'s condition-code families (2nd/3rd operands, per their manual-documented symmetric "condition operand" shape — with `GOTO,GT` deliberately excluded pending further investigation). Macro-based candidates (`SENDRSLT`, `MICSIGN`, etc.) are deliberately deferred — hardcoding one workspace's own macro vocabulary into a static check isn't done anywhere else in this extension.
+- Significantly expanded `IMPLICIT_DATA_LABELS` with the manual's own "Global Variables" catalogue (`TV1`-`TV30`, `MV1`-`10`, `RV1`-`20`, `MAX`/`MIN`/`MAX2`/`MIN2`, and more) plus further "Global Data" fields found auditing the above — resolves the single-letter/short-constant question raised previously: yes, these highlight as genuine data references, which is both technically correct and helps surface real gaps where a token isn't actually declared anywhere.
+- Fixed two bugs caught by full-corpus validation: a `\bCHECK\*\b` regex that could never match (a trailing `\b` after `*` is never satisfiable), and a missing numeric-literal exclusion that caused 202 false positives on three of the newly-added keywords.
+
 ## 0.19.0
 
 - New diagnostic: a test that doesn't end with a terminal instruction is now flagged as a warning. `END` counts, and so does a bare (unconditional) `GOTCP` — but only once its target is verified, workspace-wide and recursively, to itself actually terminate; a conditional `GOTCP,EQ`-style variant never counts on its own, since it only fires when its condition holds. No documented manual requirement backs this one (unlike every other diagnostic so far), so it ships as a warning rather than an error. Validated against the full corpus: 15 real cases flagged, all 13 real `GOTCP`-ending tests correctly resolved as terminal via their actual targets.

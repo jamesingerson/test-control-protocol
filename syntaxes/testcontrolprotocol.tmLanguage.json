@@ -54,6 +54,9 @@
 			"include": "#print-data-reference-lines"
 		},
 		{
+			"include": "#op2-data-reference-lines"
+		},
+		{
 			"include": "#instruction-lines"
 		}
 	],
@@ -364,7 +367,7 @@
 					"name": "comment.line.testcontrolprotocol"
 				}
 			},
-			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:NORMAL|GROUP|CR COM)\\b\\s{1,4})(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)((?:\\b(?:NORMAL|GROUP|CR COM|MOVE,AV|MOVE,AP|TESTADD|HL7SET|ALPHA|CHARGE|REPTKEY)\\b|\\bCHECK\\*)\\s{1,4})(.{1,9}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"cr-report-lines": {
@@ -419,6 +422,30 @@
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bPRINT(?:,[HA])?\\b\\s{1,4})(.{1,9}\\s)?(.{1,9}\\s)?(.{1,8})?(.*)",
+			"name": "instruction-line.testcontrolprotocol"
+		},
+		"op2-data-reference-lines": {
+			"captures": {
+				"2": {
+					"name": "entity.other.attribute-name.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "string.testcontrolprotocol"
+				},
+				"6": {
+					"name": "storage.testcontrolprotocol"
+				},
+				"7": {
+					"name": "comment.line.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:TESTRES|STATS|NUMERIC)\\b\\s{1,4})(.{1,9}\\s)?(.{1,9}\\s)?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"instruction-lines": {

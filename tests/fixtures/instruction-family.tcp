@@ -20,6 +20,9 @@
        I          CR CRS   CRSB-P            CRSB-C
        I          GROUP    TITLE
        I NEXT     GROUP
+       I          CHARGE   CHGBOX
+       I          CHECK*   CHKBOX
+       I          STATS    VALUE    SRANGE
        I          CR REQ   REQA-P   REQA-H   REQA-L
        I          CR REQL  REQL-P   REQL-H   REQL-L
        I HBACOMS  CR COM   HBAC-P

@@ -13,6 +13,9 @@ const {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findOp2DataReferences,
+  findErrorConditionDataReferences,
+  findGotoGosubConditionDataReferences,
   findGotoIrDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,
@@ -456,6 +459,112 @@ run('findDataReferences excludes the implicit built-in TCPNAME box (real GROUP T
   const lines = [iLine('', 'GROUP', 'TCPNAME')];
   assert.ok(isImplicitDataLabel('TCPNAME'));
   assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findDataReferences resolves the 8 confirmed built-in op1 keywords added in 0.20.0', () => {
+  const lines = [
+    iLine('', 'MOVE,AV', 'SOURCEBX'),
+    iLine('', 'MOVE,AP', 'SOURCEBX'),
+    iLine('', 'TESTADD', 'SOURCEBX'),
+    iLine('', 'HL7SET', 'SOURCEBX'),
+    iLine('', 'ALPHA', 'SOURCEBX'),
+    iLine('', 'CHARGE', 'SOURCEBX'),
+    iLine('', 'CHECK*', 'SOURCEBX'),
+    iLine('', 'REPTKEY', 'SOURCEBX'),
+  ];
+  const refs = findDataReferences(lines);
+  assert.strictEqual(refs.length, 8);
+  assert.ok(refs.every((r) => r.label === 'SOURCEBX'));
+});
+
+run('findDataReferences does not flag a numeric op1 for the 0.20.0 keywords (a literal test code/count, not a reference)', () => {
+  // Real shapes: "MOVE,AV NULL HL7RANGE" (NULL is implicit, not numeric,
+  // but confirms op1 isn't always a plain box); "TESTADD 2522" (a literal
+  // test code). A bare number must never be flagged as "undefined."
+  const lines = [iLine('', 'TESTADD', '2522'), iLine('', 'MOVE,AV', '186')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findDataReferences does not require an operand for a bare ALPHA (real, common pattern -- 52 of 89 real occurrences)', () => {
+  const lines = [iLine('', 'ALPHA')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run("CHECK* never mismatches CHECK*X (a different real keyword) -- the field's required trailing separator prevents it", () => {
+  const lines = [iLine('', 'CHECK*X', 'FOO')];
+  assert.strictEqual(findDataReferences(lines).length, 0);
+});
+
+run('findMissingDataOperands flags the 7 zero-blank 0.20.0 keywords (MOVE,AV/AP, TESTADD, HL7SET, CHARGE, CHECK*, REPTKEY) used with a blank operand', () => {
+  const lines = [
+    iLine('', 'MOVE,AV'), iLine('', 'MOVE,AP'), iLine('', 'TESTADD'), iLine('', 'HL7SET'),
+    iLine('', 'CHARGE'), iLine('', 'CHECK*'), iLine('', 'REPTKEY'),
+  ];
+  const missing = findMissingDataOperands(lines);
+  assert.deepStrictEqual(
+    missing.map((m) => m.keyword),
+    ['MOVE,AV', 'MOVE,AP', 'TESTADD', 'HL7SET', 'CHARGE', 'CHECK*', 'REPTKEY']
+  );
+});
+
+run('findOp2DataReferences resolves TESTRES/STATS/NUMERIC op2, not op1 (real "STATS VALUE SRANGE" shape)', () => {
+  const lines = [
+    iLine('', 'TESTRES', '2522', 'LONGV1'),
+    iLine('', 'STATS', 'VALUE', 'SRANGE'),
+    iLine('', 'NUMERIC', 'TAV1', 'SRANGE'),
+  ];
+  const refs = findOp2DataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['SRANGE', 'SRANGE']
+  );
+});
+
+run('findErrorConditionDataReferences resolves op2 AND op3, excluding numeric literals (real "ERROR,EQ 1 VALUE 0" shape)', () => {
+  const lines = [
+    iLine('', 'ERROR,EQ', '1', 'VALUE', '0'),
+    iLine('', 'ERROR,MM', '15', 'R?'),
+    iLine('', 'ERROR,NE', '177', 'FLAG', '5'),
+  ];
+  const refs = findErrorConditionDataReferences(lines);
+  // VALUE/R?/FLAG are all implicit -- zero real (non-implicit) references
+  // in this fixture, but the numeric "0"/"1"/"15"/"5"/"177" must never
+  // appear as a flagged label.
+  assert.ok(refs.every((r) => !/^\d+$/.test(r.label)));
+});
+
+run('findErrorConditionDataReferences flags a genuinely undeclared op2/op3 value', () => {
+  const lines = [iLine('', 'ERROR,EQ', '1', 'UNDECLBX', '0')];
+  const refs = findErrorConditionDataReferences(lines);
+  assert.deepStrictEqual(refs.map((r) => r.label), ['UNDECLBX']);
+});
+
+run('findGotoGosubConditionDataReferences resolves op3 across the condition family, excluding numeric literals', () => {
+  const lines = [
+    iLine('', 'GOTO,EQ', 'FIN', 'PROG-NO', '8'),
+    iLine('', 'GOSUB,EQ', 'GOTCULT', 'CONSTIT', '0'),
+  ];
+  const refs = findGotoGosubConditionDataReferences(lines);
+  // PROG-NO/CONSTIT (op2) are NOT checked for these condition codes (only
+  // op3 is, for the arithmetic-comparison variants) -- only a genuinely
+  // undeclared op3 would ever be flagged, and "8"/"0" are numeric.
+  assert.strictEqual(refs.length, 0);
+});
+
+run('findGotoGosubConditionDataReferences ALSO resolves op2 (and still op3) for the M/MM list-membership variants specifically (real BOPSEARCH shape)', () => {
+  const lines = [iLine('', 'GOTO,M', 'GOTDOC', 'UNDECLBX', 'TCPNAME')];
+  const refs = findGotoGosubConditionDataReferences(lines);
+  // op3 ("TCPNAME") is implicit and correctly not flagged; op2
+  // ("UNDECLBX") is genuinely undeclared and correctly is -- confirming
+  // BOTH positions are checked for this specific keyword family, not
+  // just op2.
+  assert.deepStrictEqual(refs.map((r) => r.label), ['UNDECLBX']);
+});
+
+run('findGotoGosubConditionDataReferences does not check op2 for non-M/MM condition codes, even if it looks undeclared', () => {
+  const lines = [iLine('', 'GOTO,EQ', 'FIN', 'UNDECLBX', '0')];
+  const refs = findGotoGosubConditionDataReferences(lines);
+  assert.strictEqual(refs.length, 0);
 });
 
 run('findDataReferences does not treat SIGNOUT or MOVE,D operands as data references (rejected candidates)', () => {

@@ -193,48 +193,36 @@ Asked directly: are there other operand positions across the whole instruction s
 
 By volume, largest first:
 - [x] **`PRINT` op2** (0.7.0) — see "PRINT op2 data reference" section below.
-- [ ] `MOVE,AV` op1 (2786, 76%)
-- [ ] `SENDRSLT` op1/op2 (1094 each, 100%) — surfaces the single-letter-constant question below (`SENDRSLT Y Y Y`)
-- [ ] `MOVE,AP` op1 (877, 62%)
-- [ ] `TESTRES` op2 (278, 81%)
-- [ ] `SENDGRP`/`SENDORD` op1 (261 each, 100%)
-- [ ] `PRINT,H` op2 (208, 82%)
-- [ ] `TESTADD` op1 (200, 81% of non-numeric)
-- [ ] `HL7NUM` op2 (151, 100%)
-- [ ] `HL7SET` op1 (137, 62%)
-- [ ] `HL7NUMX` op2 (139, 100%)
-- [ ] `MOLPCR` op2 (129, 100%)
+- [x] **`MOVE,AV`/`MOVE,AP` op1, `TESTADD` op1, `HL7SET` op1, `ALPHA` op1, `CHARGE` op1, `CHECK*` op1, `REPTKEY` op1** (0.20.0) — all confirmed genuine Delphic built-ins (not local macros), built together. See "Comprehensive operand highlighting audit, second pass (0.20.0)" below.
+- [x] **`TESTRES`/`STATS`/`NUMERIC` op2** (0.20.0) — same pass, see below.
+- [x] `PRINT,H` op2, `PRINT,A` op2 — already shipped since 0.7.0 (`PRINT_DATA_REFERENCE_RE` already covers `PRINT(?:,[HA])?`); these two lines were stale leftovers in this list, not actually outstanding.
+- [ ] `SENDRSLT` op1/op2 (1094 each, 100%) — **local macro, not a built-in** (confirmed via `D SENDRSLT` in the real `MACRO` file, no manual entry) — deferred per direct instruction: "leave macros for later, we don't want to do anything static with them as new ones are added over time." Surfaces the single-letter-constant question below (`SENDRSLT Y Y Y`) — that question is now resolved (yes, highlight them, see the "Single-letter/constant global tokens" decision below), the remaining blocker for this specific item is purely the macro-vs-builtin one.
+- [ ] `SENDGRP`/`SENDORD` op1 (261 each, 100%) — local macros, deferred (same reason).
+- [ ] `HL7NUM` op2 (151, 100%) — local macro, deferred.
+- [ ] `HL7NUMX` op2 (139, 100%) — local macro, deferred.
+- [ ] `MOLPCR` op2 (129, 100%) — local macro, deferred.
 - [ ] `SIGNOUT`-style false positives already excluded — not a real candidate, listed here only as a reminder not to re-add it
-- [ ] `MICSIGN` op1/op2/op3 (92 each, 100%)
-- [ ] `ALPHA` op1 (89, 100% of non-blank)
-- [ ] `PRINT,A` op2 (83, 100%)
-- [ ] `QIAMCR` op1 (64, 100%)
-- [ ] `ERROR,NE` op3 (60, 89%)
-- [ ] `CHARGE` op1 (48, 100%)
-- [ ] `ERROR,OR` op3 (41, 98%)
-- [ ] `HAEMNUM` op2 (35, 100% of non-blank)
-- [ ] `GOTO,OR` op3 (35, 100%)
-- [ ] `STATS` op2 (33, 100% of non-blank)
-- [ ] `SERO-INT` op2 (27, 100%)
-- [ ] `RESPREF` op2 (25, 100%)
-- [ ] `CHECK*` op1 (21, 100%) — note the literal `*` is part of the keyword name
-- [ ] Long tail (5–12 uses each, all ≥89%): `QLINKPN` op1, `BGASNUM` op2/op3, `URINEMC1` op2, `PCR-CT` op1, `REPTKEY` op1, `ERROR,M` op2, `EPCRMCR` op2/op3, `NUMERIC` op2, `ENA-INT` op1, `HAMHL7N2` op2, `PNMCR3` op1, `PLNOREP` op1, `SPOREMAC` op1, `COVRNA` op1, `WHKPNEGE` op1, `PTESTMCR` op1/op2
+- [ ] `MICSIGN` op1/op2/op3 (92 each, 100%) — local macro, deferred (the other keyword specifically named alongside `SENDRSLT` when this question was raised).
+- [ ] `QIAMCR` op1 (64, 100%) — local macro, deferred.
+- [ ] `SERO-INT` op2 (27, 100%) — local macro, deferred.
+- [ ] `RESPREF` op2 (25, 100%) — local macro, deferred.
+- [ ] Long tail (5–12 uses each, all ≥89%), all local macros, deferred: `QLINKPN` op1, `BGASNUM` op2/op3, `URINEMC1` op2, `PCR-CT` op1, `EPCRMCR` op2/op3, `ENA-INT` op1, `HAMHL7N2` op2, `PNMCR3` op1, `PLNOREP` op1, `SPOREMAC` op1, `COVRNA` op1, `WHKPNEGE` op1, `PTESTMCR` op1/op2. (`REPTKEY` op1 and `NUMERIC` op2 were also in this original long tail but turned out to be genuine built-ins, not macros — done, see above.)
 
-### Additional operand positions on already-handled keyword families, not yet implemented
+### Single-letter/constant global tokens: resolved (0.20.0)
 
-- [ ] `GOTO,M` op2/op3 (2894 uses, 80%/79% data)
-- [ ] `GOTO,EQ` op3 when non-numeric (4651, 71% of non-numeric)
-- [ ] `GOTO,NE` op3 when non-numeric (1343, 67% of non-numeric)
-- [ ] `GOTO,MM` op2/op3 (524, 55%/91%)
-- [ ] `GOSUB,EQ` op3 (193, 97% of non-numeric)
-- [ ] `GOSUB,M` op2/op3 (119, 63%/100%)
-- [ ] `ERROR,MM` op2/op3 (813, 98%/58%)
-- [ ] `ERROR,EQ` op3 (92, 67% of non-numeric)
-- [ ] Borderline, needs more scrutiny before trusting (50–65% range, could be a mixed-semantics field like `MOVE,D`'s `VALUE`): `GOTO,GE` op3 (54%), `GOSUB,M` op2 (63%)
+Direct decision: **yes, highlight them, even single-character ones** — "this will help identify a gap where not every single char is defined in global, and is also just technically correct." This was the blocker noted in the "Open design question" section below; that section is kept for its own historical record, but the open question itself is now closed. No code change was needed for this specific decision (the resolution logic already included every `GLOBAL`-declared constant regardless of length; the question was purely about whether it was worth surfacing, not a technical exclusion to remove) — it directly unblocked the macro-based candidates above whenever they're picked up, and was confirmed valuable in practice during the `ERROR`/`GOTO`/`GOSUB` audit below, where several genuine single/short-token globals (`N`, `R?`, `R#`, `R0`, `&$`) resolved correctly once checked.
 
-### Open design question, not yet resolved
+### Additional operand positions on already-handled keyword families
 
-The real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Needs a decision (highlight everything technically correct, or exclude short/constant-like global tokens) before implementing any of the findings above that would surface this pattern at scale (`SENDRSLT`, `MICSIGN`). Note: this did NOT block `PRINT` op2 below — its real unresolved values were meaningfully-named system fields (`DATE`, `TESTCODE`, `DRNAME`...), not single-letter constants, so this question remains genuinely open for the *other* candidates only.
+- [x] **`GOTO,M`/`GOTO,MM`/`GOSUB,M` op2 AND op3, plus op3 (only) for the rest of the condition family** (`GOTO,EQ`/`NE`/`GE`/`LE`/`LT`/`OR`, `GOSUB,EQ`/`NE`/`GT`/`GE`/`LE`/`LT`/`MM`/`OR`) (0.20.0) — see "Comprehensive operand highlighting audit, second pass" below. The original percentages quoted here (`GOTO,M` "80%/79%", `GOTO,MM` "55%/91%" etc.) turned out to be measured against the OLD, narrower `IMPLICIT_DATA_LABELS` catalogue — all resolve 100% now.
+- [x] **`ERROR,MM`/`ERROR,EQ` op2/op3** (0.20.0) — same pass, generalized to the full `ERROR` condition family.
+- [x] ~~Borderline: `GOTO,GE` op3 (54%), `GOSUB,M` op2 (63%)~~ — both resolved to 100% once the expanded `IMPLICIT_DATA_LABELS` catalogue is accounted for; no longer borderline.
+- [ ] **New finding, not yet implemented: `GOTO,GT`'s op3 is only 85.1% clean** (7 of 47 non-numeric instances unresolved) — a recurring value `SUB` in a specific real pattern (`ICNET`/`MICRO`, e.g. `I NEXT GOTO,GT NEXTGET 4 SUB   4 SUB-ANSWERS ONLY`) that doesn't resolve against any known declaration or the expanded implicit catalogue. Deliberately excluded from the 0.20.0 `GOTO`/`GOSUB` condition-family batch rather than guessed at — needs its own investigation (is `SUB` a genuine, not-yet-catalogued Global Data field, or is this a real latent bug in these specific lines?) before shipping.
+- [ ] **New finding, not yet implemented: `GOTO`/`GOSUB`'s arithmetic-comparison op2 (`EQ`/`NE`/`GE`/`LE`/`LT`/`OR`, NOT the `M`/`MM` list-membership variants) is genuinely messy, 25-96% clean depending on variant** — dominated by special comparison fields not yet catalogued: `VALIDATE`, `USER`, `PROG-NO`, `FASTING`, `CUREPORT`, `EXACTAGE`, `REPTMODE`, `DELTFAIL`, `CONSTIT`, `DOC2`-`DOC4`, `ORGNBR`, and a `TIME REG`/`TIME COL` pair that looks like it might be the same "global date family" pattern already documented for `NORMALX` (`DATE REG`/`DATE COL`/etc.) but applied to `TIME` instead — worth checking the manual for a parallel `TIME` global-date enum before assuming it's just more `IMPLICIT_DATA_LABELS` entries. Deliberately excluded from 0.20.0's op2 checking (only the `M`/`MM` variants' op2 shipped, a genuinely different "list membership" shape that IS 100% clean) — this is a separate, not-yet-investigated expansion.
+
+### Open design question -- RESOLVED (0.20.0), see "Single-letter/constant global tokens" above
+
+The real `GLOBAL` file declares 125 short symbolic "constants" — not just meaningful names but single letters (`A`-`Z`), punctuation (`SPACE`/`DASH`/`COMMA`), and numeric-looking codes (`01`/`20`/`30`...). `SENDRSLT Y Y Y` technically resolves all three `Y`s as genuine data references (`Y` is a real declared global box containing the literal string `"Y"`), but that's a boolean-style flag used everywhere, not a meaningfully named box — highlighting every bare `Y`/`N`/single letter as blue could be more visual noise than signal even though it's technically correct. Kept here for the historical record of the question as originally raised; see the "Single-letter/constant global tokens" entry above for the direct decision and how it's already paid off in practice.
 
 ### Related but separate opportunity, noted in passing
 
@@ -265,6 +253,40 @@ Raised directly by the user (not from the automated audit — `GOTO,IR` never su
 - `GOSUB,IR` has **zero** real occurrences in the corpus but was kept in the regex alternation for symmetry with every other condition code (all shared between `GOTO`/`GOSUB` elsewhere in this grammar) — unverified for `GOSUB` specifically, a consistency choice, not a data-backed one.
 - Grammar: `GOTO,IR`/`GOSUB,IR` carved out of the shared `goto-lines` rule into a new `goto-ir-lines` rule (op3 → `storage.testcontrolprotocol`) — a single rule can't give op3 a different scope only for the `IR` condition code while every other condition code's op3 stays plain `string`. `IR` removed from `goto-lines`' own alternation to avoid overlap (labelParser.js's `GOTO_TARGET_RE`, which only concerns op1/branch-label validation, is unaffected and still includes `IR`).
 - **Validation**: re-ran the full corpus check after implementing (extends the already-shipped, previously-zero-false-positive undefined-data-reference check) — zero diagnostics. New fixture coverage (both the resolving-named-range case and the `RANGE` exemption case), snapshot diff reviewed.
+
+## Comprehensive operand highlighting audit, second pass (0.20.0)
+
+Picked up directly from the long-dormant backlog above, on explicit instruction: *"only do the delphic built ins for now, leave macros for later, we don't want to do anything static with them as new ones are added over time."* First step was triaging the whole remaining candidate list by cross-checking each keyword against `KNOWN_INSTRUCTION_KEYWORDS`: roughly half turned out to be genuine Delphic built-ins (safe to hardcode, matching every check shipped so far), the other half local Pathlab macros (e.g. `SENDRSLT`, `MICSIGN` — confirmed via `D SENDRSLT`/`D MICSIGN` in the real `MACRO` file, no manual entry) that must stay deferred, since baking workspace-specific macro names into a static regex is exactly the anti-pattern this whole project has avoided everywhere else.
+
+### A major find: the manual's own "Global Variables" catalogue
+
+Auditing the built-in candidates surfaced a large number of unresolved operand values (`MAX`, `MIN`, `TV1`-`TV29`, `MV7`, `NULL`, and more). Cross-checking against the manual found an entire clean, directly-quotable "Global Variables" section (a different manual section from the "Global Data" table `PRINT` op2 used) — unlike that scrambled multi-column table, this one is linear prose: *"GV1 GV2 : GV6 IAV (A) IV LONGAV1 (A) LONGAV2 (A) : LONGAV6 (A) LONGV (A) LONGV1 (A) LONGV2 (A) : LONGV6 (A) MAX MAX2 MIN MIN2 MV1 MV2 : MV10 RANGE RANGE2 RV1 RV2 : RV20 TAV1 (A) TAV2 (A) : TAV6 (A) TIME (A) TIME1 TIME2 TV1 TV2 : TV30"* plus a parallel date-field family (`DATE1`, `DATE2`, `DATE9`, `DAY`, `MONTH`, `CENTURY`, `YEAR`, `GAV1`-`GAV6`). Transcribed in full into `IMPLICIT_DATA_LABELS` (labelled distinctly from the empirically-derived "Global Data" subset, since this one is a complete authoritative list, not a sample) — also caught `LONGAV6`/`LONGV6` as genuine gaps in the *existing* `LONGAV1-5`/`LONGV1-5` entries (the manual documents 6 of each, the original `PRINT` op2 pass had only found evidence for 5). A further batch of genuine "Global Data" fields (`SNOCODE`, `ALTCODE`, `CODETYPE`, `OCLASS`, `PAGESTAT`, `DOC1`, `REP DOC`, `CONTFLAG`, `DRKEY`, `ANTNBR`, `RPINFO`, `RPSTYLE`, `RPRECIP`, `TRSTATUS`, `RPDOC`, `EXTPAGE`, `ORGCODE`, `UCLASS`, `ABN-RSLT`, `DREMAILP`, `ANTCODE`, `TESTNO`, `REQLOCN`, `COPYTO`) and later `AGE`/`FLAG`/`GROUP`/`LABNO`/`SUB`/`WORKLAB` (found auditing `ERROR`'s op2 specifically) were added the same empirically-derived-subset way as `PRINT` op2 originally was — every genuinely unresolved value cross-checked against the manual's raw text before trusting it. `GROUP` here is a confirmed genuine data field (manual line 528 lists it directly alongside `FLAG`) — a coincidental name collision with the built-in `GROUP` *instruction*, harmless since `IMPLICIT_DATA_LABELS` is only ever checked against operand values, never opcodes.
+
+### Built (all 100% resolved against the full real corpus)
+
+- **8 op1 built-ins added to `DATA_REFERENCE_RE`**: `MOVE,AV`, `MOVE,AP`, `TESTADD`, `HL7SET`, `ALPHA`, `CHARGE`, `CHECK*`, `REPTKEY`. Also extended `MISSING_OPERAND_KEYWORDS` with the 7 of these confirmed to never have a blank operand (all except `ALPHA`, which — like `GROUP`/`CR COM` — is bare 58% of the time, a legitimate common pattern).
+- **3 op2 built-ins via a new `OP2_DATA_REFERENCE_RE`/`findOp2DataReferences`**: `TESTRES`, `STATS`, `NUMERIC`. `STATS`'s manual entry directly confirms op2 as "Optional Statistics acceptance range"; `TESTRES`/`NUMERIC` have no dedicated manual entry found, trusted on real corpus evidence alone (both already independently confirmed genuine built-ins via `KNOWN_INSTRUCTION_KEYWORDS`).
+- **`ERROR`'s full condition-code family** (`EQ`/`NE`/`GT`/`GE`/`LT`/`LE`/`M`/`MM`/`OR`), op2 AND op3 both checked — confirmed via the manual's own entry: *"1 Error code (number) 2 Optional - Condition operand 3 Optional - Condition operand."* New `findErrorConditionDataReferences`.
+- **`GOTO`/`GOSUB`'s condition-code family** (excluding `IR`, already handled separately, and excluding `GT` for both — see below): op3 checked uniformly across `EQ`/`NE`/`GE`/`LE`/`LT`/`M`/`MM`/`OR`, op2 checked *additionally* only for the list-membership variants `GOTO,M`/`GOTO,MM`/`GOSUB,M`. New `findGotoGosubConditionDataReferences`. `GOSUB`'s manual entry confirms the identical symmetric "condition operand" shape as `ERROR`'s.
+- No grammar changes needed for the `ERROR`/`GOTO`/`GOSUB` condition families — they already fell through to (`ERROR`) or were already handled by (`GOTO`/`GOSUB`'s existing `goto-lines` rule) grammar paths that already scope op2/op3 as plain `string`, which is also the *correct* choice here (these fields are frequently numeric; colouring a number `storage` blue would be misleading). Grammar changes were only needed for the op1/op2 builtins above: extended `data-reference-lines`, and a new `op2-data-reference-lines` rule for `TESTRES`/`STATS`/`NUMERIC`.
+
+### Two real bugs caught by full-corpus validation, not by inspection
+
+1. **A regex boundary bug: `\bCHECK\*\b` can never match.** `\b` requires a transition between a word character and a non-word one — but both `*` and the whitespace that always follows it in this fixed-column format are non-word characters, so the trailing `\b` structurally can never succeed, for *any* input. `CHECK*` was silently never matching at all until this was caught by its own dedicated unit test (not by eyeballing the regex). Fixed by pulling `CHECK*` out of the shared `\b(?:...)\b` alternation into its own `\bCHECK\*` branch with no trailing `\b` — the immediately-following required `\s{1,4}` is what actually disambiguates it from `CHECK*X` (a different real keyword), not the boundary assertion.
+2. **Missing numeric-literal exclusion in `findDataReferences`.** The original `DATA_REFERENCE_RE` family (`NORMAL`/`GROUP`/`CR`-family) never needed to filter out bare numbers, because none of those keywords' op1 was ever observed numeric in the real corpus. Three of the eight new 0.20.0 additions (`MOVE,AV`, `MOVE,AP`, `TESTADD`) genuinely do have a numeric op1 sometimes (a literal test code or count, not a reference at all) — adding them to the same function without a numeric filter produced **202 real false positives** on the first full-corpus check. Fixed by adding a shared `NUMERIC_LITERAL_RE` exclusion to `findDataReferences` (safe for the original three keywords too, since the filter simply never triggers for them).
+
+### The central lesson: op2 and op3 are not equally reliable just because the manual describes them symmetrically
+
+Both `ERROR`'s and `GOSUB`'s manual entries describe op2/op3 as two identically-optional "Condition operand" slots — reading that, the natural assumption is that whatever's true of one position is true of the other. It isn't:
+- For `ERROR`, an **initial census only checked ONE position per condition variant** (matching the original backlog's own narrower per-keyword scope from the first audit pass) and then implemented both uniformly on that partial evidence — producing 202 of the false positives above (`FLAG`/`AGE`/`GROUP`/`SUB`/`WORKLAB`/`LABNO`, all genuine Global Data fields op2 specifically needed that op3 never surfaced).
+- For `GOTO`/`GOSUB`, re-running a **complete, uniform census of both positions for every variant** (learning directly from the `ERROR` mistake, before writing any implementation) found op3 is 100% clean across literally every condition variant tested, with zero exceptions — but op2 is genuinely messy for the arithmetic-comparison variants (`EQ`/`NE`/`GE`/`LE`/`LT`/`OR`, 25-96% depending on variant) and only clean for the list-membership variants (`M`/`MM`), which turned out to have a real, different underlying operand shape ("is X in this list" rather than a simple two-sided comparison).
+
+**How to apply**: when a manual (or any documentation) describes two operand positions as structurally symmetric, that is not evidence they behave identically in practice — census EVERY position genuinely in scope, uniformly, before implementing any of them together. A census scoped to "whichever position the original backlog entry happened to name" is not the same as a complete one, and the gap between them is exactly where false positives hide.
+
+### New findings, not yet implemented
+
+- **`GOTO,GT`'s op3 is only 85.1% clean** — a recurring unresolved `SUB` value in a specific real pattern (`ICNET`/`MICRO`, e.g. `GOTO,GT NEXTGET 4 SUB   4 SUB-ANSWERS ONLY`). Deliberately excluded from this batch (and `GOSUB,GT` alongside it, for alternation simplicity and because its own real sample is trivially small) rather than guessed at.
+- **`GOTO`/`GOSUB`'s arithmetic-comparison op2 is a real but not-yet-catalogued Global Data expansion** — `VALIDATE`, `USER`, `PROG-NO`, `FASTING`, `CUREPORT`, `EXACTAGE`, `REPTMODE`, `DELTFAIL`, `CONSTIT`, `DOC2`-`DOC4`, `ORGNBR`, and a `TIME REG`/`TIME COL` pair that looks like it could be the same "global date family" pattern already shipped for `NORMALX` (`DATE REG`/`DATE COL`/etc.), just applied to `TIME` — worth checking the manual for a parallel documented `TIME` enum before assuming it's just more flat `IMPLICIT_DATA_LABELS` entries.
 
 ## Colour taxonomy: distinguish user variables from global/implicit data (not started)
 

@@ -185,7 +185,27 @@ const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
 // positive here too (`GROUP` lines in HAEM/HISTO/PALMSAP each followed by
 // a distant `No`/`for ...` comment, wrongly flagged as an undefined
 // reference to that word).
-const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|CR REQL|CR REQ|CR COM|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
+//
+// `MOVE,AV`/`MOVE,AP`/`TESTADD`/`HL7SET`/`ALPHA`/`CHARGE`/`CHECK*`/
+// `REPTKEY` added (0.20.0), confirmed genuine Delphic built-ins (not
+// local macros -- see KNOWN_INSTRUCTION_KEYWORDS) whose op1 is a data
+// reference: all 100% resolved once the expanded IMPLICIT_DATA_LABELS
+// "Global Variables"/"Global Data" catalogue additions are accounted
+// for (see that set's own comments). `CHECK*` is deliberately pulled out
+// of the shared `\b(?:...)\b` alternation into its own `\bCHECK\*`
+// branch with NO trailing `\b`: a trailing `\b` after `*` can never
+// succeed (`\b` requires a transition between a word character and a
+// non-word one, but both `*` and the whitespace that always follows it
+// are non-word) -- wrapping it in the same shared trailing `\b` as
+// every other keyword here made this alternative silently never match
+// at all (caught by its own unit test, not by inspection). The
+// immediately-following required `\s{1,4}` (not `\b`) is what actually
+// prevents it from ever matching a `CHECK*X` line (a different real
+// keyword) -- `CHECK*X`'s field can never satisfy "literal `CHECK*`
+// followed immediately by whitespace", since the next real character
+// there is `X`, not whitespace.
+const DATA_REFERENCE_RE =
+  /^(.{7})(\bI\b\s)(.{1,8}\s)((?:\b(?:NORMAL|CR TEST|CR CRS|CR REQL|CR REQ|CR COM|GROUP|MOVE,AV|MOVE,AP|TESTADD|HL7SET|ALPHA|CHARGE|REPTKEY)\b|\bCHECK\*)\s{1,4})(.{1,9}\s)?/d;
 
 // CR TEST/CR CRS/CR REQ/CR REQL's op2 and op3 -- confirmed against real
 // production data (BIO) to be genuine I-line BRANCH labels, not data
@@ -227,6 +247,90 @@ const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQL|CR R
 // genuinely different instruction despite the shared "PRINT" prefix.
 const PRINT_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bPRINT(?:,[HA])?\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?/d;
 
+// TESTRES/STATS/NUMERIC's op2 (0.20.0) -- the same "reference sits at op2,
+// not op1" shape as PRINT, but a genuinely different keyword family (kept
+// as its own regex rather than folded into PRINT_DATA_REFERENCE_RE).
+// `STATS`'s manual entry confirms op2 as "Optional Statistics acceptance
+// range (local or global numeric)" -- a genuine data reference, op1 being
+// "the result value" (unvalidated here, a separate position). No manual
+// Function/Operands entry was found for `TESTRES`/`NUMERIC` specifically
+// (both already confirmed as genuine built-ins via KNOWN_INSTRUCTION_-
+// KEYWORDS's own corpus+manual cross-reference) -- trusted here on real
+// corpus evidence alone: 278 and 7 real op2 instances respectively, both
+// 100% resolved once the expanded IMPLICIT_DATA_LABELS catalogue is
+// accounted for.
+const OP2_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:TESTRES|STATS|NUMERIC)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?/d;
+
+// A bare numeric literal (optionally signed/decimal) -- a genuine
+// comparison value, not a data reference, wherever a "condition operand"
+// shape (ERROR/GOTO/GOSUB's own condition-code families below) allows
+// either. Unlike DATA_REFERENCE_RE's family (whose single op1 position
+// was never observed with a real numeric value in the corpus, so no
+// filter was ever needed there), these condition-operand positions are
+// frequently numeric by design (e.g. `ERROR,EQ 1 VALUE 0`) -- checking
+// membership in a known-label set alone would wrongly flag every one of
+// these as "undefined."
+const NUMERIC_LITERAL_RE = /^[+-]?\d+(\.\d+)?$/;
+
+// ERROR's own condition-code family (`ERROR,EQ`/`NE`/`GT`/`GE`/`LT`/`LE`/
+// `M`/`MM`/`OR`) -- confirmed via the Reference Manual's own ERROR entry:
+// "1 Error code (number) 2 Optional - Condition operand 3 Optional -
+// Condition operand. Any of the condition variations... can be attached
+// to the instruction." Op1 is always the numeric error code (unvalidated
+// here); op2 AND op3 are BOTH "condition operands" -- either can
+// genuinely be a data reference (e.g. `ERROR,MM 15 R?` -- `R?` a real
+// declared GLOBAL constant) or a bare number/the special `VALUE` keyword
+// (e.g. `ERROR,EQ 1 VALUE 0`). Confirmed against real data: 100% resolved
+// across every condition variant once numeric literals are excluded and
+// the expanded IMPLICIT_DATA_LABELS catalogue is accounted for (some
+// variants trivially, due to sparse or entirely-numeric real usage --
+// included anyway for consistency with the documented "any condition
+// variation" convention, the same reasoning already used to keep
+// `GOSUB,IR` in `GOTO_TARGET_RE`'s alternation despite zero real uses).
+// IMPORTANT lesson from getting this wrong the first time: op2 and op3
+// are NOT equally clean just because the manual describes them
+// symmetrically -- an initial census only checked ONE of the two
+// positions per condition variant (matching the original backlog's own
+// narrower per-keyword scope), and implementing both uniformly on that
+// partial evidence produced 202 real false positives (`FLAG`/`AGE`/
+// `GROUP`/`SUB`/`WORKLAB`/`LABNO` -- all genuine Global Data fields op2
+// specifically needed that op3 never surfaced). Fixed by re-running a
+// COMPLETE census of both positions for every variant before trusting
+// the uniform treatment -- see the same lesson applied to GOTO/GOSUB
+// below, where it mattered even more (op2 is NOT uniformly clean there).
+const ERROR_CONDITION_RE =
+  /^(.{7})(\bI\b\s)(.{1,8}\s)(\bERROR,(?:EQ|NE|GT|GE|LT|LE|MM|M|OR)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+
+// GOTO/GOSUB's own condition-code family (0.20.0) -- GOSUB's manual entry
+// documents the identical symmetric shape as ERROR's: "1 Label 2 Optional
+// Condition operand 3 Optional Condition operand." Op1 is the branch
+// label, already validated separately by the existing GOTO_TARGET_RE/
+// findLabelReferences -- not re-checked here. `IR` is excluded (handled
+// entirely separately by GOTO_IR_DATA_REFERENCE_RE, a genuinely different
+// shape) and so is `GT` for both GOTO and GOSUB -- `GOTO,GT`'s op3
+// checked at only 85.1% real (a recurring unresolved `SUB` value in a
+// specific comment-adjacent pattern, `ICNET`/`MICRO`, needs more
+// scrutiny before shipping); `GOSUB,GT` excluded too for consistency
+// (shares the same suffix alternation) and because its real sample size
+// is trivially small (4 instances) regardless.
+//
+// A COMPLETE uniform census of op2 AND op3 (not just the position each
+// keyword happened to be scoped for in the original backlog) found these
+// are NOT equally reliable, unlike ERROR: op3 is 100% clean across EVERY
+// remaining condition variant with no exceptions, but op2 is genuinely
+// messy for the arithmetic comparisons (EQ/NE/GE/LE/LT/OR: 25-96% real,
+// dominated by special comparison fields not yet catalogued --
+// `VALIDATE`/`USER`/`PROG-NO`/`FASTING`/`EXACTAGE`/`REPTMODE`/`TIME COL`/
+// `TIME REG`/`CONSTIT`/`DOC2`-`DOC4`/`ORGNBR` and more -- a separate,
+// not-yet-investigated Global Data expansion, see TODO.md). Only the
+// list-membership variants (`M`/`MM`, matching real "is X in this list"
+// semantics rather than a simple arithmetic comparison) have a genuinely
+// different op2 shape that IS 100% clean -- confirmed for `GOTO,M`/
+// `GOTO,MM`/`GOSUB,M` (matching the original backlog's own narrower
+// "op2/op3" scope for exactly these three, not the other variants).
+const GOTO_GOSUB_CONDITION_RE =
+  /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:GOTO|GOSUB),(?:EQ|NE|GE|LE|LT|MM|M|OR)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+
 // GOTO,IR's op3 -- a genuinely different shape from GOTO's other condition
 // codes: `GOTO,IR <label> VALUE <range>` compares the current value
 // against a named reference/feasible range, e.g. `GOTO,IR SCHECK VALUE
@@ -257,7 +361,16 @@ const GOTO_IR_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:GOTO|GOSUB),I
 // zero blank-operand instances across 1688 combined real uses, so a blank
 // operand for those four is safe to treat as a genuine mistake. `CR REQL`
 // joins them: op1 present across all 6 real occurrences, zero blanks.
-const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ', 'CR REQL']);
+// `MOVE,AV`/`MOVE,AP`/`TESTADD`/`HL7SET`/`CHARGE`/`CHECK*`/`REPTKEY`
+// (0.20.0) also join: zero blank-operand instances each (2786/877/200/
+// 137/48/21/9 combined real uses). `ALPHA` is deliberately excluded,
+// same reasoning as `GROUP`/`CR COM`: bare `ALPHA` with no operand
+// occurs 52 of 89 real uses (58%) -- a common, legitimate pattern, not
+// an omission.
+const MISSING_OPERAND_KEYWORDS = new Set([
+  'NORMAL', 'CR TEST', 'CR CRS', 'CR REQ', 'CR REQL',
+  'MOVE,AV', 'MOVE,AP', 'TESTADD', 'HL7SET', 'CHARGE', 'CHECK*', 'REPTKEY',
+]);
 
 // Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
 // declaration -- the Reference Manual documents an entire "Global Data"
@@ -311,6 +424,80 @@ const IMPLICIT_DATA_LABELS = new Set([
   // (TODO.md) that intends to give these categories visually distinct
   // treatment instead of collapsing them into one "implicit" bucket.
   'RANGE', 'RANGE2',
+
+  // "Global Variables" catalogue (a distinct manual section from "Global
+  // Data" above) -- found while auditing the remaining built-in
+  // data-reference candidates (0.20.0): the manual gives this family as
+  // one clean, complete, directly-quotable list (unlike "Global Data"'s
+  // scrambled multi-column table), so it's transcribed here in full
+  // rather than as an empirically-derived subset: "GV1 GV2 : GV6 IAV (A)
+  // IV LONGAV1 (A) LONGAV2 (A) : LONGAV6 (A) LONGV (A) LONGV1 (A) LONGV2
+  // (A) : LONGV6 (A) MAX MAX2 MIN MIN2 MV1 MV2 : MV10 RANGE RANGE2 RV1
+  // RV2 : RV20 TAV1 (A) TAV2 (A) : TAV6 (A) TIME (A) TIME1 TIME2 TV1 TV2
+  // : TV30" plus the date-field family from the same section ("DATE (A)
+  // DATE1 DATE2 DATE11 (A) DATE6 (A) DATE7 (A) DATE8 (A) DATE9 (A) DAY
+  // MONTH CENTURY YEAR GAV1 (A) GAV2 (A) : GAV6 (A)"). `TAV1-6`/`RANGE`/
+  // `RANGE2`/most of the `DATE*` family were already present above
+  // (confirmed independently before this section was found); this adds
+  // the rest of the same documented family. `MAX`/`MIN`/`MV7`/`TV1`-
+  // `TV29` etc. were also independently confirmed as real, previously
+  // unresolved operand values across MOVE,AV/GOTO,EQ/GOTO,GE/ERROR,MM/
+  // and others in the real corpus -- this manual section is what
+  // explains them, not a speculative transcription. `LONGAV6`/`LONGV6`
+  // extend the two families already present above (previously only
+  // 1-5, confirmed too narrow -- the manual documents 1-6 for both).
+  'DATE1', 'DATE2', 'DATE9', 'DAY', 'MONTH', 'CENTURY', 'YEAR',
+  'GAV1', 'GAV2', 'GAV3', 'GAV4', 'GAV5', 'GAV6',
+  'GV1', 'GV2', 'GV3', 'GV4', 'GV5', 'GV6',
+  'IAV', 'IV',
+  'LONGAV6', 'LONGV', 'LONGV6',
+  'MAX', 'MAX2', 'MIN', 'MIN2',
+  'MV1', 'MV2', 'MV3', 'MV4', 'MV5', 'MV6', 'MV7', 'MV8', 'MV9', 'MV10',
+  'RV1', 'RV2', 'RV3', 'RV4', 'RV5', 'RV6', 'RV7', 'RV8', 'RV9', 'RV10',
+  'RV11', 'RV12', 'RV13', 'RV14', 'RV15', 'RV16', 'RV17', 'RV18', 'RV19', 'RV20',
+  'TIME1', 'TIME2',
+  'TV1', 'TV2', 'TV3', 'TV4', 'TV5', 'TV6', 'TV7', 'TV8', 'TV9', 'TV10',
+  'TV11', 'TV12', 'TV13', 'TV14', 'TV15', 'TV16', 'TV17', 'TV18', 'TV19', 'TV20',
+  'TV21', 'TV22', 'TV23', 'TV24', 'TV25', 'TV26', 'TV27', 'TV28', 'TV29', 'TV30',
+
+  // NULL: a special literal keyword (see the manual's HL7ABN/HL7RANGE
+  // entries -- "move NULL to this field" to suppress a default), not a
+  // named data box at all -- same category as VALUE/RANGE/RANGE2 above,
+  // confirmed as the entire unresolved bucket for MOVE,AV's op1 wherever
+  // it appears (e.g. `MOVE,AV NULL HL7RANGE`).
+  'NULL',
+  // VALUE: previously identified (during the MOVE,D investigation) as
+  // "the current CRS element's parsed value", not a declared data box --
+  // MOVE,D itself was rejected as a data-reference candidate entirely
+  // because VALUE dominated it with no confident fallback classification
+  // for the rest. Adding it here now because it also genuinely appears
+  // (6 real instances) in the newly-audited GOTO,EQ/TESTADD op positions,
+  // where the rest of the operand IS confidently a data reference.
+  'VALUE',
+
+  // Additional "Global Data" catalogue fields (0.20.0) -- same
+  // empirically-derived-subset methodology as the original PRINT op2
+  // pass: every genuinely unresolved value across the newly-audited
+  // built-in keywords (MOVE,AV/AP, TESTRES, TESTADD, GOTO/GOSUB/ERROR
+  // condition-code families, etc.) was collected, then cross-checked
+  // against the manual's raw text -- all confirmed present as real
+  // catalogue field names, not typos. See TODO.md's "Comprehensive
+  // operand highlighting audit, second pass" section.
+  'SNOCODE', 'ALTCODE', 'CODETYPE', 'OCLASS', 'PAGESTAT', 'DOC1',
+  'REP DOC', 'CONTFLAG', 'DRKEY', 'ANTNBR', 'RPINFO', 'RPSTYLE',
+  'RPRECIP', 'TRSTATUS', 'RPDOC', 'EXTPAGE', 'ORGCODE', 'UCLASS',
+  'ABN-RSLT', 'DREMAILP', 'ANTCODE', 'TESTNO', 'REQLOCN', 'COPYTO',
+
+  // Found auditing ERROR's condition-operand op2 specifically (0.20.0) --
+  // a uniform census of BOTH op2 and op3 for every ERROR condition
+  // variant (not just the position originally sampled per-variant)
+  // surfaced these five as real, previously-uncaught Global Data fields.
+  // `GROUP` here is confirmed a genuine data field (manual line 528 lists
+  // it directly alongside `FLAG` in the same catalogue table) -- a
+  // coincidental name collision with the built-in `GROUP` *instruction*
+  // keyword, harmless here since this set is only ever checked against
+  // operand *values*, never opcodes.
+  'AGE', 'FLAG', 'GROUP', 'LABNO', 'SUB', 'WORKLAB',
 ]);
 
 function isImplicitDataLabel(label) {
@@ -507,7 +694,14 @@ function findDataReferences(lines) {
   const results = [];
   lines.forEach((line, lineIndex) => {
     const found = extractGroup(line, DATA_REFERENCE_RE, 5);
-    if (found && !isImplicitDataLabel(found.text)) {
+    // NORMAL/CR-family/GROUP's op1 was confirmed to never be numeric in
+    // the original investigation, so this filter never used to matter --
+    // but three of the keywords added to this same alternation in 0.20.0
+    // (MOVE,AV/MOVE,AP/TESTADD) genuinely do have a numeric op1 sometimes
+    // (a literal test code or count, not a data reference at all) --
+    // without this, those were being flagged as "undefined" (a real bug
+    // caught via the full corpus check, 202 false positives).
+    if (found && !NUMERIC_LITERAL_RE.test(found.text) && !isImplicitDataLabel(found.text)) {
       results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
     }
   });
@@ -527,6 +721,78 @@ function findPrintDataReferences(lines) {
     const found = extractGroup(line, PRINT_DATA_REFERENCE_RE, 6);
     if (found && !isImplicitDataLabel(found.text)) {
       results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
+ * Operand2 of TESTRES/STATS/NUMERIC (see OP2_DATA_REFERENCE_RE) -- the
+ * same "reference sits at op2, not op1" shape as PRINT, kept as its own
+ * regex/function since it's a different keyword family.
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findOp2DataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, OP2_DATA_REFERENCE_RE, 6);
+    if (found && !isImplicitDataLabel(found.text)) {
+      results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
+ * ERROR's op2 and op3 (see ERROR_CONDITION_RE) -- both are "condition
+ * operands" per the manual, either of which can be a data reference. A
+ * bare numeric literal is never flagged (a genuine comparison value, not
+ * a reference) -- this is the first data-reference check in this codebase
+ * that needs an explicit numeric exclusion, since ERROR's condition
+ * operands are frequently numeric by design (unlike DATA_REFERENCE_RE's
+ * single-op1 family).
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findErrorConditionDataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    for (const groupIndex of [6, 7]) {
+      const found = extractGroup(line, ERROR_CONDITION_RE, groupIndex);
+      if (found && !NUMERIC_LITERAL_RE.test(found.text) && !isImplicitDataLabel(found.text)) {
+        results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+      }
+    }
+  });
+  return results;
+}
+
+// GOTO,M / GOTO,MM / GOSUB,M keywords whose op2 (not just op3) is also
+// confirmed a genuine data reference -- see GOTO_GOSUB_CONDITION_RE's own
+// comment for why this is narrower than "every condition variant."
+const GOTO_GOSUB_MEMBERSHIP_KEYWORDS = new Set(['GOTO,M', 'GOTO,MM', 'GOSUB,M']);
+
+/**
+ * GOTO/GOSUB's op3 (see GOTO_GOSUB_CONDITION_RE) across every condition
+ * variant in that alternation, plus op2 additionally for the `M`/`MM`
+ * list-membership variants specifically (GOTO_GOSUB_MEMBERSHIP_KEYWORDS).
+ * Op1 (the branch label) is validated separately by the existing
+ * GOTO_TARGET_RE/findLabelReferences machinery, not here.
+ * @param {string[]} lines
+ * @returns {Array<{label: string, line: number, startCol: number, endCol: number}>}
+ */
+function findGotoGosubConditionDataReferences(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const keyword = extractGroup(line, GOTO_GOSUB_CONDITION_RE, 4);
+    if (!keyword) return;
+    const groupIndexes = GOTO_GOSUB_MEMBERSHIP_KEYWORDS.has(keyword.text) ? [6, 7] : [7];
+    for (const groupIndex of groupIndexes) {
+      const found = extractGroup(line, GOTO_GOSUB_CONDITION_RE, groupIndex);
+      if (found && !NUMERIC_LITERAL_RE.test(found.text) && !isImplicitDataLabel(found.text)) {
+        results.push({ label: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+      }
     }
   });
   return results;
@@ -745,6 +1011,9 @@ module.exports = {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findOp2DataReferences,
+  findErrorConditionDataReferences,
+  findGotoGosubConditionDataReferences,
   findGotoIrDataReferences,
   findMissingDataOperands,
   isGlobalDataFile,

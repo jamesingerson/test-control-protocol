@@ -607,4 +607,67 @@ run('treats a GOTCP ending with no terminalTestCodes index supplied as unverifie
   assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
 });
 
+run('flags an undefined op1 reference for the 0.20.0 built-in keywords (CHARGE/CHECK*/etc.), end to end', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'CHARGE', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('resolves the 0.20.0 built-in op1 keywords against a declaration in the same block', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('N', 'CHGBOX', '0', '100'),
+    iLine('', 'CHARGE', 'CHGBOX'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags an undefined op2 reference for TESTRES/STATS/NUMERIC, end to end', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'STATS', 'VALUE', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('flags an undefined ERROR condition-operand reference, end to end (op2 and op3 both checked)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'ERROR,EQ', '1', 'MISSING', '0'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('does not flag a numeric ERROR condition operand, end to end', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'ERROR,EQ', '1', 'VALUE', '0'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags an undefined GOTO,M op2 reference (the list-membership variant), end to end', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'GOTO,M', 'GOTDOC', 'MISSING', 'TCPNAME'),
+    iLine('GOTDOC', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-data-reference');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('does not flag GOTO,EQ op2 even if it looks undeclared (only op3 is checked for arithmetic-comparison variants), end to end', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'GOTO,EQ', 'FIN', 'UNDECLBX', '0'),
+    iLine('FIN', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 console.log('all diagnostics tests passed');

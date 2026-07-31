@@ -29,6 +29,9 @@ const {
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
+  findOp2DataReferences,
+  findErrorConditionDataReferences,
+  findGotoGosubConditionDataReferences,
   findGotoIrDataReferences,
   findMissingDataOperands,
   findOpcodeFields,
@@ -156,6 +159,9 @@ function computeDiagnostics(lines, options) {
     const dataRefs = [
       ...findDataReferences(blockLines),
       ...findPrintDataReferences(blockLines),
+      ...findOp2DataReferences(blockLines),
+      ...findErrorConditionDataReferences(blockLines),
+      ...findGotoGosubConditionDataReferences(blockLines),
       ...findGotoIrDataReferences(blockLines),
     ];
     for (const ref of dataRefs) {

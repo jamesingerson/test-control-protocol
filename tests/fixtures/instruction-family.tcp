@@ -1,5 +1,6 @@
        I          GOSUB    SUB1
        I          SEARCH   NOTFND   TEST     FIRST
+       I          SEARCH   NOTFND   TESTX    FIRST
        I          DATE,GT  TODAY    FMT
        I          GOTCP    T0400    START
        I          GOTCP,EQ T0500    FLAG
@@ -32,5 +33,6 @@
        I          GOTO,IR  FIN      VALUE    RANGE
        I TPX      NORMALX  0710
        I          NORMALX  0770     DATE REG
+       I          NORMALX  0770     DATE XXX
        I          NORMALX           ENTDATE
        I          NORMALX

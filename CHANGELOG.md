@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.15.0
+
+- A typo'd `NORMALX` global-date or `SEARCH` item keyword now renders as `invalid` (red) instead of falling through to the neutral catch-all colour — both diagnostics already caught these, but the highlighting didn't reflect it. Grammar-only change; validated against every real `NORMALX`/`SEARCH` line in the corpus (2201 lines) with zero misclassifications.
+
 ## 0.14.0
 
 - `REQPRIOR`/`OPENFILE`/`COPYDR`/`CRDX`/`REQUEST`/`REQNEXT`/`GETSPEC`'s single operand is now recognized and checked as a branch label, the same treatment `GOTO`'s target already had. Confirmed against all 191 real combined occurrences, 100% resolving to a real label once macro-label injection is accounted for.

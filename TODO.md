@@ -2,7 +2,7 @@
 
 Backlog from the grammar/colour review and testing work-through. Grouped by area; `[x]` = already done in this pass, `[ ]` = still open.
 
-- [ ] **Queued (raised mid-session, not yet started): invalid fixed-vocabulary values should highlight as `invalid` (red), not fall through to the neutral catch-all (`comment.line`, green in most themes).** Concretely: a typo'd `NORMALX` op2 (e.g. `DATE REH` instead of `DATE REG`) correctly triggers the `invalid-normalx-date-type` diagnostic, but still renders green, because the `normalx-lines` rule's op2 alternation simply doesn't match it and the unmatched text falls through to the generic trailing catch-all group. Unlike the label/data-reference checks (which need workspace context the grammar doesn't have), this is a genuinely fixable case: `NORMALX`'s op2 is a small **closed, static** vocabulary (6 words), so the grammar itself — no workspace index needed — can already tell "recognized" from "not." Needs a regex restructure along the lines of `(?:(\b(?:WORD1|WORD2|...)\b\s*)|((?!\b(?:WORD1|WORD2|...)\b)\S.{0,N}\s?))?` — one branch for the recognized alternation (current `string` scope), a second branch (negative-lookahead-gated) for "anything else in that same field" scoped `invalid`. `SEARCH`'s item-word (see "SEARCH's item-word promoted to a real diagnostic" below) has the exact same shape/problem — implement both together for consistency once picked up, rather than fixing just one and leaving the other inconsistent.
+- [x] **Invalid fixed-vocabulary values now highlight as `invalid` (red)** (0.15.0) — built, see "Invalid enum values render as invalid (0.15.0)" below.
 
 ## Grammar correctness
 
@@ -339,7 +339,7 @@ Reference Manual Error 30: `SEARCH`'s op2 (item keyword) must be one of a fixed 
 - `src/diagnostics.js`: new `invalid-search-item-word` diagnostic (warning) — the third enumerated-value check in this codebase (after `invalid-normalx-date-type`), same shape.
 - No grammar changes needed — the grammar already highlights this field, this only adds the missing diagnostic signal on top.
 - **Validation**: full corpus check — zero diagnostics.
-- **Known gap, queued separately**: like `NORMALX`'s op2, an invalid `SEARCH` item word triggers this diagnostic but still renders with the neutral catch-all colour, not `invalid`/red — see the queued item at the top of this file.
+- **Highlighting gap (fixed in 0.15.0)**: like `NORMALX`'s op2, an invalid `SEARCH` item word triggered this diagnostic but rendered with the neutral catch-all colour, not `invalid`/red, until 0.15.0 — see "Invalid enum values render as invalid" below.
 
 ## Pure branch-label candidates feature (0.14.0)
 
@@ -351,6 +351,17 @@ Seven keywords whose op1 is a genuine in-file branch label (the same category GO
 - Grammar: new `simple-branch-lines` rule, op1 → `entity.name.function.testcontrolprotocol` (yellow, matching every other branch-label target).
 - `COPYDR`'s own optional op2 (the special keyword `FIRST`, "restart the find from the beginning of the copy to list", confirmed via its own manual entry) is deliberately NOT parsed by this check — same "leave the next operand for its own future check" pattern as `GOTO,IR`'s op2 (`VALUE`).
 - **Validation**: full corpus check — zero diagnostics. New fixture coverage for all 7 shapes in `instruction-family.tcp`; snapshot diff reviewed, confirmed isolated to the new lines only.
+
+## Invalid enum values render as invalid (0.15.0)
+
+Raised directly by the user: a typo'd `NORMALX` op2 (e.g. `DATE REH` instead of `DATE REG`) correctly triggered its diagnostic, but still rendered with the neutral catch-all colour (`comment.line`, green in most themes) instead of `invalid` (red) — the grammar's op2 alternation simply didn't match the typo'd text, so it fell through to the generic trailing-content group like an ordinary comment. `SEARCH`'s item-word had the identical gap. Unlike the label/data-reference checks (which need workspace context the grammar doesn't have), both of these are genuinely fixable at the grammar level alone: both vocabularies are small, closed, and static (`NORMALX`'s 6 words, `SEARCH`'s 13), so the tokenizer itself — no diagnostics/workspace index involved — can already tell "recognized" from "not."
+
+Fixed by splitting each rule's single optional "recognized word" capture group into a two-branch alternation: `(?:(\b(?:WORD1|WORD2|...)\b\s*)|(\S.{0,8}\s*))?`. The first branch is the unchanged recognized-word alternation (still scoped `string`); the second branch only matches when the first one fails to (regex tries alternatives left-to-right, so the fallback is never reached for a recognized word) AND there's genuinely non-blank content there (`\S` requires at least one real character, so a legitimately blank op2 field still correctly matches neither branch and falls through as before) — scoped `invalid.testcontrolprotocol`. The `.{0,8}` bound matches the same ~9-char field-width convention used throughout this grammar (covers the longest real words, `DATESPEC`/`ANTIBODY`/`DATETIME`/`REPORTED`/`TESTDEPT`, all 8 chars) and, critically, is NOT preceded by any unbounded `\s+`/`\s*`, so (like every bounded-separator fix earlier in this file) it can't skip over a legitimately blank field to grab distant unrelated content.
+
+- Grammar only — `src/labelParser.js`/`src/diagnostics.js` untouched, since the diagnostics already correctly identified invalid values; this was purely a highlighting gap.
+- `normalx-lines`: new capture group 7 (`invalid.testcontrolprotocol`) inserted before the renumbered catch-all (was 7, now 8).
+- `search-lines`: new capture group 7 (`invalid.testcontrolprotocol`) inserted before the existing "criteria" group (renumbered 7→8) and catch-all (renumbered 8→9).
+- **Validation**: new fixture lines (a typo'd `NORMALX` date and a typo'd `SEARCH` item word) confirm the `invalid` scope now renders correctly, diff isolated to just those two lines. Then, since the real corpus has zero invalid values by construction (already confirmed via the diagnostics validation for both features), bulk-tokenized all 2201 real `NORMALX`/`SEARCH` lines in the corpus directly through `vscode-textmate` (not just the usual snapshot fixtures) and confirmed zero of them hit the new `invalid` scope — the restructure doesn't misclassify any real, valid value.
 
 ## Highlight the Global Data catalogue in a distinct colour (not started)
 

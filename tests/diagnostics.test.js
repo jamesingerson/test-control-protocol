@@ -234,6 +234,29 @@ run('does not flag any of the six documented NORMALX global-date values, with or
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags a SEARCH item word outside the 13 documented keywords (Reference Manual Error 30 shape)', () => {
+  const lines = [
+    titleLine('T0400', 'Other'),
+    iLine('', 'SEARCH', 'NOTFND', 'TESTX', 'FIRST'),
+    iLine('NOTFND', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'invalid-search-item-word');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('TESTX'));
+});
+
+run('does not flag a real SEARCH item word (real "SEARCH NOTFND TEST FIRST" shape)', () => {
+  const lines = [
+    titleLine('T0400', 'Other'),
+    iLine('', 'SEARCH', 'NOTFND', 'TEST', 'FIRST'),
+    iLine('NOTFND', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('skips GOTCP validation entirely when no testCodes index is supplied', () => {
   const lines = [titleLine('T0400', 'Other'), iLine('', 'GOTCP', 'T9999', 'START'), iLine('', 'END')];
   const diags = computeDiagnostics(lines);

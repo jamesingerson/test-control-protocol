@@ -27,6 +27,29 @@ const GOTO_TARGET_RE =
 // SEARCH's op2 (item keyword) and op3 (criteria) are not labels, not parsed here.
 const SEARCH_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bSEARCH\s+)(.{1,9}\s)?/d;
 
+// SEARCH's op2 (item keyword) -- a separate, bounded-separator regex from
+// SEARCH_TARGET_RE above (which keeps its older unbounded \s+ for op1, the
+// established shipped behaviour) rather than modifying that one, since this
+// only needs op1's presence to skip past it, not to validate it. Confirmed
+// against the real corpus: 1833 real SEARCH lines, zero unmatched, op2
+// always present (never blank) and always one of 6 distinct real values
+// (TEST 1052, CONSTIT 326, DATETIME 219, GROUP 218, REPORTED 14, REQUEST 4).
+const SEARCH_ITEM_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bSEARCH\b\s{1,4})(.{1,9}\s)?(.{1,9})?/d;
+
+// SEARCH's fixed item-keyword vocabulary -- confirmed directly from the
+// Reference Manual's own SEARCH instruction entry: "PATIENT NAME REQUEST
+// DATETIME (or ARRSET) REPORTED TRACKED TEST GROUP CONSTIT ANTIBODY PRODUCT
+// TESTDEPT" (13 distinct words -- DATETIME/ARRSET are each their own word,
+// not one merged option). This exactly matches search-lines' existing
+// grammar alternation, already shipped since before this check existed --
+// only 6 of the 13 actually appear in this specific corpus (see
+// SEARCH_ITEM_RE above), so the other 7 are trusted from the manual alone,
+// the same "don't assume corpus comprehensiveness" lesson as NORMAL2.
+const SEARCH_ITEM_WORDS = new Set([
+  'PATIENT', 'NAME', 'REQUEST', 'DATETIME', 'ARRSET', 'REPORTED', 'TRACKED',
+  'TEST', 'GROUP', 'CONSTIT', 'ANTIBODY', 'PRODUCT', 'TESTDEPT',
+]);
+
 // GOTCP's target -- a 4-digit test code referring to a DIFFERENT TCP file,
 // not a label in this file. Mirrors gotcp-lines' match.
 const GOTCP_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\s+)(.{1,8}\s)?/d;
@@ -406,6 +429,25 @@ function findInvalidNormalxDateTypes(lines) {
 }
 
 /**
+ * SEARCH's op2 (item keyword) values that are NOT one of the 13 documented
+ * words (see SEARCH_ITEM_WORDS) -- the second enumerated-value check in
+ * this codebase, same shape as findInvalidNormalxDateTypes (Reference
+ * Manual Error 30).
+ * @param {string[]} lines
+ * @returns {Array<{value: string, line: number, startCol: number, endCol: number}>}
+ */
+function findInvalidSearchItemWords(lines) {
+  const results = [];
+  lines.forEach((line, lineIndex) => {
+    const found = extractGroup(line, SEARCH_ITEM_RE, 6);
+    if (found && !SEARCH_ITEM_WORDS.has(found.text)) {
+      results.push({ value: found.text, line: lineIndex, startCol: found.startCol, endCol: found.endCol });
+    }
+  });
+  return results;
+}
+
+/**
  * A/M/N/R/S/H-line data declarations (the box a label identifies, per the
  * Introduction Manual's "every item of data is held in a box... identified
  * by a LABEL" model) -- a separate namespace from I-line branch labels.
@@ -657,6 +699,7 @@ module.exports = {
   findGotcpReferences,
   findNormalxTestReferences,
   findInvalidNormalxDateTypes,
+  findInvalidSearchItemWords,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.13.0
+
+- New diagnostic: `SEARCH`'s item keyword (2nd operand) is checked against its documented 13-word vocabulary (Reference Manual Error 30) — an unrecognized value is now flagged, matching the highlighting the grammar already had for it. Corrected the vocabulary count along the way: it's 13 words, not 12 — the Reference Manual's own `SEARCH` entry includes `TESTDEPT` alongside the others. Validated against the entire real corpus with zero false positives.
+
 ## 0.12.0
 
 - `CR REQL` recognized as a sixth "CR" family member, alongside `CR TEST`/`CR CRS`/`CR REQ`/`CR COM`: op1 is a data reference, op2/op3 are branch labels (either optional). Confirmed against all 6 real occurrences in the corpus, zero deviations.

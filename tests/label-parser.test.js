@@ -9,6 +9,7 @@ const {
   findGotcpReferences,
   findNormalxTestReferences,
   findInvalidNormalxDateTypes,
+  findInvalidSearchItemWords,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -221,6 +222,37 @@ run('findInvalidNormalxDateTypes flags a value outside the six documented global
 run('findInvalidNormalxDateTypes does not require op2 (optional, defaults to DATE REG per the manual)', () => {
   const lines = [iLine('', 'NORMALX', '0710'), iLine('', 'NORMALX')];
   assert.strictEqual(findInvalidNormalxDateTypes(lines).length, 0);
+});
+
+run('findInvalidSearchItemWords accepts every real corpus value and manual-only words alike (real "SEARCH NOTFND TEST" shape)', () => {
+  const lines = [
+    iLine('', 'SEARCH', 'NOTFND', 'TEST', 'FIRST'),
+    iLine('', 'SEARCH', 'NXTCON', 'CONSTIT', 'FIRST'),
+    iLine('', 'SEARCH', 'NEXTREQ', 'DATETIME', '20070'),
+    iLine('', 'SEARCH', 'FIN', 'GROUP', 'FIRST'),
+    iLine('', 'SEARCH', 'NEXTREQ', 'REPORTED', 'FIRST'),
+    iLine('', 'SEARCH', 'LOOP', 'REQUEST', 'TAV1'),
+    // Manual-documented but not seen in the real corpus -- trusted from the
+    // manual alone, same "don't assume corpus comprehensiveness" lesson as
+    // NORMAL2 (see labelParser.js's SEARCH_ITEM_WORDS comment).
+    iLine('', 'SEARCH', 'FIN', 'PATIENT'),
+    iLine('', 'SEARCH', 'FIN', 'ARRSET'),
+    iLine('', 'SEARCH', 'FIN', 'TRACKED'),
+    iLine('', 'SEARCH', 'FIN', 'ANTIBODY'),
+    iLine('', 'SEARCH', 'FIN', 'PRODUCT'),
+    iLine('', 'SEARCH', 'FIN', 'TESTDEPT'),
+    iLine('', 'SEARCH', 'FIN', 'NAME'),
+  ];
+  assert.strictEqual(findInvalidSearchItemWords(lines).length, 0);
+});
+
+run('findInvalidSearchItemWords flags a value outside the 13 documented item keywords', () => {
+  const lines = [iLine('', 'SEARCH', 'NOTFND', 'TESTX', 'FIRST')];
+  const invalid = findInvalidSearchItemWords(lines);
+  assert.deepStrictEqual(
+    invalid.map((i) => i.value),
+    ['TESTX']
+  );
 });
 
 run('a well-formed GOTO,MM target line reports correct column ranges', () => {

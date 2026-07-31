@@ -119,7 +119,7 @@ Not started — a brainstorm grounded in the TCP Reference Manual's Assembly/Sys
 
 - [x] **Undefined data reference** (Reference Manual Errors 8 "Undefined numeric" and 10 "Undefined alpha") — built, see "Undefined data reference feature (2026-07-30)" below.
 - [x] **Unrecognized instruction keyword** (Error 6, "Unrecognisable instruction") — built, see "Unrecognized instruction keyword feature (0.11.0)" below.
-- [ ] **SEARCH's item-word promoted to a real diagnostic** (Error 30). The grammar already knows the fixed 12-word list (`PATIENT NAME REQUEST DATETIME ARRSET REPORTED TRACKED TEST GROUP CONSTIT ANTIBODY PRODUCT`); an invalid word currently just loses its colour instead of being flagged as a problem.
+- [x] **SEARCH's item-word promoted to a real diagnostic** (0.13.0) — built, see "SEARCH item-word diagnostic (0.13.0)" below. Correction while implementing: the grammar's actual list is **13** words, not 12 — the manual's own SEARCH entry includes `TESTDEPT` alongside the 12 this line originally listed; the grammar was already correct, this summary line just missed it.
 
 ### Hygiene checks — validated against the real corpus, mixed results
 
@@ -332,6 +332,20 @@ Two mistakes made and corrected while building this, both worth keeping in mind 
 - `src/labelParser.js`: new `KNOWN_INSTRUCTION_KEYWORDS` set and `findUnrecognizedOpcodes` (reuses `findOpcodeFields`, no new regex).
 - `src/diagnostics.js`: new `unrecognized-instruction` diagnostic (warning) — an opcode is only flagged if it's absent from BOTH the static keyword set AND `opts.macroLabels` (the live workspace macro index), so a workspace's own custom macro names are always correctly exempt regardless of what's baked into the static list.
 - **Validation**: full corpus check — zero diagnostics (3815 test codes, 253 macros indexed). Sanity-checked by injecting a deliberate typo (`GOTO` → `GOTOX`) into a real file and confirming it's caught.
+
+## SEARCH item-word diagnostic (0.13.0)
+
+Reference Manual Error 30: `SEARCH`'s op2 (item keyword) must be one of a fixed vocabulary. The grammar has known and highlighted this vocabulary since before diagnostics existed for it — an unrecognized value simply lost its colour, with no actual signal that something was wrong (the same gap `NORMALX`'s op2 had before 0.10.0).
+
+**Correction found while implementing**: the vocabulary is **13** words, not the 12 the original backlog entry listed. The Reference Manual's own `SEARCH` instruction entry spells it out directly: *"PATIENT NAME REQUEST DATETIME (or ARRSET) REPORTED TRACKED TEST GROUP CONSTIT ANTIBODY PRODUCT TESTDEPT"* — `DATETIME` and `ARRSET` are each their own word (alternatives for the same purpose, not a merged pair), and `TESTDEPT` is a genuine 13th member the original backlog line simply missed. The grammar's existing alternation already had all 13 correct; only the backlog's own summary was short by one.
+
+**Confirmed against real data before implementing**: 1833 real `SEARCH` lines across the corpus, op2 always present (never blank), and only 6 of the 13 documented words actually appear in this specific corpus (`TEST` 1052, `CONSTIT` 326, `DATETIME` 219, `GROUP` 218, `REPORTED` 14, `REQUEST` 4) — the other 7 (`PATIENT`, `ARRSET`, `TRACKED`, `ANTIBODY`, `PRODUCT`, `TESTDEPT`, `NAME`) are trusted from the manual alone and not corpus-verified, the same "don't assume corpus comprehensiveness" lesson as `NORMAL2` — a word absent from this corpus snapshot is not evidence it's invalid.
+
+- `src/labelParser.js`: new `SEARCH_ITEM_RE` (a bounded-separator regex, deliberately separate from the existing `SEARCH_TARGET_RE`'s older unbounded `\s+` rather than modifying that one), `SEARCH_ITEM_WORDS` (13-entry set), and `findInvalidSearchItemWords`.
+- `src/diagnostics.js`: new `invalid-search-item-word` diagnostic (warning) — the third enumerated-value check in this codebase (after `invalid-normalx-date-type`), same shape.
+- No grammar changes needed — the grammar already highlights this field, this only adds the missing diagnostic signal on top.
+- **Validation**: full corpus check — zero diagnostics.
+- **Known gap, queued separately**: like `NORMALX`'s op2, an invalid `SEARCH` item word triggers this diagnostic but still renders with the neutral catch-all colour, not `invalid`/red — see the queued item at the top of this file.
 
 ## Highlight the Global Data catalogue in a distinct colour (not started)
 

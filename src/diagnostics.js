@@ -24,6 +24,7 @@ const {
   findGotcpReferences,
   findNormalxTestReferences,
   findInvalidNormalxDateTypes,
+  findInvalidSearchItemWords,
   findDataDeclarations,
   findDataReferences,
   findPrintDataReferences,
@@ -162,6 +163,23 @@ function computeDiagnostics(lines, options) {
         severity: 'warning',
         code: 'invalid-normalx-date-type',
         message: `'${invalid.value}' is not one of NORMALX's documented global dates (DATE REG, DATE ARR, DATE COL, DATESPEC, ENTDATE, AUTHDATE)`,
+      });
+    }
+
+    // SEARCH's op2 (Reference Manual Error 30, "Unrecognisable item"):
+    // must be one of 13 documented item keywords (PATIENT, NAME, REQUEST,
+    // DATETIME, ARRSET, REPORTED, TRACKED, TEST, GROUP, CONSTIT, ANTIBODY,
+    // PRODUCT, TESTDEPT), the exact same list search-lines' grammar rule
+    // already highlights. Confirmed against the real corpus: 1833 real
+    // SEARCH lines, op2 always present, always one of 6 of these 13 words.
+    for (const invalid of findInvalidSearchItemWords(blockLines)) {
+      diagnostics.push({
+        line: block.startLine + invalid.line,
+        startCol: invalid.startCol,
+        endCol: invalid.endCol,
+        severity: 'warning',
+        code: 'invalid-search-item-word',
+        message: `'${invalid.value}' is not one of SEARCH's documented item keywords (PATIENT, NAME, REQUEST, DATETIME, ARRSET, REPORTED, TRACKED, TEST, GROUP, CONSTIT, ANTIBODY, PRODUCT, TESTDEPT)`,
       });
     }
 

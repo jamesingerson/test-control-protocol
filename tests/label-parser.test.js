@@ -16,6 +16,7 @@ const {
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
+  findUnrecognizedOpcodes,
   findMacroDefinitions,
   findTestBlocks,
 } = require('../src/labelParser');
@@ -260,6 +261,30 @@ run('findOpcodeFields extracts the field after the label on every I-line, matchi
   const opcodes = findOpcodeFields(lines);
   assert.strictEqual(opcodes.length, 1);
   assert.strictEqual(opcodes[0].text, 'DRUGMCR');
+});
+
+run('findUnrecognizedOpcodes does not flag known built-in keywords, including multi-word and comma-suffixed ones', () => {
+  const lines = [
+    iLine('', 'GOTO,EQ', 'TARGET'),
+    iLine('', 'CR TEST', 'FLK-P'),
+    iLine('', 'NORMAL2', 'RRANGE'),
+    iLine('', 'GROUP', 'TITLE'),
+  ];
+  assert.deepStrictEqual(findUnrecognizedOpcodes(lines), []);
+});
+
+run('findUnrecognizedOpcodes flags an opcode that is neither a known keyword nor (from this module\'s perspective) a macro name', () => {
+  const lines = [iLine('', 'GOTOX')];
+  const found = findUnrecognizedOpcodes(lines);
+  assert.strictEqual(found.length, 1);
+  assert.strictEqual(found[0].opcode, 'GOTOX');
+});
+
+run('findUnrecognizedOpcodes flags a macro-invocation-shaped opcode too (macro-name exemption is the caller\'s job, see diagnostics.js)', () => {
+  const lines = [iLine('DRUGM', 'DRUGMCR')];
+  const found = findUnrecognizedOpcodes(lines);
+  assert.strictEqual(found.length, 1);
+  assert.strictEqual(found[0].opcode, 'DRUGMCR');
 });
 
 run('findDataDeclarations finds A/M/N/R/S/H-line labels, a separate namespace from I-line branch labels', () => {

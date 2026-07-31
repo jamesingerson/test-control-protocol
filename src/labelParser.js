@@ -519,6 +519,90 @@ function findOpcodeFields(lines) {
   return results;
 }
 
+// Instruction keywords confirmed as genuine, universal TCP language
+// built-ins -- NOT specific to any one workspace's own macro definitions.
+// Derived by unioning (a) every opcode used in a real T/Q test block
+// across the entire production corpus (C:\repos\TCP) that does NOT match
+// any locally-defined macro name (a D-line header) anywhere in that same
+// corpus, with (b) every instruction name found in the Reference Manual's
+// own "Instructions in Alphabetical Order" section (82 entries, extracted
+// from its linear prose layout -- unlike the multi-column "Global Data"
+// tables elsewhere in the manual, this section reliably parses as one
+// instruction name per line immediately followed by a line starting with
+// "Function").
+//
+// The manual union matters: three genuine built-ins (ALPHA, GROUP,
+// NUMERIC) are ALSO coincidentally macro names in this specific
+// workspace's own MACRO file (`D GROUP`, `D ALPHA`, `D NUMERIC` are real
+// macros here) -- the corpus-census step deliberately excludes any opcode
+// matching a locally-defined macro name, precisely so this "universal"
+// list doesn't accidentally bake in one workspace's own custom macro
+// vocabulary (e.g. WBHBIO, DRUGMCR, PNMCR1 -- real Pathlab macro names
+// that must NOT be treated as recognized everywhere; they're only
+// legitimate via a live macro-name index, see opts.macroLabels in
+// diagnostics.js). That filter would have silently dropped ALPHA/GROUP/
+// NUMERIC too, since they collide with real local macro names -- the
+// manual's independent confirmation restores them without reopening that
+// hole.
+//
+// Lesson learned while building this list: an opcode's low frequency (or
+// even single-instance rarity -- NORMAL2 was initially mistaken for a
+// likely copy-paste typo, since it appears exactly once, in a spot
+// structurally identical to an adjacent NORMAL) is NOT evidence of
+// invalidity. Every file in the real corpus has already assembled and is
+// running in production, meaning it already passed the real assembler's
+// own Error 6 ("Unrecognisable instruction") check -- rarity reflects an
+// uncommon real feature, not a mistake. NORMAL2 has a full Reference
+// Manual entry (selects a second RANGE2 comparison range, see
+// GOTO_IR_DATA_REFERENCE_RE above) confirming it's genuine. Nothing was
+// excluded from this list on the basis of rarity alone -- only the
+// macro-name-collision filter above deliberately excludes anything.
+const KNOWN_INSTRUCTION_KEYWORDS = new Set([
+  'ADD', 'ADDSPEC', 'ALIASPID', 'ALPHA', 'ANTIBIO', 'BACSTAT', 'CHARGE', 'CHECK*', 'CHECK*X',
+  'CHECKSUS', 'CLEAR', 'CLOSEFIL', 'COMMENT', 'COPYDR', 'COPYTO', 'CR COM', 'CR CRS', 'CR CRSNH',
+  'CR REF', 'CR REQ', 'CR REQL', 'CR TEST', 'CRDX', 'CRDX,NFT', 'CRDY', 'CRDY,NFT', 'DATECOMP',
+  'DAYOFWK', 'DELTA', 'DELTA,%', 'DELTAX', 'DIAG,A', 'DIVIDE', 'DOCTOR', 'EMAILVAL', 'END',
+  'EPIDIAG', 'ERROR', 'ERROR,EQ', 'ERROR,GE', 'ERROR,GT', 'ERROR,LE', 'ERROR,LT', 'ERROR,M',
+  'ERROR,MM', 'ERROR,NE', 'ERROR,OR', 'EXP', 'EXTRACT', 'EXTROUT', 'FAXTO', 'FEASX', 'FIRSTDAY',
+  'GET', 'GET,A', 'GET,E', 'GET,O', 'GETPARAM', 'GETSPEC', 'GETYEAR', 'GLHREP', 'GOSUB',
+  'GOSUB,EQ', 'GOSUB,GE', 'GOSUB,GT', 'GOSUB,LE', 'GOSUB,LT', 'GOSUB,M', 'GOSUB,MM', 'GOSUB,NE',
+  'GOTCP', 'GOTCP,EQ', 'GOTCP,GE', 'GOTCP,GT', 'GOTCP,LE', 'GOTCP,LT', 'GOTCP,NE', 'GOTO',
+  'GOTO,EQ', 'GOTO,GE', 'GOTO,GT', 'GOTO,IR', 'GOTO,LE', 'GOTO,LT', 'GOTO,M', 'GOTO,MM', 'GOTO,NE',
+  'GOTO,OR', 'GOTO,PCT', 'GROUP', 'HIGHLITE', 'HL7PRINT', 'HL7SET', 'INSERT', 'LAB', 'LOG', 'MOVE',
+  'MOVE,A', 'MOVE,AI1', 'MOVE,AI2', 'MOVE,AP', 'MOVE,AV', 'MOVE,D', 'MOVE,I1', 'MOVE,I2', 'MOVE,N',
+  'MOVE,T', 'MULTIPLY', 'NEWDATE', 'NEWLINE', 'NEWPAGE', 'NOAMEND', 'NOQUERY', 'NOREPORT',
+  'NORMAL', 'NORMAL2', 'NORMAL2X', 'NORMALX', 'NUMERIC', 'NUMRSLT', 'NUMVAL', 'OPENFILE',
+  'ORGANISM', 'PHONE', 'POSNEG', 'PRINT', 'PRINT,A', 'PRINT,H', 'PRINT,HJ', 'PRINT,J', 'PRINT,M',
+  'PRINT,R', 'READPID', 'READREQ', 'REPT', 'REPTKEY', 'REPTMODE', 'REPTTYPE', 'REQDEBT', 'REQNEXT',
+  'REQPRIOR', 'REQSTART', 'REQUEST', 'RESTORE', 'RETAIN', 'RETURN', 'REVIEW', 'SEARCH', 'SELDEL',
+  'SELREP', 'SIGNOUT', 'SNOMED', 'SPECIMEN', 'SPECTYPE', 'STATS', 'STATSX', 'SUBTRACT', 'SUPRECIP',
+  'TEST', 'TESTADD', 'TESTFEE', 'TESTRES', 'TESTTYPE', 'TIMEDIFF', 'TOX', 'UNAUTHX', 'USERCODE',
+  'VERIFY', 'WARN', 'WRITEREC',
+]);
+
+/**
+ * I-line opcodes (see I_LINE_OPCODE_RE via findOpcodeFields) that are not
+ * one of the confirmed universal built-in keywords (KNOWN_INSTRUCTION_-
+ * KEYWORDS) -- candidates for Reference Manual Error 6, "Unrecognisable
+ * instruction". This module has no workspace context, so a candidate here
+ * may still turn out to be a legitimate macro invocation -- the caller
+ * (diagnostics.js) must additionally exempt any opcode matching a live
+ * macro-name index (opts.macroLabels' own keys) before treating a
+ * candidate as a genuine error, exactly like the existing
+ * macro-label-injection pattern used for undefined-label checking.
+ * @param {string[]} lines
+ * @returns {Array<{opcode: string, line: number, startCol: number, endCol: number}>}
+ */
+function findUnrecognizedOpcodes(lines) {
+  const results = [];
+  for (const field of findOpcodeFields(lines)) {
+    if (!KNOWN_INSTRUCTION_KEYWORDS.has(field.text)) {
+      results.push({ opcode: field.text, line: field.line, startCol: field.startCol, endCol: field.endCol });
+    }
+  }
+  return results;
+}
+
 // Turns a list of {name, line} header hits into [{name, startLine, endLine}]
 // blocks, each running up to the next header (exclusive) or end of file.
 function toBlocks(headers, lineCount) {
@@ -570,6 +654,7 @@ module.exports = {
   findMissingDataOperands,
   isGlobalDataFile,
   findOpcodeFields,
+  findUnrecognizedOpcodes,
   findMacroDefinitions,
   findTestBlocks,
 };

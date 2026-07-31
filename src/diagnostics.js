@@ -30,6 +30,7 @@ const {
   findGotoIrDataReferences,
   findMissingDataOperands,
   findOpcodeFields,
+  findUnrecognizedOpcodes,
 } = require('./labelParser');
 
 /**
@@ -178,6 +179,25 @@ function computeDiagnostics(lines, options) {
         severity: 'warning',
         code: 'missing-data-operand',
         message: `'${missing.keyword}' is missing its data-reference operand in ${block.name}`,
+      });
+    }
+
+    // Unrecognized instruction keyword (Reference Manual Error 6,
+    // "Unrecognisable instruction"): an I-line opcode that's neither a
+    // known built-in keyword (labelParser.js's KNOWN_INSTRUCTION_KEYWORDS,
+    // derived from corpus census + manual cross-reference) nor a live
+    // macro invocation (opts.macroLabels' own keys, so a workspace's own
+    // custom macro names are always exempt) is very likely a typo or a
+    // misaligned column.
+    for (const candidate of findUnrecognizedOpcodes(blockLines)) {
+      if (opts.macroLabels && opts.macroLabels.has(candidate.opcode)) continue;
+      diagnostics.push({
+        line: block.startLine + candidate.line,
+        startCol: candidate.startCol,
+        endCol: candidate.endCol,
+        severity: 'warning',
+        code: 'unrecognized-instruction',
+        message: `'${candidate.opcode}' is not a recognized instruction keyword or macro name -- check spelling and column position`,
       });
     }
 

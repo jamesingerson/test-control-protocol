@@ -75,10 +75,18 @@ run('resolves a reference to a label injected by an invoked macro (real BIO/DRUG
     iLine('FIN', 'REMAUTH'),
     iLine('', 'END'),
   ];
-  const macroLabels = new Map([['DRUGMCR', new Set(['CONT', 'DCHECK', 'ENDMCR'])]]);
+  // DRUGMCR and REMAUTH are both real macro names (confirmed: `D DRUGMCR`
+  // and `D REMAUTH` are defined in the real MACRO file), not built-in
+  // keywords -- without a workspace macro index, both are indistinguishable
+  // from a genuine typo and correctly flagged as unrecognized-instruction.
+  const macroLabels = new Map([
+    ['DRUGMCR', new Set(['CONT', 'DCHECK', 'ENDMCR'])],
+    ['REMAUTH', new Set()],
+  ]);
   const diagsWithoutIndex = computeDiagnostics(lines);
-  assert.strictEqual(diagsWithoutIndex.length, 1);
-  assert.strictEqual(diagsWithoutIndex[0].code, 'undefined-label');
+  assert.strictEqual(diagsWithoutIndex.length, 3);
+  assert.strictEqual(diagsWithoutIndex.filter((d) => d.code === 'undefined-label').length, 1);
+  assert.strictEqual(diagsWithoutIndex.filter((d) => d.code === 'unrecognized-instruction').length, 2);
 
   const diagsWithIndex = computeDiagnostics(lines, { macroLabels });
   assert.strictEqual(diagsWithIndex.length, 0);
@@ -295,8 +303,11 @@ run('resolves a data reference injected by an invoked macro', () => {
   ];
   const macroLabels = new Map([['SOMEMAC', new Set(['REF'])]]);
   const diagsWithoutIndex = computeDiagnostics(lines);
-  assert.strictEqual(diagsWithoutIndex.length, 1);
-  assert.strictEqual(diagsWithoutIndex[0].code, 'undefined-data-reference');
+  // Without a workspace macro index, SOMEMAC (a fictitious macro name for
+  // this test) is indistinguishable from a genuine typo.
+  assert.strictEqual(diagsWithoutIndex.length, 2);
+  assert.strictEqual(diagsWithoutIndex.filter((d) => d.code === 'undefined-data-reference').length, 1);
+  assert.strictEqual(diagsWithoutIndex.filter((d) => d.code === 'unrecognized-instruction').length, 1);
 
   const diagsWithIndex = computeDiagnostics(lines, { macroLabels });
   assert.strictEqual(diagsWithIndex.length, 0);
@@ -341,6 +352,37 @@ run('does not flag a bare GROUP with no operand (real, common pattern, excluded 
   const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GROUP'), iLine('', 'END')];
   const diags = computeDiagnostics(lines);
   assert.strictEqual(diags.length, 0);
+});
+
+run('flags an unrecognized instruction keyword (Assembly Error 6 shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'GOTOX', 'FOO'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'unrecognized-instruction');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('GOTOX'));
+});
+
+run('does not flag known built-in keywords, including multi-word and comma-suffixed ones', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'GOTO,EQ', 'DONE'),
+    iLine('', 'NORMAL2', 'RRANGE'),
+    iLine('DONE', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not flag a real macro invocation once its name is known via the workspace macro index', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('DRUGM', 'DRUGMCR'), iLine('', 'END')];
+  const macroLabels = new Map([['DRUGMCR', new Set()]]);
+  const diagsWithoutIndex = computeDiagnostics(lines);
+  assert.strictEqual(diagsWithoutIndex.length, 1);
+  assert.strictEqual(diagsWithoutIndex[0].code, 'unrecognized-instruction');
+
+  const diagsWithIndex = computeDiagnostics(lines, { macroLabels });
+  assert.strictEqual(diagsWithIndex.length, 0);
 });
 
 console.log('all diagnostics tests passed');

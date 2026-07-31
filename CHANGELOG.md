@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.11.0
+
+- New diagnostic: an I-line opcode that's neither a recognized instruction keyword nor a known macro invocation is now flagged (Reference Manual Error 6, "Unrecognisable instruction"). The recognized-keyword list is derived from a full census of the real production corpus plus the Reference Manual's own instruction catalogue; a workspace's own macro names (from the existing macro index) are always additionally recognized, so this never flags a legitimate custom macro call. Validated against the entire real corpus with zero false positives.
+
 ## 0.10.0
 
 - `NORMALX` has a documented 2nd operand (per the Reference Manual: "Optional. If present, this operand must be one of the following global dates: DATE REG, DATE ARR, DATE COL, DATESPEC, ENTDATE, AUTHDATE. If not specified... the system uses DATE REG as the default"), confirmed against real data with zero deviations across 54 real occurrences. Previously miscategorised as free-text trailing comment. Now recognised and highlighted like `SEARCH`'s item keyword, and validated with a new enumerated-value check — the first of its kind in this extension — flagging anything outside those six documented words.

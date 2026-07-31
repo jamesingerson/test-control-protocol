@@ -116,7 +116,7 @@ Not started — a brainstorm grounded in the TCP Reference Manual's Assembly/Sys
 ### Strong candidates — same architecture as the label/GOTCP feature
 
 - [x] **Undefined data reference** (Reference Manual Errors 8 "Undefined numeric" and 10 "Undefined alpha") — built, see "Undefined data reference feature (2026-07-30)" below.
-- [ ] **Unrecognized instruction keyword** (Error 6, "Unrecognisable instruction"). Flag an I-line opcode that's neither a known keyword nor a known macro name (reuse the existing macro index). Currently such lines silently fall through to the generic `instruction-lines` highlighting rule with no signal at all.
+- [x] **Unrecognized instruction keyword** (Error 6, "Unrecognisable instruction") — built, see "Unrecognized instruction keyword feature (0.11.0)" below.
 - [ ] **SEARCH's item-word promoted to a real diagnostic** (Error 30). The grammar already knows the fixed 12-word list (`PATIENT NAME REQUEST DATETIME ARRSET REPORTED TRACKED TEST GROUP CONSTIT ANTIBODY PRODUCT`); an invalid word currently just loses its colour instead of being flagged as a problem.
 
 ### Hygiene checks — validated against the real corpus, mixed results
@@ -315,6 +315,21 @@ The user supplied the exact Reference Manual wording: *"Optional. If present, th
 - **Validation**: full corpus check after the correction — zero diagnostics. Fixture updated to cover the "op2 without op1" shape; snapshot diff reviewed and confirmed `DATE REG` moved from `comment.line` to `string`.
 
 **Lesson**: real-data sampling alone won't always distinguish "genuine short fixed-vocabulary operand" from "coincidentally short trailing free text" — both can look identical from field-position and character-count alone. When the user or a manual explicitly documents a shape, that's a stronger signal than corpus inference and should prompt re-checking a "trailing comment" classification already made.
+
+## Unrecognized instruction keyword feature (0.11.0)
+
+Reference Manual Error 6, "Unrecognisable instruction": an I-line opcode that's neither a known keyword nor a known macro name. Previously such lines silently fell through to the generic `instruction-lines` highlighting rule with no signal at all.
+
+**Building the keyword baseline (the bulk of the work here)**: a static `KNOWN_INSTRUCTION_KEYWORDS` set (170 entries) derived by unioning (a) every opcode used in a real T/Q block across the entire production corpus (`C:\repos\TCP`) that does NOT match any locally-defined macro name, with (b) every instruction name extracted from the Reference Manual's "Instructions in Alphabetical Order" section (82 entries — a linear prose layout, one name per line immediately followed by a line starting with "Function", unlike the multi-column "Global Data" tables elsewhere in the manual that defeated clean extraction).
+
+Two mistakes made and corrected while building this, both worth keeping in mind for any future keyword/vocabulary audit of this kind:
+
+1. **`NORMAL2` mistaken for a typo.** It appears exactly once in the entire corpus, in a spot structurally identical to an adjacent block using plain `NORMAL` — looked exactly like a copy-paste error. The user corrected this directly: *"Careful, normal2 is a real command, check the manual, don't trust the production corpus to be comprehensive."* The manual confirms a full entry for `NORMAL2` (selects a second `RANGE2` comparison range — the same `RANGE2` keyword found independently during the `GOTO,IR` work, see above). **Lesson**: production code that has assembled and is running has, by definition, already passed the real assembler's own Error 6 check — an opcode's rarity in one corpus snapshot is not evidence of invalidity. Nothing was excluded from the final list on the basis of rarity alone.
+2. **Macro-name collisions hid three genuine keywords.** `GROUP`, `ALPHA`, and `NUMERIC` are all real, heavily-used built-in keywords already relied on by shipped features (`GROUP` is in `DATA_REFERENCE_RE`) — but this specific workspace's own `MACRO` file *also* defines macros literally named `D GROUP`, `D ALPHA`, `D NUMERIC`. A first attempt at the census excluded any opcode matching a locally-defined macro name (deliberately, to avoid baking Pathlab-specific macro names like `WBHBIO`/`DRUGMCR`/`PNMCR1` into a supposedly-universal keyword list), which silently dropped these three real keywords along with the genuine macro invocations. Resolved by keeping the macro-collision exclusion (still correct for avoiding workspace-specific bleed) and relying on the manual union to independently re-confirm `GROUP`/`ALPHA`/`NUMERIC` as real instructions — the same `REMAUTH` situation surfaced afterwards during testing (a real macro name, confirmed via `D REMAUTH` in the real `MACRO` file, with no manual entry) and was correctly left OUT of the static list, since it's genuinely only a macro, not a built-in.
+
+- `src/labelParser.js`: new `KNOWN_INSTRUCTION_KEYWORDS` set and `findUnrecognizedOpcodes` (reuses `findOpcodeFields`, no new regex).
+- `src/diagnostics.js`: new `unrecognized-instruction` diagnostic (warning) — an opcode is only flagged if it's absent from BOTH the static keyword set AND `opts.macroLabels` (the live workspace macro index), so a workspace's own custom macro names are always correctly exempt regardless of what's baked into the static list.
+- **Validation**: full corpus check — zero diagnostics (3815 test codes, 253 macros indexed). Sanity-checked by injecting a deliberate typo (`GOTO` → `GOTOX`) into a real file and confirming it's caught.
 
 ## Highlight the Global Data catalogue in a distinct colour (not started)
 

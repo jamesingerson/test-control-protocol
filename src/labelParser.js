@@ -54,6 +54,32 @@ const SEARCH_ITEM_WORDS = new Set([
 // not a label in this file. Mirrors gotcp-lines' match.
 const GOTCP_TARGET_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\s+)(.{1,8}\s)?/d;
 
+// A small family of keywords whose op1 is a genuine in-file branch label
+// (like GOTO's target) but, unlike GOTO/GOSUB/DATE/GET, take no condition
+// codes and no other operand shape -- confirmed against real production
+// data (TODO.md's "Pure branch-label candidates" audit): `REQPRIOR` (41
+// real uses), `OPENFILE` (73), `COPYDR` (34), `CRDX` (23), `REQUEST` (7),
+// `REQNEXT` (7), `GETSPEC` (6) -- 191 combined, op1 never blank, ALL 191
+// (100%) resolve to a real branch label once macro-label injection is
+// accounted for. One case (`COPYDR ENDPCHK` in HAEM, T4997) looked like a
+// miss under a standalone same-block-only check -- turned out `ENDPCHK` is
+// a real label declared inside the `PREGCHK` macro's body, injected into
+// that block because it invokes `PREGCHK` elsewhere; resolves cleanly
+// through the normal `opts.macroLabels` mechanism every other check here
+// already uses. Confirmed via the manual's own COPYDR entry ("Operand 1:
+// the TCP label to branch to if the find is unsuccessful") that this really
+// is the same branch-label shape as the other 6 keywords, not a coincidence.
+// The bounded `\s{1,5}` separator accommodates the shortest keyword here
+// (`CRDX`, 4 chars, needing up to 5 padding characters to fill its own
+// 9-char field) -- confirmed against real spacing for all 7 keywords.
+// `COPYDR`'s own optional op2 (the special keyword `FIRST`, "restart the
+// find from the beginning") is deliberately not parsed here -- out of
+// scope for this specifically-branch-label-focused check, same as
+// GOTO,IR's op2 (`VALUE`) was left for its own op3 check rather than
+// bundled in.
+const SIMPLE_BRANCH_TARGET_RE =
+  /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:REQPRIOR|OPENFILE|COPYDR|CRDX|REQUEST|REQNEXT|GETSPEC)\b\s{1,5})(.{1,9}\s)?/d;
+
 // NORMALX's op1 -- a test-code reference (like GOTCP's target), NOT a data
 // box, despite NORMALX's name/family resemblance to NORMAL (which the
 // existing `\b` boundary in DATA_REFERENCE_RE already correctly excludes
@@ -361,7 +387,9 @@ function findLabelReferences(lines) {
   const results = [];
   lines.forEach((line, lineIndex) => {
     const candidates = [
-      extractGroup(line, GOTO_TARGET_RE, 5) || extractGroup(line, SEARCH_TARGET_RE, 5),
+      extractGroup(line, GOTO_TARGET_RE, 5) ||
+        extractGroup(line, SEARCH_TARGET_RE, 5) ||
+        extractGroup(line, SIMPLE_BRANCH_TARGET_RE, 5),
       // CR TEST/CR CRS can reference up to two branch labels (op2 and op3);
       // either, both, or neither may be present on a given line.
       extractGroup(line, CR_LABEL_RE, 6),

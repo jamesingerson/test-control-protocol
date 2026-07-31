@@ -100,6 +100,23 @@ run('findLabelReferences finds GOSUB/DATE/GET targets', () => {
   assert.deepStrictEqual(refs.map((r) => r.label), ['SUB1', 'TODAY', 'RESULT']);
 });
 
+run('findLabelReferences finds REQPRIOR/OPENFILE/COPYDR/CRDX/REQUEST/REQNEXT/GETSPEC op1 as branch targets (real corpus shapes)', () => {
+  const lines = [
+    iLine('', 'REQPRIOR', 'FIN'),
+    iLine('', 'OPENFILE', 'SKIP'),
+    iLine('', 'COPYDR', 'PRG-RET', 'FIRST'),
+    iLine('', 'CRDX', 'HEAD', '5'),
+    iLine('', 'REQUEST', 'ERREND', 'TAV1'),
+    iLine('', 'REQNEXT', 'FIN'),
+    iLine('', 'GETSPEC', 'FIN'),
+  ];
+  const refs = findLabelReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['FIN', 'SKIP', 'PRG-RET', 'HEAD', 'ERREND', 'FIN', 'FIN']
+  );
+});
+
 run('findLabelReferences finds SEARCH op1 (branch target) but not the item keyword or criteria', () => {
   const lines = [iLine('', 'SEARCH', 'NOTFND', 'TEST', 'FIRST')];
   const refs = findLabelReferences(lines);

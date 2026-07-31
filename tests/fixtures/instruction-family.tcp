@@ -4,6 +4,13 @@
        I          GOTCP    T0400    START
        I          GOTCP,EQ T0500    FLAG
        I          GET      RESULT   PCT1
+       I          REQPRIOR FIN
+       I          OPENFILE SKIP
+       I          COPYDR   PRG-RET  FIRST
+       I          CRDX     HEAD     5
+       I          REQUEST  ERREND   TAV1
+       I          REQNEXT  FIN
+       I          GETSPEC  FIN
        I          GOTO,MM  PCT1     TEMPLATE
        I          GOTO,XX  PCT1     VALUE
        I          NORMAL   RRANGE

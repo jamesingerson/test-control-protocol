@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.14.0
+
+- `REQPRIOR`/`OPENFILE`/`COPYDR`/`CRDX`/`REQUEST`/`REQNEXT`/`GETSPEC`'s single operand is now recognized and checked as a branch label, the same treatment `GOTO`'s target already had. Confirmed against all 191 real combined occurrences, 100% resolving to a real label once macro-label injection is accounted for.
+
 ## 0.13.0
 
 - New diagnostic: `SEARCH`'s item keyword (2nd operand) is checked against its documented 13-word vocabulary (Reference Manual Error 30) — an unrecognized value is now flagged, matching the highlighting the grammar already had for it. Corrected the vocabulary count along the way: it's 13 words, not 12 — the Reference Manual's own `SEARCH` entry includes `TESTDEPT` alongside the others. Validated against the entire real corpus with zero false positives.

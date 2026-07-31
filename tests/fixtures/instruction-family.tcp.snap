@@ -40,6 +40,51 @@
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
+>       I          REQPRIOR FIN
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+>       I          OPENFILE SKIP
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+>       I          COPYDR   PRG-RET  FIRST
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                                    ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       I          CRDX     HEAD     5
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                                    ^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       I          REQUEST  ERREND   TAV1
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                                    ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol comment.line.testcontrolprotocol
+>       I          REQNEXT  FIN
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+>       I          GETSPEC  FIN
+#^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
+#       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
+#                           ^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I          GOTO,MM  PCT1     TEMPLATE
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol

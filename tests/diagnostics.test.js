@@ -39,6 +39,30 @@ run('does not flag a label reference resolved within the same block', () => {
   assert.strictEqual(diags.length, 0);
 });
 
+run('flags an undefined REQPRIOR/OPENFILE/COPYDR/CRDX/REQUEST/REQNEXT/GETSPEC branch target as undefined-label', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'COPYDR', 'MISSING'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'undefined-label');
+  assert.ok(diags[0].message.includes('MISSING'));
+});
+
+run('resolves REQPRIOR/OPENFILE/COPYDR/CRDX/REQUEST/REQNEXT/GETSPEC branch targets declared elsewhere in the same block', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    iLine('', 'REQPRIOR', 'FIN'),
+    iLine('', 'OPENFILE', 'FIN'),
+    iLine('', 'COPYDR', 'FIN', 'FIRST'),
+    iLine('', 'CRDX', 'FIN'),
+    iLine('', 'REQUEST', 'FIN'),
+    iLine('', 'REQNEXT', 'FIN'),
+    iLine('', 'GETSPEC', 'FIN'),
+    iLine('FIN', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
 run('flags every occurrence of a duplicate label (Assembly Error 5 shape)', () => {
   const lines = [
     titleLine('T0302', 'Procalcitonin'),

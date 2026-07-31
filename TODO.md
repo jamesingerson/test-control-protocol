@@ -185,15 +185,9 @@ Asked directly: are there other operand positions across the whole instruction s
 
 - [x] **`CR REQL`** (0.12.0) — a sixth "CR" family member, missed in the first pass. Confirmed against all 6 real occurrences (BIO x2, BIOCUM, HAEMCUM, HAEM x2): identical shape to `CR REQ` — op1 always a declared `N` data label (never blank), op2 always a real branch label, op3 a branch label when present (blank 2 of 6 times, the real HAEM `WINDOW` shape). Added to `cr-report-lines`, `CR_LABEL_RE`, `DATA_REFERENCE_RE`, and `MISSING_OPERAND_KEYWORDS`. Zero diagnostics across the full corpus after adding.
 
-### Pure branch-label candidates (op1, 95–100% label rate), not yet implemented
+### Pure branch-label candidates (op1, 95–100% label rate)
 
-- [ ] `REQPRIOR` op1 (41 uses, 95% — `REQPRIOR FIN`)
-- [ ] `OPENFILE` op1 (73, 100%)
-- [ ] `COPYDR` op1 (34, 100% — `COPYDR PRG-RET FIRST`)
-- [ ] `CRDX` op1 (23, 100% — `CRDX HEAD 5`)
-- [ ] `REQUEST` op1 (7, 100% — `REQUEST ERREND TAV1`; confirmed even an oddly-named real label like `2ND` resolves)
-- [ ] `REQNEXT` op1 (7, 100%)
-- [ ] `GETSPEC` op1 (6, 100%)
+- [x] **`REQPRIOR`/`OPENFILE`/`COPYDR`/`CRDX`/`REQUEST`/`REQNEXT`/`GETSPEC`** (0.14.0) — built, see "Pure branch-label candidates feature (0.14.0)" below. All 7 confirmed at 100% (not the original 95–100% estimate) once macro-label injection is accounted for.
 
 ### Pure data-reference candidates (blue), not yet implemented
 
@@ -346,6 +340,17 @@ Reference Manual Error 30: `SEARCH`'s op2 (item keyword) must be one of a fixed 
 - No grammar changes needed — the grammar already highlights this field, this only adds the missing diagnostic signal on top.
 - **Validation**: full corpus check — zero diagnostics.
 - **Known gap, queued separately**: like `NORMALX`'s op2, an invalid `SEARCH` item word triggers this diagnostic but still renders with the neutral catch-all colour, not `invalid`/red — see the queued item at the top of this file.
+
+## Pure branch-label candidates feature (0.14.0)
+
+Seven keywords whose op1 is a genuine in-file branch label (the same category GOTO/GOSUB/SEARCH's targets belong to) but, unlike those, take no condition codes and no other operand shape: `REQPRIOR`, `OPENFILE`, `COPYDR`, `CRDX`, `REQUEST`, `REQNEXT`, `GETSPEC`.
+
+**Confirmed against real data before implementing**: 191 combined real uses across the 7 keywords (`REQPRIOR` 41, `OPENFILE` 73, `COPYDR` 34, `CRDX` 23, `REQUEST` 7, `REQNEXT` 7, `GETSPEC` 6), op1 never blank. A same-block-only census initially showed 190/191 (99.5%) resolving — one line, `I COPYDR ENDPCHK` in `HAEM` (`T4997`), looked like a genuine dead-code bug (`ENDPCHK` appears nowhere else in the file). Before shipping that conclusion, ran it through the real `computeDiagnostics` pipeline (not just the standalone census script) — it resolves cleanly: `ENDPCHK` is declared inside the `PREGCHK` macro's body, and that block invokes `PREGCHK` elsewhere, injecting the label via the existing `opts.macroLabels` mechanism every other check here already relies on. All 191 (100%) resolve once macro injection is accounted for, not 190. **Lesson**: a same-block-only census script is a reasonable first pass, but a "miss" from it isn't a confirmed finding until re-checked against the real `computeDiagnostics` pipeline (which knows about macro injection) — the standalone script is a simplification, not the ground truth.
+
+- `src/labelParser.js`: new `SIMPLE_BRANCH_TARGET_RE` (bounded `\s{1,5}` separator, wide enough for the shortest keyword here, `CRDX`), fed into `findLabelReferences` alongside `GOTO_TARGET_RE`/`SEARCH_TARGET_RE`.
+- Grammar: new `simple-branch-lines` rule, op1 → `entity.name.function.testcontrolprotocol` (yellow, matching every other branch-label target).
+- `COPYDR`'s own optional op2 (the special keyword `FIRST`, "restart the find from the beginning of the copy to list", confirmed via its own manual entry) is deliberately NOT parsed by this check — same "leave the next operand for its own future check" pattern as `GOTO,IR`'s op2 (`VALUE`).
+- **Validation**: full corpus check — zero diagnostics. New fixture coverage for all 7 shapes in `instruction-family.tcp`; snapshot diff reviewed, confirmed isolated to the new lines only.
 
 ## Highlight the Global Data catalogue in a distinct colour (not started)
 

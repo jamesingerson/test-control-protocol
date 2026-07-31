@@ -39,6 +39,9 @@
 			"include": "#gotcp-lines"
 		},
 		{
+			"include": "#simple-branch-lines"
+		},
+		{
 			"include": "#normalx-lines"
 		},
 		{
@@ -284,6 +287,27 @@
 				}
 			},
 			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\bGOTCP(?:,(?:EQ|NE|GT|GE|LT|LE))?\\s+)(.{1,8}\\s)?(.{1,8}\\s)?(.{1,8})?(.*)",
+			"name": "instruction-line.testcontrolprotocol"
+		},
+		"simple-branch-lines": {
+			"captures": {
+				"2": {
+					"name": "entity.other.attribute-name.testcontrolprotocol"
+				},
+				"3": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"4": {
+					"name": "keyword.control.testcontrolprotocol"
+				},
+				"5": {
+					"name": "entity.name.function.testcontrolprotocol"
+				},
+				"6": {
+					"name": "comment.line.testcontrolprotocol"
+				}
+			},
+			"match": "(^.{7})(\\bI\\b\\s)(.{1,8}\\s)(\\b(?:REQPRIOR|OPENFILE|COPYDR|CRDX|REQUEST|REQNEXT|GETSPEC)\\b\\s{1,5})(.{1,9}\\s)?(.*)",
 			"name": "instruction-line.testcontrolprotocol"
 		},
 		"normalx-lines": {

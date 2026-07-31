@@ -124,7 +124,7 @@
 					"name": "entity.other.attribute-name.testcontrolprotocol"
 				},
 				"3": {
-					"name": "entity.name.function.testcontrolprotocol"
+					"name": "storage.testcontrolprotocol"
 				},
 				"4": {
 					"name": "string.control.testcontrolprotocol"

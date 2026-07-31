@@ -1,11 +1,11 @@
 >       H CRLF     0D0A
 #^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol hex-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol storage.testcontrolprotocol
 #                  ^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol string.control.testcontrolprotocol
 >       H          FF
 #^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol hex-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
-#         ^^^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol entity.name.function.testcontrolprotocol
+#         ^^^^^^^^^ source.testcontrolprotocol hex-line.testcontrolprotocol storage.testcontrolprotocol
 #                  ^^ source.testcontrolprotocol hex-line.testcontrolprotocol string.control.testcontrolprotocol
 >

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.18.0
+
+- `H`-line's own label now renders `storage` (blue), matching `A`/`M`/`N`/`R`/`S`'s own label, instead of the branch-label yellow it used before — fixes the inconsistency documented in `COLOURS.md`/`TODO.md` last release, where `H` was coloured differently even though the diagnostics logic already treats it as the same data-declaration category. Validated against all 128 real `H`-lines in the corpus.
+
 ## 0.17.0
 
 - Added `COLOURS.md`: every scope this grammar assigns, what it's for, why it was chosen, and its resolved colour under Dark+/Light+. Found and documented a real inconsistency along the way — `H`-line's own label uses the label colour instead of the data colour, even though it's treated as data everywhere else — left as documentation, not silently changed.

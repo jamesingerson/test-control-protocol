@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.17.0
+
+- Added `COLOURS.md`: every scope this grammar assigns, what it's for, why it was chosen, and its resolved colour under Dark+/Light+. Found and documented a real inconsistency along the way — `H`-line's own label uses the label colour instead of the data colour, even though it's treated as data everywhere else — left as documentation, not silently changed.
+
 ## 0.16.0
 
 - New diagnostics: a `T`/`Q` test code declared more than once across the workspace (or twice in the same file), and a test code declared out of ascending numeric order — both errors. `REJECT.DJS` (an auxiliary reference file, not a compiled TCP source) is disregarded entirely for the duplicate check, dropping the count from 32 originally-found duplicates to the 15 genuine ones. Validated against the full corpus: 30 duplicate and 41 out-of-order diagnostics, matching the pre-implementation census exactly.

@@ -62,7 +62,7 @@ Checks run on-change, debounced, so they don't run on every keystroke. They're s
 
 The data-reference check is deliberately narrow — only specific keywords/positions confirmed clean against real usage, not every instruction that might reference data. Sampling showed most instructions' operands aren't data references at all (numeric literals, special keywords, or something else), and a blanket check would have been mostly noise; see `TODO.md` for the analysis, the still-open backlog of unimplemented candidates, and why several plausible-looking ones (`SIGNOUT`, `MOVE,D`, `PRINT,R`, `PRINT,J`) were rejected.
 
-`TODO.md` also tracks a larger backlog not yet implemented: a colour-taxonomy revisit (splitting "user-declared variable" from "implicit global/system field", currently both rendered the same blue) and hover/go-to-definition support for labels and variables.
+`TODO.md` also tracks a larger backlog not yet implemented: a colour-taxonomy revisit (splitting "user-declared variable" from "implicit global/system field", currently both rendered the same blue) and hover/go-to-definition support for labels and variables. See [COLOURS.md](COLOURS.md) for what every scope this grammar assigns currently means, why, and its resolved colour under Dark+/Light+.
 
 A few things worth knowing before relying on or sharing this:
 

@@ -137,6 +137,24 @@ run('findLabelReferences finds CR REQ op2/op3 as branch labels, the same shape a
   );
 });
 
+run('findLabelReferences finds CR REQL op2/op3 as branch labels, the sixth CR-family member (real BIO/HAEM shape)', () => {
+  const lines = [iLine('REQL1', 'CR REQL', 'REQ-PL', 'REQ-H', 'REQ-L')];
+  const refs = findLabelReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['REQ-H', 'REQ-L']
+  );
+});
+
+run('findLabelReferences tolerates a blank op3 for CR REQL (real HAEM "WINDOW" shape)', () => {
+  const lines = [iLine('WINDOW', 'CR REQL', 'REQ-P', 'REQ-SUB')];
+  const refs = findLabelReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['REQ-SUB']
+  );
+});
+
 run('findLabelReferences does not treat CR COM as having label operands (confirmed: never has op2/op3 in the real corpus)', () => {
   const lines = [iLine('HBACOMS', 'CR COM', 'HBAC-P')];
   assert.strictEqual(findLabelReferences(lines).length, 0);
@@ -323,6 +341,15 @@ run('findDataReferences resolves CR REQ/CR COM operand1 too (confirmed as two mo
   );
 });
 
+run('findDataReferences resolves CR REQL operand1 too (the sixth CR family member, real BIO/HAEM shape)', () => {
+  const lines = [iLine('REQL1', 'CR REQL', 'REQ-PL', 'REQ-H', 'REQ-L')];
+  const refs = findDataReferences(lines);
+  assert.deepStrictEqual(
+    refs.map((r) => r.label),
+    ['REQ-PL']
+  );
+});
+
 run('findDataReferences does not require an operand for a bare CR COM (real, common, 4 of 6 real occurrences)', () => {
   const lines = [iLine('', 'CR COM')];
   assert.strictEqual(findDataReferences(lines).length, 0);
@@ -386,12 +413,18 @@ run('findDataReferences does not mistake a distant trailing comment for a blank 
   assert.strictEqual(findDataReferences([line]).length, 0);
 });
 
-run('findMissingDataOperands flags NORMAL/CR TEST/CR CRS/CR REQ used with a blank operand', () => {
-  const lines = [iLine('', 'NORMAL'), iLine('', 'CR TEST'), iLine('', 'CR CRS'), iLine('', 'CR REQ')];
+run('findMissingDataOperands flags NORMAL/CR TEST/CR CRS/CR REQ/CR REQL used with a blank operand', () => {
+  const lines = [
+    iLine('', 'NORMAL'),
+    iLine('', 'CR TEST'),
+    iLine('', 'CR CRS'),
+    iLine('', 'CR REQ'),
+    iLine('', 'CR REQL'),
+  ];
   const missing = findMissingDataOperands(lines);
   assert.deepStrictEqual(
     missing.map((m) => m.keyword),
-    ['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ']
+    ['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ', 'CR REQL']
   );
 });
 

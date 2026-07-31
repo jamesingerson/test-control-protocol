@@ -2,6 +2,8 @@
 
 Backlog from the grammar/colour review and testing work-through. Grouped by area; `[x]` = already done in this pass, `[ ]` = still open.
 
+- [ ] **Queued (raised mid-session, not yet started): invalid fixed-vocabulary values should highlight as `invalid` (red), not fall through to the neutral catch-all (`comment.line`, green in most themes).** Concretely: a typo'd `NORMALX` op2 (e.g. `DATE REH` instead of `DATE REG`) correctly triggers the `invalid-normalx-date-type` diagnostic, but still renders green, because the `normalx-lines` rule's op2 alternation simply doesn't match it and the unmatched text falls through to the generic trailing catch-all group. Unlike the label/data-reference checks (which need workspace context the grammar doesn't have), this is a genuinely fixable case: `NORMALX`'s op2 is a small **closed, static** vocabulary (6 words), so the grammar itself — no workspace index needed — can already tell "recognized" from "not." Needs a regex restructure along the lines of `(?:(\b(?:WORD1|WORD2|...)\b\s*)|((?!\b(?:WORD1|WORD2|...)\b)\S.{0,N}\s?))?` — one branch for the recognized alternation (current `string` scope), a second branch (negative-lookahead-gated) for "anything else in that same field" scoped `invalid`. `SEARCH`'s item-word (see "SEARCH's item-word promoted to a real diagnostic" below) has the exact same shape/problem — implement both together for consistency once picked up, rather than fixing just one and leaving the other inconsistent.
+
 ## Grammar correctness
 
 - [x] **Title-line scope mislabelled as `hex-line`.** `title-lines` was created by copy-pasting `hex-lines` (confirmed via `git show 53a899c`) and its overall scope name was never updated. Fixed in `syntaxes/testcontrolprotocol.tmLanguage.json` — now `title-line.testcontrolprotocol`. Caught by the new snapshot tests before it could get baked in as "expected" behaviour.
@@ -179,9 +181,9 @@ Asked directly: are there other operand positions across the whole instruction s
 - [x] **`CR REQ`** (0.6.0) — identical shape to `CR TEST`/`CR CRS`: `I CR REQ REQ-P REQ-H REQ-L`, `REQ-P` a declared `N` numeric label (data), `REQ-H`/`REQ-L` real `I`-line branch labels. Op1 never blank across 32 real occurrences — in `MISSING_OPERAND_KEYWORDS` too.
 - [x] **`CR COM`** (0.6.0) — genuine fourth "CR" family member (`I HBACOMS CR COM HBAC-P`, alongside `CR TEST`/`CR CRS` in the same real block in `BIOCUM`) but narrower: never has op2/op3 across all 6 real occurrences, and bare (no op1) 4 of those 6 times — same "legitimate common bare usage" as `GROUP`, excluded from `MISSING_OPERAND_KEYWORDS`.
 
-### Newly found while re-auditing, not yet implemented
+### Newly found while re-auditing
 
-- [ ] **`CR REQL`** — a **sixth** "CR" family member, missed in the first pass. 6 real occurrences, 100% clean on all three operand positions: op1 data reference, op2 always a real branch label, op3 a branch label when present (blank 2 of 6 times). Same shape as `CR REQ` — should be a trivial addition to `cr-report-lines`/`CR_LABEL_RE`/`DATA_REFERENCE_RE` once picked up, following the exact same verification steps as `CR REQ`.
+- [x] **`CR REQL`** (0.12.0) — a sixth "CR" family member, missed in the first pass. Confirmed against all 6 real occurrences (BIO x2, BIOCUM, HAEMCUM, HAEM x2): identical shape to `CR REQ` — op1 always a declared `N` data label (never blank), op2 always a real branch label, op3 a branch label when present (blank 2 of 6 times, the real HAEM `WINDOW` shape). Added to `cr-report-lines`, `CR_LABEL_RE`, `DATA_REFERENCE_RE`, and `MISSING_OPERAND_KEYWORDS`. Zero diagnostics across the full corpus after adding.
 
 ### Pure branch-label candidates (op1, 95–100% label rate), not yet implemented
 

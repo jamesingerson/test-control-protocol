@@ -132,6 +132,30 @@ run('resolves CR REQ (the fourth CR-family member) the same way as CR TEST/CR CR
   assert.strictEqual(diags.length, 0);
 });
 
+run('resolves CR REQL (the sixth CR-family member) the same way as CR REQ, including a blank op3 (real HAEM "WINDOW" shape)', () => {
+  const lines = [
+    titleLine('T0302', 'Procalcitonin'),
+    dataLine('N', 'REQ-PL', '9', '7'),
+    iLine('REQL1', 'CR REQL', 'REQ-PL', 'REQ-H', 'REQ-L'),
+    iLine('REQ-H', 'MOVE,A', 'DATESPEC', 'DATE8'),
+    iLine('REQ-L', 'PRINT', '1', 'TCPNAME'),
+    dataLine('N', 'REQ-P', '9', '7'),
+    iLine('WINDOW', 'CR REQL', 'REQ-P', 'REQ-SUB'),
+    iLine('REQ-SUB', 'PRINT', '1', 'TCPNAME'),
+    iLine('', 'END'),
+  ];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags CR REQL used with a blank operand (Assembly Error 7 shape)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'CR REQL'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-data-operand');
+  assert.ok(diags[0].message.includes('CR REQL'));
+});
+
 run('CR COM has no label operands: a bare CR COM or CR COM + data ref never triggers undefined-label/missing-operand', () => {
   const lines = [
     titleLine('T0302', 'Procalcitonin'),

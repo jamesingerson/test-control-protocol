@@ -116,42 +116,51 @@ const GLOBAL_HEADER_RE = /^.{7}GLOBAL\s+ALPHA\s+DATA/;
 // TODO.md's "Undefined data reference" and "Comprehensive operand audit"
 // sections for the frequency analysis; this list is intentionally not
 // exhaustive (the manual documents 100+ instructions, most with
-// unvalidated operand semantics).
+// unvalidated operand semantics). `CR REQL` is a sixth family member,
+// missed in the original audit and added later: confirmed against all 6
+// real occurrences (BIO x2, BIOCUM, HAEMCUM, HAEM x2) -- op1 (`REQ-PL`/
+// `REQ-P`) is always present and always a declared `N` numeric label,
+// identical to `CR REQ`'s shape.
 //
 // The separator after the keyword is bounded to \s{1,4} (enough to finish
 // out its own 9-char field: "GROUP" + 4 spaces, "NORMAL" + 3, "CR TEST"/"CR
-// CRS"/"CR REQ"/"CR COM" + 2 -- all confirmed against real spacing), NOT
-// unbounded \s+. A real production line can use one of these keywords with
-// a genuinely blank operand1 followed, many blank fields later, by a
-// distant trailing comment (e.g. `I NEXT GROUP <lots of blank fields> No`)
-// -- unbounded \s+ would greedily cross every blank field in between and
-// let the optional operand-capture group latch onto that far-away comment
-// word instead of correctly seeing operand1 as blank. Same bug class as
-// the "number-line label field swallowed its own comment" fix elsewhere in
-// this grammar; confirmed via a real false positive here too (`GROUP`
-// lines in HAEM/HISTO/PALMSAP each followed by a distant `No`/`for ...`
-// comment, wrongly flagged as an undefined reference to that word).
-const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|CR REQ|CR COM|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
+// CRS"/"CR REQ"/"CR COM"/"CR REQL" + 2 or 1 -- all confirmed against real
+// spacing), NOT unbounded \s+. A real production line can use one of these
+// keywords with a genuinely blank operand1 followed, many blank fields
+// later, by a distant trailing comment (e.g. `I NEXT GROUP <lots of blank
+// fields> No`) -- unbounded \s+ would greedily cross every blank field in
+// between and let the optional operand-capture group latch onto that
+// far-away comment word instead of correctly seeing operand1 as blank.
+// Same bug class as the "number-line label field swallowed its own
+// comment" fix elsewhere in this grammar; confirmed via a real false
+// positive here too (`GROUP` lines in HAEM/HISTO/PALMSAP each followed by
+// a distant `No`/`for ...` comment, wrongly flagged as an undefined
+// reference to that word).
+const DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:NORMAL|CR TEST|CR CRS|CR REQL|CR REQ|CR COM|GROUP)\b\s{1,4})(.{1,9}\s)?/d;
 
-// CR TEST/CR CRS/CR REQ's op2 and op3 -- confirmed against real production
-// data (BIO) to be genuine I-line BRANCH labels, not data references: e.g.
-// `CR TEST FLK-P FLK-H RES1-C` has `FLK-H`/`RES1-C` declared elsewhere in
-// the same block as `I FLK-H PRINT 1 FLK` / `I RES1-C MOVE 1 LITPRINT`;
-// `CR REQ REQ-P REQ-H REQ-L` likewise (`REQ-H`/`REQ-L` are real I-line
-// labels, `REQ-P` is a declared `N` numeric label). Either or both can be
-// legitimately blank (e.g. `CR CRS EPP-P` alone, or `CR CRS EPP-P <blank>
-// EPP-C`; `CR REQ REQ-P REQ-H` with op3 omitted) -- each field is
-// independently bounded (no shared unbounded separator between
-// op1/op2/op3), so a blank middle field can't be crossed into by a later
-// field the way the keyword's own separator bug could; confirmed by
-// mapping real field boundaries exactly before trusting this.
+// CR TEST/CR CRS/CR REQ/CR REQL's op2 and op3 -- confirmed against real
+// production data (BIO) to be genuine I-line BRANCH labels, not data
+// references: e.g. `CR TEST FLK-P FLK-H RES1-C` has `FLK-H`/`RES1-C`
+// declared elsewhere in the same block as `I FLK-H PRINT 1 FLK` / `I
+// RES1-C MOVE 1 LITPRINT`; `CR REQ REQ-P REQ-H REQ-L` likewise (`REQ-H`/
+// `REQ-L` are real I-line labels, `REQ-P` is a declared `N` numeric
+// label); `CR REQL REQ-PL REQ-H REQ-L` the same shape again (confirmed
+// against all 6 real occurrences: `REQ-H`/`REQ-L`/`REQ-SUB` are always
+// real I-line labels declared elsewhere in the same block). Either or
+// both can be legitimately blank (e.g. `CR CRS EPP-P` alone, or `CR CRS
+// EPP-P <blank> EPP-C`; `CR REQ REQ-P REQ-H` with op3 omitted; `CR REQL
+// REQ-P REQ-SUB` with op3 omitted, 2 of 6 real `CR REQL` occurrences) --
+// each field is independently bounded (no shared unbounded separator
+// between op1/op2/op3), so a blank middle field can't be crossed into by
+// a later field the way the keyword's own separator bug could; confirmed
+// by mapping real field boundaries exactly before trusting this.
 // `CR COM` does NOT share this shape -- confirmed against all 6 real
 // occurrences in the corpus, it never has op2/op3 at all (just an optional
 // op1) -- so it's in DATA_REFERENCE_RE above but deliberately excluded
 // here. NORMAL/GROUP also do NOT share this shape (their extra operands
 // are numeric/keyword flags, not labels). This is intentionally a separate
 // regex from DATA_REFERENCE_RE, not a generalization of it.
-const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQ)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
+const CR_LABEL_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:CR TEST|CR CRS|CR REQL|CR REQ)\b\s{1,4})(.{1,9}\s)?(.{1,9}\s)?(.{1,8})?/d;
 
 // PRINT/PRINT,H/PRINT,A's op2 -- a genuinely different shape from
 // DATA_REFERENCE_RE's family: the data reference sits at op2, not op1
@@ -197,8 +206,9 @@ const GOTO_IR_DATA_REFERENCE_RE = /^(.{7})(\bI\b\s)(.{1,8}\s)(\b(?:GOTO|GOSUB),I
 // own meaning, not an omission), confirmed by checking real matching
 // lines, not just an aggregate count. NORMAL/CR TEST/CR CRS/CR REQ have
 // zero blank-operand instances across 1688 combined real uses, so a blank
-// operand for those four is safe to treat as a genuine mistake.
-const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ']);
+// operand for those four is safe to treat as a genuine mistake. `CR REQL`
+// joins them: op1 present across all 6 real occurrences, zero blanks.
+const MISSING_OPERAND_KEYWORDS = new Set(['NORMAL', 'CR TEST', 'CR CRS', 'CR REQ', 'CR REQL']);
 
 // Implicit built-in data boxes that always exist without a local A/M/N/R/S/H
 // declaration -- the Reference Manual documents an entire "Global Data"

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.12.0
+
+- `CR REQL` recognized as a sixth "CR" family member, alongside `CR TEST`/`CR CRS`/`CR REQ`/`CR COM`: op1 is a data reference, op2/op3 are branch labels (either optional). Confirmed against all 6 real occurrences in the corpus, zero deviations.
+
 ## 0.11.0
 
 - New diagnostic: an I-line opcode that's neither a recognized instruction keyword nor a known macro invocation is now flagged (Reference Manual Error 6, "Unrecognisable instruction"). The recognized-keyword list is derived from a full census of the real production corpus plus the Reference Manual's own instruction catalogue; a workspace's own macro names (from the existing macro index) are always additionally recognized, so this never flags a legitimate custom macro call. Validated against the entire real corpus with zero false positives.

@@ -32,9 +32,12 @@
 
 const {
   findTestCodeDeclarations,
+  findTestBlocks,
   findMacroDefinitions,
   findLabelDefinitions,
   findDataDeclarations,
+  findOpcodeFields,
+  findGotcpReferences,
   isGlobalDataFile,
 } = require('./labelParser');
 
@@ -66,15 +69,68 @@ function basename(uri) {
   }
 }
 
+// A block is terminal "on its own terms" if it has no instructions at all
+// (a link stub, e.g. `T0010 H911 Link` -- title + comment only, a
+// documented real pattern), its own last instruction is a literal `END`,
+// or it ends by invoking a macro whose OWN body's last instruction is
+// `END` (the same label-injection mechanism already used for GOTO/data
+// references, applied here to "does this macro's body terminate").
+// Deliberately does NOT itself resolve a trailing GOTCP -- that requires
+// following the target workspace-wide, see resolveTerminalCode below.
+function isBaseTerminal(info, macroEndsInEnd) {
+  if (!info.hasInstructions) return true;
+  if (info.lastOp === 'END') return true;
+  if (info.lastOp && macroEndsInEnd.has(info.lastOp)) return true;
+  return false;
+}
+
+// GOTCP is only a genuine terminator if the target it jumps to ALSO
+// terminates -- it is not "a get out of jail free card" (direct user
+// instruction, after the initial design considered any GOTCP sufficient).
+// Only a BARE, unconditional `GOTCP` qualifies as a *candidate* terminator
+// at all: a conditional variant (`GOTCP,EQ` etc.) as a block's last
+// instruction only transfers control when its condition holds -- if it
+// doesn't, execution still runs off the end of the block, which is
+// exactly the bug this check exists to catch. (Confirmed moot against the
+// real corpus: zero blocks end on a conditional GOTCP variant today --
+// this is a correctness rule for the future, not a current false-negative
+// fix.) Resolves recursively (a target can itself end in a bare GOTCP to
+// a third test) with cycle detection -- an unresolvable target (not found
+// anywhere in the workspace) or a cycle counts as NOT terminal, the same
+// as any other genuinely dead end.
+function resolveTerminalCode(code, blocksByCode, macroEndsInEnd, memo, stack) {
+  if (memo.has(code)) return memo.get(code);
+  if (stack.has(code)) return false;
+  const blocks = blocksByCode.get(code);
+  if (!blocks || blocks.length === 0) return false;
+  stack.add(code);
+  let result = false;
+  for (const info of blocks) {
+    if (isBaseTerminal(info, macroEndsInEnd)) {
+      result = true;
+      break;
+    }
+    if (info.gotcpTargetCode && resolveTerminalCode(info.gotcpTargetCode, blocksByCode, macroEndsInEnd, memo, stack)) {
+      result = true;
+      break;
+    }
+  }
+  stack.delete(code);
+  memo.set(code, result);
+  return result;
+}
+
 /**
  * @param {Array<{uri: string, lines: string[]}>} documents
- * @returns {{ testCodes: Set<string>, macroLabels: Map<string, Set<string>>, globalDataLabels: Set<string>, duplicateTestCodes: Map<string, string[]> }}
+ * @returns {{ testCodes: Set<string>, macroLabels: Map<string, Set<string>>, globalDataLabels: Set<string>, duplicateTestCodes: Map<string, string[]>, macroEndsInEnd: Set<string>, terminalTestCodes: Set<string> }}
  */
 function buildWorkspaceIndex(documents) {
   const testCodes = new Set();
   const macroLabels = new Map();
   const globalDataLabels = new Set();
   const testCodeFiles = new Map();
+  const macroEndsInEnd = new Set();
+  const blocksByCode = new Map();
 
   for (const doc of documents) {
     const disregarded = isDisregardedFile(doc.uri);
@@ -92,10 +148,39 @@ function buildWorkspaceIndex(documents) {
       if (!macroLabels.has(macro.name)) macroLabels.set(macro.name, new Set());
       const set = macroLabels.get(macro.name);
       for (const name of names) set.add(name);
+
+      const bodyOpcodes = findOpcodeFields(body);
+      if (bodyOpcodes.length > 0 && bodyOpcodes[bodyOpcodes.length - 1].text === 'END') {
+        macroEndsInEnd.add(macro.name);
+      }
     }
 
     if (isGlobalDataFile(doc.lines)) {
       for (const decl of findDataDeclarations(doc.lines)) globalDataLabels.add(decl.label);
+    }
+
+    // For the "every test ends with a terminal instruction" check below --
+    // records each block's own last opcode and, if it's a bare GOTCP, the
+    // 4-digit code it targets (workspace-wide resolution happens after
+    // every document has been scanned, since the target is very often in
+    // a different physical file).
+    for (const block of findTestBlocks(doc.lines)) {
+      const blockLines = doc.lines.slice(block.startLine, block.endLine);
+      const opcodes = findOpcodeFields(blockLines);
+      const lastOpcode = opcodes.length > 0 ? opcodes[opcodes.length - 1] : null;
+      let gotcpTargetCode = null;
+      if (lastOpcode && lastOpcode.text === 'GOTCP') {
+        const gotcpRefs = findGotcpReferences(blockLines);
+        const lastGotcpRef = gotcpRefs.find((ref) => ref.line === lastOpcode.line);
+        if (lastGotcpRef) gotcpTargetCode = lastGotcpRef.code.replace(/\D/g, '').padStart(4, '0');
+      }
+      const code = block.name.slice(1);
+      if (!blocksByCode.has(code)) blocksByCode.set(code, []);
+      blocksByCode.get(code).push({
+        hasInstructions: opcodes.length > 0,
+        lastOp: lastOpcode ? lastOpcode.text : null,
+        gotcpTargetCode,
+      });
     }
   }
 
@@ -104,7 +189,15 @@ function buildWorkspaceIndex(documents) {
     if (files.length > 1) duplicateTestCodes.set(code, files);
   }
 
-  return { testCodes, macroLabels, globalDataLabels, duplicateTestCodes };
+  const terminalTestCodes = new Set();
+  const terminalMemo = new Map();
+  for (const code of blocksByCode.keys()) {
+    if (resolveTerminalCode(code, blocksByCode, macroEndsInEnd, terminalMemo, new Set())) {
+      terminalTestCodes.add(code);
+    }
+  }
+
+  return { testCodes, macroLabels, globalDataLabels, duplicateTestCodes, macroEndsInEnd, terminalTestCodes };
 }
 
 module.exports = { buildWorkspaceIndex };

@@ -539,4 +539,72 @@ run('does not flag a real macro invocation once its name is known via the worksp
   assert.strictEqual(diagsWithIndex.length, 0);
 });
 
+run('flags a test block that ends with neither END nor a resolvable GOTCP (bad practice)', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'MOVE', '1', 'TV1')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
+  assert.strictEqual(diags[0].severity, 'warning');
+  assert.ok(diags[0].message.includes('MOVE'));
+});
+
+run('does not flag a test block ending in a literal END', () => {
+  const lines = [titleLine('T0302', 'Procalcitonin'), iLine('', 'MOVE', '1', 'TV1'), iLine('', 'END')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not flag a zero-instruction link-stub block (real "T0010 H911 Link" pattern)', () => {
+  const lines = [titleLine('T0010', 'H911 Link'), LN + '* See linked TCP for details'];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 0);
+});
+
+run('does not flag a block ending by invoking a macro whose own body ends in END', () => {
+  const lines = [titleLine('T0750', 'Digoxin'), iLine('', 'DRUGMCR')];
+  const macroLabels = new Map([['DRUGMCR', new Set()]]);
+  const macroEndsInEnd = new Set(['DRUGMCR']);
+  const diags = computeDiagnostics(lines, { macroLabels, macroEndsInEnd });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags a block invoking a macro NOT known to end in END', () => {
+  const lines = [titleLine('T0750', 'Digoxin'), iLine('', 'DRUGMCR')];
+  const macroLabels = new Map([['DRUGMCR', new Set()]]);
+  const macroEndsInEnd = new Set(['SOMEOTHERMAC']);
+  const diags = computeDiagnostics(lines, { macroLabels, macroEndsInEnd });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
+});
+
+run('does not flag a bare GOTCP ending that resolves to a terminal target (real MICRO T3034/T3030 shape)', () => {
+  const lines = [titleLine('T3034', 'Child Urine'), iLine('', 'GOTCP', '3030')];
+  const terminalTestCodes = new Set(['3030']);
+  const diags = computeDiagnostics(lines, { terminalTestCodes });
+  assert.strictEqual(diags.length, 0);
+});
+
+run('flags a bare GOTCP ending whose target does not resolve to terminal', () => {
+  const lines = [titleLine('T3034', 'Child Urine'), iLine('', 'GOTCP', '3030')];
+  const terminalTestCodes = new Set(); // 3030 not present -- does not itself terminate
+  const diags = computeDiagnostics(lines, { terminalTestCodes });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
+});
+
+run('flags a CONDITIONAL GOTCP ending even when its target would resolve fine -- GOTCP,EQ only fires conditionally', () => {
+  const lines = [titleLine('T3034', 'Child Urine'), iLine('', 'GOTCP,EQ', 'FLAG', '3030', '1')];
+  const terminalTestCodes = new Set(['3030']);
+  const diags = computeDiagnostics(lines, { terminalTestCodes });
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
+});
+
+run('treats a GOTCP ending with no terminalTestCodes index supplied as unverified (flags it, does not assume the best)', () => {
+  const lines = [titleLine('T3034', 'Child Urine'), iLine('', 'GOTCP', '3030')];
+  const diags = computeDiagnostics(lines);
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, 'missing-terminal-instruction');
+});
+
 console.log('all diagnostics tests passed');

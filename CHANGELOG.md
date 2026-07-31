@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.19.0
+
+- New diagnostic: a test that doesn't end with a terminal instruction is now flagged as a warning. `END` counts, and so does a bare (unconditional) `GOTCP` — but only once its target is verified, workspace-wide and recursively, to itself actually terminate; a conditional `GOTCP,EQ`-style variant never counts on its own, since it only fires when its condition holds. No documented manual requirement backs this one (unlike every other diagnostic so far), so it ships as a warning rather than an error. Validated against the full corpus: 15 real cases flagged, all 13 real `GOTCP`-ending tests correctly resolved as terminal via their actual targets.
+
 ## 0.18.0
 
 - `H`-line's own label now renders `storage` (blue), matching `A`/`M`/`N`/`R`/`S`'s own label, instead of the branch-label yellow it used before — fixes the inconsistency documented in `COLOURS.md`/`TODO.md` last release, where `H` was coloured differently even though the diagnostics logic already treats it as the same data-declaration category. Validated against all 128 real `H`-lines in the corpus.

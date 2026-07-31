@@ -137,4 +137,85 @@ run('buildWorkspaceIndex collects data labels from the real GLOBAL header shape,
   assert.deepStrictEqual([...index.globalDataLabels].sort(), ['DASH', 'SPACE']);
 });
 
+run('buildWorkspaceIndex: macroEndsInEnd is true only for a macro whose own body\'s last opcode is END', () => {
+  const documents = [
+    {
+      uri: 'MACRO',
+      lines: [
+        LN + 'D DRUGMCR',
+        iLine('CONT', 'GOTO,EQ', 'DCHECK', 'VALIDATE', '1'),
+        iLine('ENDMCR', 'END'),
+        LN + 'D NOTERM',
+        iLine('', 'MOVE', '1', 'TV1'),
+      ],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.macroEndsInEnd.has('DRUGMCR'), true);
+  assert.strictEqual(index.macroEndsInEnd.has('NOTERM'), false);
+});
+
+run('buildWorkspaceIndex: terminalTestCodes resolves a test that ends in a literal END', () => {
+  const documents = [{ uri: 'BIO', lines: [LN + 'T0302 Procalcitonin', iLine('', 'END')] }];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.terminalTestCodes.has('0302'), true);
+});
+
+run('buildWorkspaceIndex: terminalTestCodes resolves a bare GOTCP chain to a test that itself ends in END (real MICRO shape)', () => {
+  const documents = [
+    {
+      uri: 'MICRO',
+      lines: [
+        LN + 'T3034 Child Urine',
+        iLine('', 'GOTCP', '3030'),
+        LN + 'T3030 Urine',
+        iLine('', 'END'),
+      ],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.terminalTestCodes.has('3034'), true);
+});
+
+run('buildWorkspaceIndex: terminalTestCodes follows a multi-hop bare GOTCP chain', () => {
+  const documents = [
+    {
+      uri: 'A',
+      lines: [
+        LN + 'T0001 First',
+        iLine('', 'GOTCP', '0002'),
+        LN + 'T0002 Second',
+        iLine('', 'GOTCP', '0003'),
+        LN + 'T0003 Third',
+        iLine('', 'END'),
+      ],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.terminalTestCodes.has('0001'), true);
+});
+
+run('buildWorkspaceIndex: terminalTestCodes does not resolve a GOTCP cycle (mutual reference, never reaches END)', () => {
+  const documents = [
+    {
+      uri: 'A',
+      lines: [
+        LN + 'T0001 First',
+        iLine('', 'GOTCP', '0002'),
+        LN + 'T0002 Second',
+        iLine('', 'GOTCP', '0001'),
+      ],
+    },
+  ];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.terminalTestCodes.has('0001'), false);
+  assert.strictEqual(index.terminalTestCodes.has('0002'), false);
+});
+
+run('buildWorkspaceIndex: terminalTestCodes does not resolve a GOTCP to a target that does not exist anywhere', () => {
+  const documents = [{ uri: 'A', lines: [LN + 'T0001 First', iLine('', 'GOTCP', '9999')] }];
+  const index = buildWorkspaceIndex(documents);
+  assert.strictEqual(index.terminalTestCodes.has('0001'), false);
+});
+
 console.log('all workspace-index tests passed');

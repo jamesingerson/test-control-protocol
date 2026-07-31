@@ -54,6 +54,21 @@ const {
  *   to only codes with more than one declaration (REJECT.DJS excluded).
  *   When provided, every declaration of a listed code in this document is
  *   flagged.
+ * @param {Set<string>} [options.macroEndsInEnd] macro names whose own body's
+ *   last instruction is a literal END, from buildWorkspaceIndex. A block
+ *   whose own last instruction invokes one of these macros counts as
+ *   properly terminated. Without this, a macro-ending block is treated as
+ *   unverified (flagged) -- same "don't assume the best without workspace
+ *   context" treatment as the GOTCP case below.
+ * @param {Set<string>} [options.terminalTestCodes] 4-digit test codes that
+ *   resolve (workspace-wide, recursively through further bare GOTCPs) to
+ *   something that itself terminates properly, from buildWorkspaceIndex.
+ *   A block whose own last instruction is a bare (unconditional) GOTCP to
+ *   one of these codes counts as properly terminated -- GOTCP alone is
+ *   NOT sufficient without this: it must be verified to actually reach an
+ *   END, not just assumed. A conditional GOTCP variant (GOTCP,EQ etc.)
+ *   never counts, since it only transfers control when its condition
+ *   holds.
  * @returns {Array<{line: number, startCol: number, endCol: number, severity: 'error'|'warning', code: string, message: string}>}
  */
 function computeDiagnostics(lines, options) {
@@ -253,6 +268,41 @@ function computeDiagnostics(lines, options) {
           severity: 'warning',
           code: 'normalx-test-not-found',
           message: `NORMALX target '${normalx.code}' does not match any test code found in the workspace`,
+        });
+      }
+    }
+
+    // Every test should end with a terminal instruction (a literal `END`,
+    // or invoking a macro whose own body ends in `END`) -- otherwise
+    // execution runs off the end of the test with no defined stop point.
+    // A bare, unconditional `GOTCP` also counts, but only if its target
+    // itself resolves (workspace-wide, recursively) to something
+    // terminal -- GOTCP is not a free pass on its own, per direct
+    // instruction. A block with no instructions at all (a link stub, e.g.
+    // `T0010 H911 Link`) is exempt entirely. Warning severity ("bad
+    // practice", not a hard error) -- no manual entry documents this as a
+    // formal requirement, and it's judged by real-corpus convention.
+    if (opcodesInBlock.length > 0) {
+      const lastOpcode = opcodesInBlock[opcodesInBlock.length - 1];
+      let terminal = lastOpcode.text === 'END';
+      if (!terminal && opts.macroEndsInEnd && opts.macroEndsInEnd.has(lastOpcode.text)) {
+        terminal = true;
+      }
+      if (!terminal && lastOpcode.text === 'GOTCP' && opts.terminalTestCodes) {
+        const lastGotcpRef = gotcpRefs.find((ref) => ref.line === lastOpcode.line);
+        if (lastGotcpRef) {
+          const digits = lastGotcpRef.code.replace(/\D/g, '').padStart(4, '0');
+          terminal = opts.terminalTestCodes.has(digits);
+        }
+      }
+      if (!terminal) {
+        diagnostics.push({
+          line: block.startLine + lastOpcode.line,
+          startCol: lastOpcode.startCol,
+          endCol: lastOpcode.endCol,
+          severity: 'warning',
+          code: 'missing-terminal-instruction',
+          message: `${block.name} does not end with a terminal instruction (last instruction is '${lastOpcode.text}') -- add an explicit END, or a GOTCP to a test that itself terminates`,
         });
       }
     }

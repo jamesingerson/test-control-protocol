@@ -40,8 +40,16 @@ In the directory where you're working, if it does not already exist create a .vs
 
 ## Installation
 
-- In `<user home>/.vscode/extensions` folder `git clone https://github.com/pl-jamesi/test-control-protocol.git` and restart VS Code.
-- If you're updating an existing install (`git pull` in that folder), **reload or restart VS Code afterwards**. Since 0.2.0 this extension runs real code on activation (previously it was pure declarative syntax highlighting) — VS Code won't pick up a changed activation entry point in an already-running extension host without a reload.
+Since 0.2.0 this extension runs real activation code (`main`/`activationEvents` in `package.json`), not just a declarative grammar. Because of that, **install it as a packaged `.vsix`, not by dropping a git clone straight into the extensions folder** — on current VS Code versions, an extension with activation code that was only ever discovered as a loose folder (not installed through VS Code's own install flow) can get silently marked "removed" on every startup scan, with no error shown and no entry in the Installed or Disabled list — highlighting just quietly stops working. (A pure declarative-grammar extension with no `main`/`activationEvents` doesn't have this problem, which is why this only started biting after 0.2.0.)
+
+- Clone this repo anywhere — it does **not** need to be inside `<user home>/.vscode/extensions`: `git clone https://github.com/pl-jamesi/test-control-protocol.git`
+- `npm install`, then `npm run package` to produce `test-control-protocol.vsix` in the repo root.
+- Install it: `code --install-extension test-control-protocol.vsix` (or, from VS Code's Extensions view, the `...` menu → "Install from VSIX...").
+- Restart VS Code.
+
+**To update**: `git pull`, `npm run package` again, then re-run `code --install-extension test-control-protocol.vsix` (installing the same extension ID again upgrades it in place) and restart VS Code.
+
+If you already have an old git-clone-in-the-extensions-folder install that's stopped highlighting after an update, that's this exact problem — follow the steps above to switch to a proper VSIX install, then it's safe to delete the old loose folder from your extensions directory.
 
 ## Diagnostics
 

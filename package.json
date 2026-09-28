@@ -2,7 +2,7 @@
     "name": "test-control-protocol",
     "displayName": "Test Control Protocol",
     "description": "Delphic LIS Test Control Protocol VS Code Syntax Highlighting",
-    "version": "0.20.1",
+    "version": "0.20.2",
     "publisher": "pl-jamesi",
     "author": "James Ingerson",
     "license": "MIT",
@@ -41,11 +41,13 @@
         ]
     },
     "devDependencies": {
-        "vscode-tmgrammar-test": "^0.1.3"
+        "vscode-tmgrammar-test": "^0.1.3",
+        "@vscode/vsce": "^3.0.0"
     },
     "scripts": {
         "test": "node tests/label-parser.test.js && node tests/workspace-index.test.js && node tests/diagnostics.test.js && node tests/glob-match.test.js && vscode-tmgrammar-snap -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
         "test:update": "vscode-tmgrammar-snap -u -s source.testcontrolprotocol -g syntaxes/testcontrolprotocol.tmLanguage.json \"tests/fixtures/**/*.tcp\"",
-        "check-colors": "node scripts/download-themes.js && node scripts/resolve-theme-colors.js"
+        "check-colors": "node scripts/download-themes.js && node scripts/resolve-theme-colors.js",
+        "package": "vsce package --out test-control-protocol.vsix"
     }
 }

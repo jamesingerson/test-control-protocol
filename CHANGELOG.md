@@ -2,9 +2,13 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.20.2
+
+- **Changed the recommended install method** (see the rewritten Installation section) from git-cloning straight into the VS Code extensions folder to packaging a `.vsix` (new `npm run package`, using the new `@vscode/vsce` devDependency) and installing that via `code --install-extension`. Root cause, found by direct comparison against another loosely-installed extension that *does* still work: VS Code only reliably keeps loading an extension that was merely discovered as a folder (never formally installed) when it's pure declarative grammar with no `main`/`activationEvents` — this extension has real activation code (since 0.2.0), and on current VS Code versions that combination gets silently marked "removed" on every startup scan (`Marked extension as removed <id>-<version>` in `sharedprocess.log`), with zero visible error and no entry in the Installed or Disabled list. The 0.20.1 fix below (adding `publisher`) turned out not to be sufficient on its own — confirmed by testing with a real publisher still getting removed — a proper VSIX install (which writes real `__metadata` into the installed copy, same as a formally-installed extension) is what actually resolves it.
+
 ## 0.20.1
 
-- Added the required `publisher` field to `package.json` (was missing entirely). VS Code's extension manifest schema requires it; without it, the extension's identifier defaults to `undefined_publisher.test-control-protocol`, and newer VS Code versions actively reject/remove extensions installed this way on every startup scan (logged as `Marked extension as removed undefined_publisher.test-control-protocol-<version>`) — it never appears in the Installed or Disabled list, and highlighting silently stops working. If you're affected: after pulling this change, remove any `undefined_publisher.test-control-protocol-*` entries from `.obsolete` in your VS Code extensions folder (`%USERPROFILE%\.vscode\extensions\.obsolete` on Windows) and restart VS Code.
+- Added the required `publisher` field to `package.json` (was missing entirely) — a real gap worth fixing regardless, though turned out insufficient on its own for the actual bug; see 0.20.2 above for the full fix and root cause.
 
 ## 0.20.0
 

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.20.1
+
+- Added the required `publisher` field to `package.json` (was missing entirely). VS Code's extension manifest schema requires it; without it, the extension's identifier defaults to `undefined_publisher.test-control-protocol`, and newer VS Code versions actively reject/remove extensions installed this way on every startup scan (logged as `Marked extension as removed undefined_publisher.test-control-protocol-<version>`) — it never appears in the Installed or Disabled list, and highlighting silently stops working. If you're affected: after pulling this change, remove any `undefined_publisher.test-control-protocol-*` entries from `.obsolete` in your VS Code extensions folder (`%USERPROFILE%\.vscode\extensions\.obsolete` on Windows) and restart VS Code.
+
 ## 0.20.0
 
 - New data-reference diagnostics for 11 more confirmed Delphic built-in keywords: `MOVE,AV`/`MOVE,AP`/`TESTADD`/`HL7SET`/`ALPHA`/`CHARGE`/`CHECK*`/`REPTKEY` (1st operand) and `TESTRES`/`STATS`/`NUMERIC` (2nd operand), plus `ERROR`'s and `GOTO`/`GOSUB`'s condition-code families (2nd/3rd operands, per their manual-documented symmetric "condition operand" shape — with `GOTO,GT` deliberately excluded pending further investigation). Macro-based candidates (`SENDRSLT`, `MICSIGN`, etc.) are deliberately deferred — hardcoding one workspace's own macro vocabulary into a static check isn't done anywhere else in this extension.

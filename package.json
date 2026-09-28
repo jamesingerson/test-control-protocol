@@ -2,7 +2,8 @@
     "name": "test-control-protocol",
     "displayName": "Test Control Protocol",
     "description": "Delphic LIS Test Control Protocol VS Code Syntax Highlighting",
-    "version": "0.20.0",
+    "version": "0.20.1",
+    "publisher": "pl-jamesi",
     "author": "James Ingerson",
     "license": "MIT",
     "repository": {

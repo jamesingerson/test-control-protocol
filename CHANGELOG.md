@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.20.3
+
+- Fixed a real false positive reported right after starting to use the duplicate-test-code check: a real test code could show as "defined 2 times across the workspace" against itself, e.g. `BIO` and `BIO.git`. Opening a git diff/history view of a tracked TCP file gives VS Code a virtual, read-only document on the `git:` URI scheme (which VS Code's own git extension builds by appending `.git` to the path) — still carrying the same language ID as the real file, so it was getting swept into the workspace-wide index and per-document diagnostics alongside real files. Both are now restricted to real files on disk (`file:` scheme).
+
 ## 0.20.2
 
 - **Changed the recommended install method** (see the rewritten Installation section) from git-cloning straight into the VS Code extensions folder to packaging a `.vsix` (new `npm run package`, using the new `@vscode/vsce` devDependency) and installing that via `code --install-extension`. Root cause, found by direct comparison against another loosely-installed extension that *does* still work: VS Code only reliably keeps loading an extension that was merely discovered as a folder (never formally installed) when it's pure declarative grammar with no `main`/`activationEvents` — this extension has real activation code (since 0.2.0), and on current VS Code versions that combination gets silently marked "removed" on every startup scan (`Marked extension as removed <id>-<version>` in `sharedprocess.log`), with zero visible error and no entry in the Installed or Disabled list. The 0.20.1 fix below (adding `publisher`) turned out not to be sufficient on its own — confirmed by testing with a real publisher still getting removed — a proper VSIX install (which writes real `__metadata` into the installed copy, same as a formally-installed extension) is what actually resolves it.

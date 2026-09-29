@@ -29,7 +29,18 @@ function activate(context) {
   // `files.associations`. Any currently-open document already carrying this
   // language ID is included too, so a file opened without matching one of
   // these patterns (e.g. manually set via "Change Language Mode") still
-  // contributes to the index.
+  // contributes to the index -- but ONLY if it's a real file on disk
+  // (`file:` scheme). Confirmed as a real false positive: opening any git
+  // view of a tracked file (diff, history, "Compare with...") gives VS
+  // Code a virtual document on the `git:` URI scheme, which still gets
+  // assigned this same language ID (language detection matches on the
+  // file's own name/pattern, regardless of scheme) -- and VS Code's own
+  // git extension appends a literal `.git` to the path when constructing
+  // these URIs. Without this filter, a workspace containing a real `BIO`
+  // and an open git-diff view of `BIO` produced two entries in the
+  // duplicate-test-code check, `BIO` and `BIO.git`, for every code
+  // declared in that file -- not two real files, one real file counted
+  // twice under two different URIs.
   //
   // IMPORTANT: association patterns must NOT be passed straight into
   // `vscode.workspace.findFiles()` -- that API matches its glob against
@@ -65,7 +76,7 @@ function activate(context) {
       }
     }
     for (const doc of vscode.workspace.textDocuments) {
-      if (doc.languageId === LANGUAGE_ID) uriMap.set(doc.uri.toString(), doc.uri);
+      if (doc.languageId === LANGUAGE_ID && doc.uri.scheme === 'file') uriMap.set(doc.uri.toString(), doc.uri);
     }
     return [...uriMap.values()];
   }
@@ -110,6 +121,14 @@ function activate(context) {
 
   function publishDiagnostics(document) {
     if (document.languageId !== LANGUAGE_ID) return;
+    // Same reasoning as collectWorkspaceUris' scheme filter -- a git
+    // diff/history view of a TCP file gets this same language ID on a
+    // non-`file:` URI; painting diagnostics onto a read-only historical
+    // snapshot is confusing at best (e.g. an "undefined reference" that's
+    // only true in that old version) and `diagnosticCollection.set` on a
+    // `git:` URI wouldn't reliably show up associated with anything the
+    // user is actually looking at as "the current file" anyway.
+    if (document.uri.scheme !== 'file') return;
     const lines = document.getText().split(/\r?\n/);
     const descriptors = computeDiagnostics(lines, workspaceIndex);
     diagnosticCollection.set(document.uri, descriptors.map(toVscodeDiagnostic));

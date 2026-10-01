@@ -112,13 +112,13 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          CR TEST  TESTA    TESTB    RESA-C
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I          CR CRS   CRSA-P
@@ -126,13 +126,13 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          CR CRS   CRSB-P            CRSB-C
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                     ^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I          GROUP    TITLE
@@ -140,7 +140,7 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I NEXT     GROUP
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
@@ -151,26 +151,26 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          CHECK*   CHKBOX
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          STATS    VALUE    SRANGE
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                    ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                    ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          CR REQ   REQA-P   REQA-H   REQA-L
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I          CR REQL  REQL-P   REQL-H   REQL-L
@@ -178,7 +178,7 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 >       I HBACOMS  CR COM   HBAC-P
@@ -186,7 +186,7 @@
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
-#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                           ^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          CR COM
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
@@ -198,21 +198,21 @@
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          PRINT,H  1        DATE8
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                    ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          PRINT,A  50       SPACE    5
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
 #         ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 #                                             ^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          PRINT,R  21
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
@@ -234,7 +234,7 @@
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                             ^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I          GOTO,IR  FIN      VALUE    RANGE
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol
@@ -242,7 +242,7 @@
 #                  ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol keyword.control.testcontrolprotocol
 #                           ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.name.function.testcontrolprotocol
 #                                    ^^^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
-#                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol storage.testcontrolprotocol
+#                                             ^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol string.testcontrolprotocol
 >       I TPX      NORMALX  0710
 #^^^^^^^ source.testcontrolprotocol instruction-line.testcontrolprotocol
 #       ^^ source.testcontrolprotocol instruction-line.testcontrolprotocol entity.other.attribute-name.testcontrolprotocol

@@ -2,6 +2,10 @@
 
 Notable changes to this extension. Versions prior to 0.1.0 predate this file — see `git log` for that history.
 
+## 0.20.4
+
+- **Reversed the 0.4.0 decision to colour an I-line data-reference operand the same blue (`storage.testcontrolprotocol`) as the declaration it resolves to.** Reported from real day-to-day use: "not applying correctly in all cases" and "distracting." These operands (`NORMAL`/`GROUP`/`CR`-family/`MOVE,AV`/`MOVE,AP`/`TESTADD`/`HL7SET`/`ALPHA`/`CHARGE`/`CHECK*`/`REPTKEY`'s data operand, `PRINT`/`PRINT,H`/`PRINT,A`'s op2, `TESTRES`/`STATS`/`NUMERIC`'s op2, `GOTO,IR`'s op3 range reference) now render `string.testcontrolprotocol` like any other unclassified operand. The declaration side (`A`/`M`/`N`/`R`/`S`/`H`'s own label) is unaffected and still renders `storage`. Pure grammar/colour change — the underlying undefined-reference diagnostics are unaffected. See `COLOURS.md`'s "Reversed decisions" section.
+
 ## 0.20.3
 
 - Fixed a real false positive reported right after starting to use the duplicate-test-code check: a real test code could show as "defined 2 times across the workspace" against itself, e.g. `BIO` and `BIO.git`. Opening a git diff/history view of a tracked TCP file gives VS Code a virtual, read-only document on the `git:` URI scheme (which VS Code's own git extension builds by appending `.git` to the path) — still carrying the same language ID as the real file, so it was getting swept into the workspace-wide index and per-document diagnostics alongside real files. Both are now restricted to real files on disk (`file:` scheme).
